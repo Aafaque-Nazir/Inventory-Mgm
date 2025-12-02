@@ -1,0 +1,162 @@
+'use client'
+
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog'
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Item } from '@/types'
+
+const formSchema = z.object({
+    name: z.string().min(2),
+    sku: z.string().min(2),
+    category: z.string().optional(),
+    unit: z.string().min(1),
+    min_stock: z.coerce.number().min(0),
+})
+
+interface EditItemDialogProps {
+    item: Item
+    open: boolean
+    onOpenChange: (open: boolean) => void
+}
+
+export function EditItemDialog({ item, open, onOpenChange }: EditItemDialogProps) {
+    const router = useRouter()
+    const supabase = createClient()
+
+    const form = useForm<any>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            name: item.name,
+            sku: item.sku,
+            category: item.category || '',
+            unit: item.unit,
+            min_stock: item.min_stock,
+        },
+    })
+
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        try {
+            const { error } = await supabase
+                .from('items')
+                .update(values)
+                .eq('id', item.id)
+
+            if (error) throw error
+
+            toast.success('Item updated successfully')
+            onOpenChange(false)
+            form.reset()
+            router.refresh()
+        } catch (error: any) {
+            toast.error(error.message || 'Failed to update item')
+        }
+    }
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                    <DialogTitle>Edit Item</DialogTitle>
+                    <DialogDescription>
+                        Update item information.
+                    </DialogDescription>
+                </DialogHeader>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <FormField
+                            control={form.control}
+                            name="name"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Name</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="sku"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>SKU</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="category"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Category</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="unit"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Unit</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        <FormField
+                            control={form.control}
+                            name="min_stock"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Min Stock</FormLabel>
+                                    <FormControl>
+                                        <Input type="number" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <DialogFooter>
+                            <Button type="submit">Save Changes</Button>
+                        </DialogFooter>
+                    </form>
+                </Form>
+            </DialogContent>
+        </Dialog>
+    )
+}
