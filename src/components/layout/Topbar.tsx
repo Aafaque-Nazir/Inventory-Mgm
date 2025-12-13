@@ -29,7 +29,8 @@ import {
     ArrowRightLeft,
     Users,
     ShoppingCart,
-    BarChart3
+    BarChart3,
+    Shield
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { useEffect, useState } from 'react'
@@ -95,7 +96,7 @@ export function Topbar() {
                     </SheetTrigger>
                     <SheetContent side="left" className="w-64 p-0">
                         <div className="flex h-16 items-center border-b px-6">
-                            <SheetTitle className="text-xl font-bold tracking-tight">Commodity<span className="text-primary">Mgm</span></SheetTitle>
+                            <SheetTitle className="text-xl font-bold tracking-tight">Inventory <span className="text-primary">Management</span></SheetTitle>
                         </div>
                         <nav className="flex-1 space-y-1 px-3 py-4">
                             {navigation.map((item) => {
@@ -122,6 +123,22 @@ export function Topbar() {
                                     </Link>
                                 )
                             })}
+                            {/* Super Admin Link for Super Admins */}
+                            {profile?.is_super_admin && (
+                                <Link
+                                    href="/super-admin"
+                                    onClick={() => setOpen(false)}
+                                    className={cn(
+                                        'group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors mt-4 border-t pt-4',
+                                        pathname.startsWith('/super-admin')
+                                            ? 'bg-purple-500/10 text-purple-500'
+                                            : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                                    )}
+                                >
+                                    <Shield className="mr-3 h-5 w-5 flex-shrink-0 text-purple-500" />
+                                    Super Admin
+                                </Link>
+                            )}
                         </nav>
                     </SheetContent>
                 </Sheet>
@@ -144,7 +161,11 @@ export function Topbar() {
                             <div className="flex flex-col space-y-2 p-2">
                                 <div className="flex items-center justify-between">
                                     <p className="text-sm font-semibold leading-none">{profile?.full_name || 'User'}</p>
-                                    {profile?.role && (
+                                    {profile?.is_super_admin ? (
+                                        <Badge className="bg-purple-600 hover:bg-purple-700 text-[10px] px-1.5 py-0 h-5">
+                                            SUPER ADMIN
+                                        </Badge>
+                                    ) : profile?.role && (
                                         <Badge variant={getRoleBadgeColor(profile.role)} className="text-[10px] px-1.5 py-0 h-5">
                                             {profile.role}
                                         </Badge>

@@ -12,8 +12,6 @@ import { Loader2 } from 'lucide-react'
 export function LoginForm() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [fullName, setFullName] = useState('')
-    const [isSignUp, setIsSignUp] = useState(false)
     const [loading, setLoading] = useState(false)
     const router = useRouter()
     const supabase = createClient()
@@ -23,40 +21,22 @@ export function LoginForm() {
         setLoading(true)
 
         try {
-            if (isSignUp) {
-                const { data, error } = await supabase.auth.signUp({
-                    email,
-                    password,
-                    options: {
-                        data: {
-                            full_name: fullName,
-                        },
-                    },
-                })
-                if (error) throw error
+            console.log('Attempting login...')
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            })
+            console.log('Login result:', { data, error })
 
-                if (data.session) {
-                    toast.success('Account created and logged in!')
-                    window.location.href = '/dashboard'
-                } else {
-                    toast.success('Account created! Please check your email to confirm your account before logging in.', { duration: 6000 })
-                    setIsSignUp(false)
-                }
-            } else {
-                console.log('Attempting login...')
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email,
-                    password,
-                })
-                console.log('Login result:', { data, error })
+            if (error) throw error
 
-                if (error) throw error
+            console.log('Login successful, redirecting...')
+            toast.success('Logged in successfully')
 
-                console.log('Login successful, redirecting...')
-                toast.success('Logged in successfully')
-                // Force a hard navigation to ensure cookies are sent and middleware runs
-                window.location.href = '/dashboard'
-            }
+            // Force a hard navigation to ensure cookies are sent and middleware runs
+            // Check if user is super admin? For now just dashboard, middleware redirects if needed.
+            window.location.href = '/dashboard'
+
         } catch (error: any) {
             console.error('Login error:', error)
             if (error.message === 'Invalid login credentials') {
@@ -70,22 +50,9 @@ export function LoginForm() {
     }
 
     return (
-        <div className="grid gap-6 p-8 border rounded-xl shadow-lg bg-card/50 backdrop-blur-sm">
+        <div className="grid gap-6 p-6 sm:p-8 border rounded-xl shadow-lg bg-card/50 backdrop-blur-sm">
             <form onSubmit={handleSubmit}>
                 <div className="grid gap-4">
-                    {isSignUp && (
-                        <div className="grid gap-2">
-                            <Label htmlFor="fullName">Full Name</Label>
-                            <Input
-                                id="fullName"
-                                placeholder="John Doe"
-                                required
-                                value={fullName}
-                                onChange={(e) => setFullName(e.target.value)}
-                                className="h-12 bg-muted/30 border-muted-foreground/20 focus:border-primary focus:ring-primary/20 transition-all"
-                            />
-                        </div>
-                    )}
                     <div className="grid gap-2">
                         <Label htmlFor="email">Email</Label>
                         <Input
@@ -115,60 +82,44 @@ export function LoginForm() {
                         disabled={loading}
                     >
                         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        {isSignUp ? 'Create Account' : 'Sign In'}
+                        Sign In
                     </Button>
                 </div>
             </form>
 
             {/* Demo Credentials Section */}
-            {!isSignUp && (
-                <div className="p-4 rounded-lg bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border border-emerald-500/20">
-                    <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
-                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-foreground mb-2">Demo Credentials</p>
-                            <div className="space-y-1.5">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xs text-muted-foreground font-medium min-w-[60px]">Email:</span>
-                                    <code className="text-xs bg-black/20 dark:bg-white/10 px-2 py-1 rounded font-mono text-foreground">
-                                        aafaquekeeper@gmail.com
-                                    </code>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xs text-muted-foreground font-medium min-w-[60px]">Password:</span>
-                                    <code className="text-xs bg-black/20 dark:bg-white/10 px-2 py-1 rounded font-mono text-foreground">
-                                        aafaque
-                                    </code>
-                                </div>
+            <div className="p-4 rounded-lg bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border border-emerald-500/20">
+                <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-foreground mb-2">Demo Credentials</p>
+                        <div className="space-y-2">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                                <span className="text-xs text-muted-foreground font-medium min-w-[90px]">Demo Account:</span>
+                                <code className="text-xs bg-black/20 dark:bg-white/10 px-2 py-1 rounded font-mono text-foreground">
+                                    projectpreview@gmail.com
+                                </code>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                                <span className="text-xs text-muted-foreground font-medium min-w-[90px]">Password:</span>
+                                <code className="text-xs bg-black/20 dark:bg-white/10 px-2 py-1 rounded font-mono text-foreground">
+                                    preview
+                                </code>
                             </div>
                         </div>
                     </div>
                 </div>
-            )}
-
-            <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">
-                        Or continue with
-                    </span>
-                </div>
             </div>
+
             <div className="text-center text-sm text-muted-foreground">
-                {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
-                <button
-                    type="button"
-                    onClick={() => setIsSignUp(!isSignUp)}
-                    className="underline hover:text-primary font-medium transition-colors"
-                >
-                    {isSignUp ? 'Login' : 'Sign up'}
-                </button>
+                Don't have an account?{' '}
+                <span className="text-primary font-medium">
+                    Contact Sales
+                </span>
             </div>
         </div>
     )

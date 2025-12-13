@@ -1,7 +1,9 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import {
     LayoutDashboard,
@@ -10,6 +12,7 @@ import {
     Users,
     ShoppingCart,
     BarChart3,
+    Lock
 } from 'lucide-react'
 
 const navigation = [
@@ -23,18 +26,42 @@ const navigation = [
 
 export function Sidebar() {
     const pathname = usePathname()
+    const supabase = createClient()
+    const [isSuperAdmin, setIsSuperAdmin] = useState(false)
+
+    useEffect(() => {
+        async function checkRole() {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (user) {
+                const { data } = await supabase
+                    .from('profiles')
+                    .select('is_super_admin')
+                    .eq('id', user.id)
+                    .single()
+                if (data?.is_super_admin) {
+                    setIsSuperAdmin(true)
+                }
+            }
+        }
+        checkRole()
+    }, [])
+
+    const finalNavigation = [
+        ...navigation,
+        ...(isSuperAdmin ? [{ name: 'Super Admin', href: '/super-admin', icon: Lock }] : [])
+    ]
 
     return (
         <div className="hidden border-r bg-card md:flex md:w-64 md:flex-col">
             <div className="flex h-16 items-center border-b px-6">
-                <h1 className="text-xl font-bold tracking-tight">Commodity<span className="text-primary">Mgm</span></h1>
+                <Link href="/dashboard" className="text-xl font-bold tracking-tight">Inventory <span className="text-primary">Management</span></Link>
             </div>
             <nav className="flex-1 space-y-1 px-3 py-4">
-                {navigation.map((item) => {
+                {finalNavigation.map((item) => {
                     const isActive = pathname.startsWith(item.href)
                     return (
                         <Link
-                            key={item.name}
+                            key={item.href}
                             href={item.href}
                             className={cn(
                                 'group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors',

@@ -9,18 +9,52 @@ export const dynamic = 'force-dynamic'
 export default async function DashboardPage() {
     const supabase = await createClient()
 
-    const { count: itemsCount } = await supabase.from('items').select('*', { count: 'exact', head: true })
-    const { count: suppliersCount } = await supabase.from('suppliers').select('*', { count: 'exact', head: true })
+    // Get current user's organization_id from their profile
+    const { data: { user } } = await supabase.auth.getUser()
 
-    const { data: allItems } = await supabase.from('items').select('*')
+    let organizationId: string | null = null
+    let isSuperAdmin = false
+
+    if (user) {
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('organization_id, is_super_admin')
+            .eq('id', user.id)
+            .single()
+
+        organizationId = profile?.organization_id || null
+        isSuperAdmin = profile?.is_super_admin || false
+    }
+
+    // Build queries with tenant filter (unless Super Admin)
+    let itemsQuery = supabase.from('items').select('*', { count: 'exact', head: true })
+    let suppliersQuery = supabase.from('suppliers').select('*', { count: 'exact', head: true })
+    let allItemsQuery = supabase.from('items').select('*')
+    let movementsQuery = supabase.from('stock_movements').select('*, item:items(name)').order('created_at', { ascending: false }).limit(5)
+
+    // Apply tenant filter if NOT super admin
+    if (!isSuperAdmin && organizationId) {
+        itemsQuery = itemsQuery.eq('organization_id', organizationId)
+        suppliersQuery = suppliersQuery.eq('organization_id', organizationId)
+        allItemsQuery = allItemsQuery.eq('organization_id', organizationId)
+        movementsQuery = movementsQuery.eq('organization_id', organizationId)
+    } else if (!isSuperAdmin && !organizationId) {
+        // User has no organization - show nothing
+        return (
+            <div className="space-y-6">
+                <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+                <p className="text-muted-foreground">Your account is not associated with any organization. Please contact your administrator.</p>
+            </div>
+        )
+    }
+
+    const { count: itemsCount } = await itemsQuery
+    const { count: suppliersCount } = await suppliersQuery
+    const { data: allItems } = await allItemsQuery
+    const { data: recentMovements } = await movementsQuery
+
     const lowStockCount = allItems?.filter(i => i.current_stock < i.min_stock).length || 0
     const lowStockList = allItems?.filter(i => i.current_stock < i.min_stock).slice(0, 5) || []
-
-    const { data: recentMovements } = await supabase
-        .from('stock_movements')
-        .select('*, item:items(name)')
-        .order('created_at', { ascending: false })
-        .limit(5)
 
     return (
         <div className="space-y-6">
@@ -64,7 +98,7 @@ export default async function DashboardPage() {
                         <p className="text-xs text-muted-foreground">Movements in last 24h</p>
                     </CardContent>
                 </Card>
-            </div>
+            </div >
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                 <Card className="col-span-4">
@@ -134,6 +168,6 @@ export default async function DashboardPage() {
                     </CardContent>
                 </Card>
             </div>
-        </div>
+        </div >
     )
 }

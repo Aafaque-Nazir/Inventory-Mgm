@@ -138,7 +138,10 @@ export function AddStockMovementDialog({ defaultType = 'IN', defaultReason = '',
                             name="item_id"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Item</FormLabel>
+                                    <FormLabel className="flex justify-between items-center">
+                                        Item
+
+                                    </FormLabel>
                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                         <FormControl>
                                             <SelectTrigger>

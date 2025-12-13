@@ -4,6 +4,8 @@ export interface Profile {
     id: string
     full_name: string | null
     role: Role | null
+    is_super_admin?: boolean
+    organization_id?: string
     created_at: string
 }
 

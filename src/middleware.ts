@@ -35,17 +35,22 @@ export async function middleware(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser()
 
-    // Auth protection
-    if (!user && !request.nextUrl.pathname.startsWith('/login')) {
+    const path = request.nextUrl.pathname
+
+    // Auth protection for dashboard and super-admin
+    if (!user && (path.startsWith('/dashboard') || path.startsWith('/super-admin'))) {
         return NextResponse.redirect(new URL('/login', request.url))
     }
 
-    if (user && request.nextUrl.pathname.startsWith('/login')) {
+    // Redirect logged-in users away from login page
+    if (user && path.startsWith('/login')) {
+        // Optionally, we could check if they are super admin and redirect to /super-admin
+        // But for now, let's default to dashboard, and dashboard can show a link to Super Admin if applicable
         return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 
     // Root redirect
-    if (request.nextUrl.pathname === '/') {
+    if (path === '/') {
         return NextResponse.redirect(new URL(user ? '/dashboard' : '/login', request.url))
     }
 

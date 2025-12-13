@@ -1,203 +1,141 @@
 import { createClient } from '@/lib/supabase/server'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
-import { TrendingDown, TrendingUp, Package, AlertTriangle } from 'lucide-react'
+import { StockDistributionChart } from '@/components/reports/StockDistributionChart'
+import { MovementTrendChart } from '@/components/reports/MovementTrendChart'
+import { LowStockTable } from '@/components/reports/LowStockTable'
+import { TopItemsTable } from '@/components/reports/TopItemsTable'
+import { SummaryCard } from '@/components/reports/SummaryCard'
+import { format, subDays } from 'date-fns'
 
 export const dynamic = 'force-dynamic'
 
 export default async function ReportsPage() {
     const supabase = await createClient()
 
-    // Stock summary
-    const { data: items } = await supabase.from('items').select('*')
+    // Get current user's organization_id
+    const { data: { user } } = await supabase.auth.getUser()
+
+    let organizationId: string | null = null
+    let isSuperAdmin = false
+
+    if (user) {
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('organization_id, is_super_admin')
+            .eq('id', user.id)
+            .single()
+        organizationId = profile?.organization_id || null
+        isSuperAdmin = profile?.is_super_admin || false
+    }
+
+    if (!organizationId && !isSuperAdmin) {
+        return <div className="p-8">No organization found for reports/analytics.</div>
+    }
+
+    // --- Fetch All Items ---
+    let itemsQuery = supabase.from('items').select('*')
+    if (!isSuperAdmin) itemsQuery = itemsQuery.eq('organization_id', organizationId!)
+    const { data: items } = await itemsQuery
+
+    // --- Fetch All Suppliers ---
+    let suppliersQuery = supabase.from('suppliers').select('*', { count: 'exact', head: true })
+    if (!isSuperAdmin) suppliersQuery = suppliersQuery.eq('organization_id', organizationId!)
+    const { count: suppliersCount } = await suppliersQuery
+
+    // --- KPI Summary Data ---
     const totalItems = items?.length || 0
+    const totalStock = items?.reduce((sum, i) => sum + Number(i.current_stock || 0), 0) || 0
     const lowStockItems = items?.filter(i => i.current_stock < i.min_stock) || []
-    const totalStockValue = items?.reduce((sum, i) => sum + i.current_stock, 0) || 0
+    const outOfStockItems = items?.filter(i => i.current_stock === 0) || []
 
-    // Stock movements summary
-    const { data: movements } = await supabase
+    // --- Stock Distribution Data (by Category) ---
+    const categoryMap = new Map<string, number>()
+    items?.forEach(item => {
+        const cat = item.category || 'Uncategorized'
+        const current = categoryMap.get(cat) || 0
+        categoryMap.set(cat, current + Number(item.current_stock || 0))
+    })
+    const distributionData = Array.from(categoryMap.entries())
+        .map(([name, value]) => ({ name, value }))
+        .sort((a, b) => b.value - a.value)
+
+    // --- Movement Trends Data (Last 7 Days) ---
+    const startDate = subDays(new Date(), 7).toISOString()
+    let moveQuery = supabase
         .from('stock_movements')
-        .select('*')
-        .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+        .select('created_at, type, quantity, item_id')
+        .gte('created_at', startDate)
+        .order('created_at', { ascending: true })
+    if (!isSuperAdmin) moveQuery = moveQuery.eq('organization_id', organizationId!)
+    const { data: movements } = await moveQuery
 
-    const totalIn = movements?.filter(m => m.type === 'IN').reduce((sum, m) => sum + m.quantity, 0) || 0
-    const totalOut = movements?.filter(m => m.type === 'OUT').reduce((sum, m) => sum + m.quantity, 0) || 0
+    const trendMap = new Map<string, { in: number, out: number }>()
+    for (let i = 6; i >= 0; i--) {
+        const d = format(subDays(new Date(), i), 'MMM dd')
+        trendMap.set(d, { in: 0, out: 0 })
+    }
+    movements?.forEach(m => {
+        const d = format(new Date(m.created_at), 'MMM dd')
+        if (trendMap.has(d)) {
+            const current = trendMap.get(d)!
+            if (m.type === 'IN') current.in += Number(m.quantity)
+            else current.out += Number(m.quantity)
+        }
+    })
+    const trendData = Array.from(trendMap.entries()).map(([date, val]) => ({ date, ...val }))
 
-    // Purchase orders summary
-    const { data: orders } = await supabase.from('purchase_orders').select('*')
-    const draftOrders = orders?.filter(o => o.status === 'DRAFT').length || 0
-    const approvedOrders = orders?.filter(o => o.status === 'APPROVED').length || 0
+    // --- Top 5 Items by Movement (Last 7 days) ---
+    const itemMovementIn = new Map<string, number>()
+    const itemMovementOut = new Map<string, number>()
+    movements?.forEach(m => {
+        const map = m.type === 'IN' ? itemMovementIn : itemMovementOut
+        const current = map.get(m.item_id) || 0
+        map.set(m.item_id, current + Number(m.quantity))
+    })
+
+    const getTopItems = (map: Map<string, number>, type: 'in' | 'out') => {
+        return Array.from(map.entries())
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([id, total]) => {
+                const item = items?.find(i => i.id === id)
+                return { name: item?.name || 'Unknown', total, unit: item?.unit || '' }
+            })
+    }
+    const topInItems = getTopItems(itemMovementIn, 'in')
+    const topOutItems = getTopItems(itemMovementOut, 'out')
+
+    // --- Low Stock Data ---
+    const lowStockData = lowStockItems.slice(0, 10).map(i => ({
+        name: i.name,
+        current_stock: Number(i.current_stock),
+        min_stock: Number(i.min_stock),
+        unit: i.unit
+    }))
 
     return (
         <div className="space-y-6">
-            <h1 className="text-3xl font-bold tracking-tight">Reports & Analytics</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Analytics & Reports</h1>
 
+            {/* KPI Summary Cards */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Items</CardTitle>
-                        <Package className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{totalItems}</div>
-                        <p className="text-xs text-muted-foreground">
-                            Total stock units: {totalStockValue.toFixed(0)}
-                        </p>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Low Stock Alerts</CardTitle>
-                        <AlertTriangle className="h-4 w-4 text-destructive" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-destructive">{lowStockItems.length}</div>
-                        <p className="text-xs text-muted-foreground">
-                            Items below minimum stock
-                        </p>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Stock IN (30d)</CardTitle>
-                        <TrendingUp className="h-4 w-4 text-green-500" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-green-500">{totalIn.toFixed(0)}</div>
-                        <p className="text-xs text-muted-foreground">
-                            Units received
-                        </p>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Stock OUT (30d)</CardTitle>
-                        <TrendingDown className="h-4 w-4 text-red-500" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-red-500">{totalOut.toFixed(0)}</div>
-                        <p className="text-xs text-muted-foreground">
-                            Units dispatched
-                        </p>
-                    </CardContent>
-                </Card>
+                <SummaryCard title="Total Items" value={totalItems} icon="package" />
+                <SummaryCard title="Total Stock Units" value={totalStock} icon="trendingUp" />
+                <SummaryCard title="Low Stock Alerts" value={lowStockItems.length} icon="alertTriangle" trend={lowStockItems.length > 0 ? 'down' : 'neutral'} />
+                <SummaryCard title="Out of Stock" value={outOfStockItems.length} icon="trendingDown" trend={outOfStockItems.length > 0 ? 'down' : 'neutral'} />
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Low Stock Items</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Item</TableHead>
-                                    <TableHead className="text-right">Current</TableHead>
-                                    <TableHead className="text-right">Min</TableHead>
-                                    <TableHead>Status</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {lowStockItems.slice(0, 10).map((item) => (
-                                    <TableRow key={item.id}>
-                                        <TableCell className="font-medium">{item.name}</TableCell>
-                                        <TableCell className="text-right text-destructive font-mono">
-                                            {item.current_stock}
-                                        </TableCell>
-                                        <TableCell className="text-right font-mono">{item.min_stock}</TableCell>
-                                        <TableCell>
-                                            <Badge variant="destructive">Low</Badge>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                                {lowStockItems.length === 0 && (
-                                    <TableRow>
-                                        <TableCell colSpan={4} className="text-center text-muted-foreground">
-                                            All items are well stocked
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Purchase Orders Status</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <Badge variant="secondary">DRAFT</Badge>
-                                    <span className="text-sm text-muted-foreground">Pending orders</span>
-                                </div>
-                                <span className="text-2xl font-bold">{draftOrders}</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <Badge>APPROVED</Badge>
-                                    <span className="text-sm text-muted-foreground">Awaiting delivery</span>
-                                </div>
-                                <span className="text-2xl font-bold">{approvedOrders}</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <Badge variant="outline">RECEIVED</Badge>
-                                    <span className="text-sm text-muted-foreground">Completed</span>
-                                </div>
-                                <span className="text-2xl font-bold">
-                                    {orders?.filter(o => o.status === 'RECEIVED').length || 0}
-                                </span>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+            {/* Charts Row */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <StockDistributionChart data={distributionData} />
+                <MovementTrendChart data={trendData} />
             </div>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Current Stock Snapshot</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Item</TableHead>
-                                <TableHead>SKU</TableHead>
-                                <TableHead>Category</TableHead>
-                                <TableHead className="text-right">Current Stock</TableHead>
-                                <TableHead className="text-right">Min Stock</TableHead>
-                                <TableHead>Status</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {items?.slice(0, 20).map((item) => (
-                                <TableRow key={item.id}>
-                                    <TableCell className="font-medium">{item.name}</TableCell>
-                                    <TableCell className="font-mono text-sm">{item.sku}</TableCell>
-                                    <TableCell>{item.category || '-'}</TableCell>
-                                    <TableCell className="text-right font-mono">{item.current_stock}</TableCell>
-                                    <TableCell className="text-right font-mono">{item.min_stock}</TableCell>
-                                    <TableCell>
-                                        {item.current_stock < item.min_stock ? (
-                                            <Badge variant="destructive">Low</Badge>
-                                        ) : (
-                                            <Badge variant="secondary">OK</Badge>
-                                        )}
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
+            {/* Tables Row */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <TopItemsTable title="Top 5 Stock In (7 Days)" items={topInItems} type="in" />
+                <TopItemsTable title="Top 5 Stock Out (7 Days)" items={topOutItems} type="out" />
+                <LowStockTable items={lowStockData} />
+            </div>
         </div>
     )
 }

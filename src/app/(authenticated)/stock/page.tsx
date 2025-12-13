@@ -12,11 +12,32 @@ export const dynamic = 'force-dynamic'
 export default async function StockPage() {
     const supabase = await createClient()
 
-    const { data: movements } = await supabase
+    // Get current user's organization_id
+    const { data: { user } } = await supabase.auth.getUser()
+    let organizationId: string | null = null
+    let isSuperAdmin = false
+
+    if (user) {
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('organization_id, is_super_admin')
+            .eq('id', user.id)
+            .single()
+        organizationId = profile?.organization_id || null
+        isSuperAdmin = profile?.is_super_admin || false
+    }
+
+    let movementsQuery = supabase
         .from('stock_movements')
         .select('*, item:items(name, sku), profile:profiles(full_name)')
         .order('created_at', { ascending: false })
         .limit(50)
+
+    if (!isSuperAdmin && organizationId) {
+        movementsQuery = movementsQuery.eq('organization_id', organizationId)
+    }
+
+    const { data: movements } = await movementsQuery
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">

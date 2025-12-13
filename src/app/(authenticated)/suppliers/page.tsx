@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { CreateSupplierDialog } from '@/components/suppliers/CreateSupplierDialog'
+import { EditSupplierDialog } from '@/components/suppliers/EditSupplierDialog'
+import { DeleteSupplierDialog } from '@/components/suppliers/DeleteSupplierDialog'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Mail, Phone, User } from 'lucide-react'
 
@@ -8,7 +10,29 @@ export const dynamic = 'force-dynamic'
 
 export default async function SuppliersPage() {
     const supabase = await createClient()
-    const { data: suppliers } = await supabase.from('suppliers').select('*').order('name')
+
+    // Get current user's organization_id
+    const { data: { user } } = await supabase.auth.getUser()
+    let organizationId: string | null = null
+    let isSuperAdmin = false
+
+    if (user) {
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('organization_id, is_super_admin')
+            .eq('id', user.id)
+            .single()
+        organizationId = profile?.organization_id || null
+        isSuperAdmin = profile?.is_super_admin || false
+    }
+
+    let suppliersQuery = supabase.from('suppliers').select('*').order('name')
+
+    if (!isSuperAdmin && organizationId) {
+        suppliersQuery = suppliersQuery.eq('organization_id', organizationId)
+    }
+
+    const { data: suppliers } = await suppliersQuery
 
     return (
         <div className="space-y-6">
@@ -31,6 +55,7 @@ export default async function SuppliersPage() {
                                     <TableHead>Phone</TableHead>
                                     <TableHead>Email</TableHead>
                                     <TableHead>Address</TableHead>
+                                    <TableHead className="w-[100px] text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -70,11 +95,17 @@ export default async function SuppliersPage() {
                                         <TableCell className="text-muted-foreground">
                                             {supplier.address || '-'}
                                         </TableCell>
+                                        <TableCell className="text-right">
+                                            <div className="flex justify-end gap-2">
+                                                <EditSupplierDialog supplier={supplier} />
+                                                <DeleteSupplierDialog supplierId={supplier.id} supplierName={supplier.name} />
+                                            </div>
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                                 {(!suppliers || suppliers.length === 0) && (
                                     <TableRow>
-                                        <TableCell colSpan={5} className="text-center text-muted-foreground">
+                                        <TableCell colSpan={6} className="text-center text-muted-foreground">
                                             No suppliers yet
                                         </TableCell>
                                     </TableRow>

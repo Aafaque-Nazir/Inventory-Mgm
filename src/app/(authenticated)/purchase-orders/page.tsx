@@ -14,11 +14,32 @@ export const dynamic = 'force-dynamic'
 export default async function PurchaseOrdersPage() {
     const supabase = await createClient()
 
-    console.log('Fetching purchase orders...')
-    const { data: orders, error } = await supabase
+    // Get current user's organization_id
+    const { data: { user } } = await supabase.auth.getUser()
+    let organizationId: string | null = null
+    let isSuperAdmin = false
+
+    if (user) {
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('organization_id, is_super_admin')
+            .eq('id', user.id)
+            .single()
+        organizationId = profile?.organization_id || null
+        isSuperAdmin = profile?.is_super_admin || false
+    }
+
+    let ordersQuery = supabase
         .from('purchase_orders')
         .select('*, supplier:suppliers(name), profile:profiles!created_by(full_name)')
         .order('created_at', { ascending: false })
+
+    if (!isSuperAdmin && organizationId) {
+        ordersQuery = ordersQuery.eq('organization_id', organizationId)
+    }
+
+    console.log('Fetching purchase orders...')
+    const { data: orders, error } = await ordersQuery
 
     if (error) {
         console.error('Error fetching orders:', JSON.stringify(error, null, 2))

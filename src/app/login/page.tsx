@@ -15,7 +15,7 @@ export default function LoginPage() {
                 </div>
                 <div className="relative z-20 flex items-center text-2xl font-bold tracking-tight">
                     <Command className="mr-2 h-8 w-8 text-indigo-400" />
-                    CommodityMgm
+                    Inventory Management
                 </div>
                 <div className="relative z-20 mt-auto">
                     <blockquote className="space-y-2 border-l-2 border-indigo-500 pl-6">
@@ -26,7 +26,7 @@ export default function LoginPage() {
                 </div>
             </div>
             <div className="lg:p-8">
-                <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px]">
+                <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[450px]">
                     <div className="flex flex-col space-y-2 text-center">
                         <h1 className="text-2xl font-semibold tracking-tight">
                             Welcome back
@@ -36,6 +36,8 @@ export default function LoginPage() {
                         </p>
                     </div>
                     <LoginForm />
+
+                    {/* Demo Credentials removed (moved to LoginForm) */}
                 </div>
             </div>
         </div>

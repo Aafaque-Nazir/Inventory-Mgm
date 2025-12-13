@@ -131,7 +131,7 @@ export function CreateItemDialog() {
                             name="sku"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>SKU</FormLabel>
+                                    <FormLabel>SKU / Barcode</FormLabel>
                                     <FormControl>
                                         <Input placeholder="APL-001" {...field} />
                                     </FormControl>
@@ -201,6 +201,6 @@ export function CreateItemDialog() {
                     </form>
                 </Form>
             </DialogContent>
-        </Dialog>
+        </Dialog >
     )
 }

@@ -22,7 +22,7 @@ export default function Home() {
               Master Your Inventory
             </h1>
             <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-              The premium solution for modern commodity management. Track stock, manage suppliers, and analyze performance with elegance.
+              The premium solution for modern inventory management. Track stock, manage suppliers, and analyze performance with elegance.
             </p>
             <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center pt-4">
               <Link href="/login">
@@ -79,7 +79,7 @@ export default function Home() {
       <footer className="border-t py-12">
         <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
           <p className="text-center text-sm text-muted-foreground md:text-left">
-            &copy; 2025 CommodityMgm. All rights reserved.
+            &copy; 2025 Inventory Management. All rights reserved.
           </p>
           <div className="flex gap-4 text-sm text-muted-foreground">
             <Link href="#" className="hover:text-foreground">Privacy Policy</Link>
