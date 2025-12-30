@@ -1,5 +1,6 @@
 import { LoginForm } from '@/components/auth/LoginForm'
 import { Command } from 'lucide-react'
+import Link from 'next/link'
 
 export default function LoginPage() {
     return (
@@ -37,7 +38,18 @@ export default function LoginPage() {
                     </div>
                     <LoginForm />
 
-                    {/* Demo Credentials removed (moved to LoginForm) */}
+                    <div className="text-center text-sm text-muted-foreground">
+                        <Link href="/forgot-password" className="underline hover:text-primary underline-offset-4">
+                            Forgot your password?
+                        </Link>
+                    </div>
+
+                    <div className="text-center text-sm text-muted-foreground">
+                        Don&apos;t have an account?{" "}
+                        <Link href="/signup" className="underline hover:text-primary underline-offset-4 font-medium text-primary">
+                            Sign Up
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>

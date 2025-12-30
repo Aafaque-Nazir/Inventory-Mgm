@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -27,8 +27,9 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Plus } from 'lucide-react'
+import { Plus, Loader2 } from 'lucide-react'
 import { Item } from '@/types'
+import { recordStockMovement } from '@/app/actions/stock'
 
 const formSchema = z.object({
     item_id: z.string().min(1, 'Item is required'),
@@ -47,6 +48,7 @@ interface AddStockMovementDialogProps {
 export function AddStockMovementDialog({ defaultType = 'IN', defaultReason = '', trigger, title = 'Add Stock Movement' }: AddStockMovementDialogProps) {
     const [open, setOpen] = useState(false)
     const [items, setItems] = useState<Item[]>([])
+    const [isPending, startTransition] = useTransition()
     const router = useRouter()
     const supabase = createClient()
 
@@ -69,50 +71,23 @@ export function AddStockMovementDialog({ defaultType = 'IN', defaultReason = '',
     }, [open, supabase])
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        try {
-            console.log('Stock movement values:', values)
-            const { data: { user } } = await supabase.auth.getUser()
+        const formData = new FormData()
+        formData.append('item_id', values.item_id)
+        formData.append('quantity', values.quantity.toString())
+        formData.append('type', values.type)
+        if (values.reason) formData.append('reason', values.reason)
 
-            // Insert stock movement
-            const { error: movementError } = await supabase.from('stock_movements').insert({
-                item_id: values.item_id,
-                quantity: values.quantity,
-                type: values.type,
-                reason: values.reason || null,
-                created_by: user?.id,
-            })
+        startTransition(async () => {
+            const result = await recordStockMovement({}, formData)
 
-            if (movementError) {
-                console.error('Movement error:', movementError)
-                throw movementError
+            if (result.error) {
+                toast.error(result.error)
+            } else {
+                toast.success(result.message)
+                setOpen(false)
+                form.reset()
             }
-
-            // Update item stock
-            const item = items.find(i => i.id === values.item_id)
-            if (item) {
-                const newStock = values.type === 'IN'
-                    ? item.current_stock + values.quantity
-                    : item.current_stock - values.quantity
-
-                const { error: updateError } = await supabase
-                    .from('items')
-                    .update({ current_stock: newStock })
-                    .eq('id', values.item_id)
-
-                if (updateError) {
-                    console.error('Update error:', updateError)
-                    throw updateError
-                }
-            }
-
-            toast.success('Stock movement recorded successfully')
-            setOpen(false)
-            form.reset()
-            router.refresh()
-        } catch (error: any) {
-            console.error('Stock movement failed:', error)
-            toast.error(error.message || 'Failed to record stock movement')
-        }
+        })
     }
 
     return (
@@ -128,7 +103,9 @@ export function AddStockMovementDialog({ defaultType = 'IN', defaultReason = '',
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
                     <DialogDescription>
-                        Record a stock IN or OUT movement.
+                        {defaultType === 'OUT'
+                            ? "Record usage or sale. Alerts will be sent if stock gets low."
+                            : "Add new stock received from suppliers."}
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
@@ -140,7 +117,6 @@ export function AddStockMovementDialog({ defaultType = 'IN', defaultReason = '',
                                 <FormItem>
                                     <FormLabel className="flex justify-between items-center">
                                         Item
-
                                     </FormLabel>
                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                         <FormControl>
@@ -151,7 +127,7 @@ export function AddStockMovementDialog({ defaultType = 'IN', defaultReason = '',
                                         <SelectContent>
                                             {items.map((item) => (
                                                 <SelectItem key={item.id} value={item.id}>
-                                                    {item.name} ({item.sku})
+                                                    {item.name} (Stock: {item.current_stock})
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
@@ -210,7 +186,10 @@ export function AddStockMovementDialog({ defaultType = 'IN', defaultReason = '',
                             )}
                         />
                         <DialogFooter>
-                            <Button type="submit">Save</Button>
+                            <Button type="submit" disabled={isPending}>
+                                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Save
+                            </Button>
                         </DialogFooter>
                     </form>
                 </Form>

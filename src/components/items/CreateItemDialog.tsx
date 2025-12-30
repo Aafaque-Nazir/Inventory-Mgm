@@ -1,10 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { createClient } from '@/lib/supabase/client'
+import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -17,84 +13,30 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog'
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Plus } from 'lucide-react'
-
-const formSchema = z.object({
-    name: z.string().min(2),
-    sku: z.string().min(2),
-    category: z.string().optional(),
-    unit: z.string().min(1),
-    min_stock: z.coerce.number().min(0),
-    initial_stock: z.coerce.number().min(0).optional(),
-})
+import { Label } from '@/components/ui/label'
+import { Plus, Loader2 } from 'lucide-react'
+import { createItem } from '@/app/actions/items'
 
 export function CreateItemDialog() {
     const [open, setOpen] = useState(false)
+    const [isPending, startTransition] = useTransition()
     const router = useRouter()
-    const supabase = createClient()
 
-    const form = useForm<any>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            name: '',
-            sku: '',
-            category: '',
-            unit: 'pcs',
-            min_stock: 0,
-            initial_stock: 0,
-        },
-    })
+    async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault()
+        const formData = new FormData(event.currentTarget)
 
-    async function onSubmit(values: z.infer<typeof formSchema>) {
-        try {
-            console.log('Submitting item:', values)
-            const { initial_stock, ...itemData } = values
-
-            // Create the item with initial stock
-            const { data, error } = await supabase
-                .from('items')
-                .insert({
-                    ...itemData,
-                    current_stock: initial_stock || 0
-                })
-                .select()
-                .single()
-
-            if (error) {
-                console.error('Supabase error:', error)
-                throw error
+        startTransition(async () => {
+            const result = await createItem({}, formData)
+            if (result?.error) {
+                toast.error(result.error)
+            } else {
+                toast.success('Item created successfully')
+                setOpen(false)
+                // Reset form manually or relying on unmount
             }
-
-            // If initial stock > 0, create a stock movement record
-            if (initial_stock && initial_stock > 0) {
-                const { data: { user } } = await supabase.auth.getUser()
-                await supabase.from('stock_movements').insert({
-                    item_id: data.id,
-                    quantity: initial_stock,
-                    type: 'IN',
-                    reason: 'Initial stock',
-                    created_by: user?.id,
-                })
-            }
-
-            console.log('Item created:', data)
-            toast.success('Item created successfully')
-            setOpen(false)
-            form.reset()
-            router.refresh()
-        } catch (error: any) {
-            console.error('Failed to create item:', error)
-            toast.error(error.message || 'Failed to create item')
-        }
+        })
     }
 
     return (
@@ -108,98 +50,46 @@ export function CreateItemDialog() {
                 <DialogHeader>
                     <DialogTitle>Add New Item</DialogTitle>
                     <DialogDescription>
-                        Create a new item in your inventory.
+                        Create a new item. Free plan limited to 50 items.
                     </DialogDescription>
                 </DialogHeader>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <FormField
-                            control={form.control}
-                            name="name"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Name</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Apple" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="sku"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>SKU / Barcode</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="APL-001" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <div className="grid grid-cols-2 gap-4">
-                            <FormField
-                                control={form.control}
-                                name="category"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Category</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Fruits" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="unit"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Unit</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="kg" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                <form onSubmit={onSubmit} className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="name">Name</Label>
+                        <Input id="name" name="name" placeholder="Apple" required />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="sku">SKU / Barcode</Label>
+                        <Input id="sku" name="sku" placeholder="APL-001" required />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="category">Category</Label>
+                            <Input id="category" name="category" placeholder="Fruits" />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <FormField
-                                control={form.control}
-                                name="min_stock"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Min Stock</FormLabel>
-                                        <FormControl>
-                                            <Input type="number" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="initial_stock"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Initial Stock</FormLabel>
-                                        <FormControl>
-                                            <Input type="number" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                        <div className="space-y-2">
+                            <Label htmlFor="unit">Unit</Label>
+                            <Input id="unit" name="unit" placeholder="kg" required defaultValue="pcs" />
                         </div>
-                        <DialogFooter>
-                            <Button type="submit">Save</Button>
-                        </DialogFooter>
-                    </form>
-                </Form>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="min_stock">Min Stock</Label>
+                            <Input id="min_stock" name="min_stock" type="number" required defaultValue={0} min={0} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="initial_stock">Initial Stock</Label>
+                            <Input id="initial_stock" name="initial_stock" type="number" defaultValue={0} min={0} />
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <Button type="submit" disabled={isPending}>
+                            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Save Item
+                        </Button>
+                    </DialogFooter>
+                </form>
             </DialogContent>
         </Dialog >
     )

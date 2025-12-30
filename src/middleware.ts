@@ -49,9 +49,9 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 
-    // Root redirect
-    if (path === '/') {
-        return NextResponse.redirect(new URL(user ? '/dashboard' : '/login', request.url))
+    // Redirect logged-in users to dashboard, but let guests see the landing page
+    if (path === '/' && user) {
+        return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 
     return response

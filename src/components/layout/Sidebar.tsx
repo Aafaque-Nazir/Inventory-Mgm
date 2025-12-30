@@ -12,7 +12,8 @@ import {
     Users,
     ShoppingCart,
     BarChart3,
-    Lock
+    Lock,
+    HelpCircle
 } from 'lucide-react'
 
 const navigation = [
@@ -22,24 +23,30 @@ const navigation = [
     { name: 'Suppliers', href: '/suppliers', icon: Users },
     { name: 'Purchase Orders', href: '/purchase-orders', icon: ShoppingCart },
     { name: 'Reports', href: '/reports', icon: BarChart3 },
+    { name: 'Help & Support', href: '/help', icon: HelpCircle },
 ]
 
 export function Sidebar() {
     const pathname = usePathname()
     const supabase = createClient()
     const [isSuperAdmin, setIsSuperAdmin] = useState(false)
+    const [planType, setPlanType] = useState<string>('FREE')
 
     useEffect(() => {
         async function checkRole() {
             const { data: { user } } = await supabase.auth.getUser()
             if (user) {
-                const { data } = await supabase
+                // Fetch Profile and Org Plan
+                const { data: profile } = await supabase
                     .from('profiles')
-                    .select('is_super_admin')
+                    .select('is_super_admin, organizations(plan_type)')
                     .eq('id', user.id)
                     .single()
-                if (data?.is_super_admin) {
-                    setIsSuperAdmin(true)
+
+                if (profile) {
+                    if (profile.is_super_admin) setIsSuperAdmin(true)
+                    // @ts-ignore
+                    if (profile.organizations?.plan_type) setPlanType(profile.organizations.plan_type)
                 }
             }
         }
@@ -59,24 +66,29 @@ export function Sidebar() {
             <nav className="flex-1 space-y-1 px-3 py-4">
                 {finalNavigation.map((item) => {
                     const isActive = pathname.startsWith(item.href)
+                    const isLocked = item.name === 'Reports' && planType === 'FREE'
+
                     return (
                         <Link
                             key={item.href}
                             href={item.href}
                             className={cn(
-                                'group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                                'group flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-colors',
                                 isActive
                                     ? 'bg-primary/10 text-primary'
                                     : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                             )}
                         >
-                            <item.icon
-                                className={cn(
-                                    'mr-3 h-5 w-5 flex-shrink-0',
-                                    isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-accent-foreground'
-                                )}
-                            />
-                            {item.name}
+                            <div className="flex items-center">
+                                <item.icon
+                                    className={cn(
+                                        'mr-3 h-5 w-5 flex-shrink-0',
+                                        isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-accent-foreground'
+                                    )}
+                                />
+                                {item.name}
+                            </div>
+                            {isLocked && <Lock className="h-3 w-3 text-muted-foreground" />}
                         </Link>
                     )
                 })}
