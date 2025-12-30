@@ -7,6 +7,9 @@ export interface Profile {
     is_super_admin?: boolean
     organization_id?: string
     created_at: string
+    organization?: {
+        plan_type: string
+    }
 }
 
 export interface Item {
