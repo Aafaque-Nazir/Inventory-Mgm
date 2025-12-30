@@ -8,11 +8,15 @@ import { Loader2, AlertCircle, Phone, Mail } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
+import { usePathname } from 'next/navigation'
+
 export function AppLayout({ children }: { children: React.ReactNode }) {
+    const pathname = usePathname()
     const [loading, setLoading] = useState(true)
     const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null)
     const [isSuperAdmin, setIsSuperAdmin] = useState(false)
     const supabase = createClient()
+
 
     useEffect(() => {
         async function checkSubscription() {
@@ -54,7 +58,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         }
 
         checkSubscription()
-    }, [supabase])
+        checkSubscription()
+    }, [supabase, pathname])
+
+    // Bypassing layout for onboarding to allow full-screen design and avoid subscription checks
+    if (pathname === '/onboarding') {
+        return <>{children}</>
+    }
 
     if (loading) {
         return (

@@ -64,11 +64,25 @@ export async function recordStockMovement(
         if (updateError) throw updateError
 
         // 4. Check for Low Stock Alert (Only on OUT movements)
-        // CHECK: Only send for PRO or ENTERPRISE plans
+        // CHECK: Only send for PRO or ENTERPRISE plans (or Super Admin)
         const plan = item.organization?.plan_type || 'FREE'
 
+        // Is the current user a Super Admin? We need to check or assume permission based on this action's context
+        // For efficiency, we can just check if plan is NOT free. 
+        // But to be precise for the "Super Admin" request, let's re-fetch or assume Pro features for now.
+        // Actually, let's just stick to the plan for email alerts for simplicity, BUT since the user asked,
+        // we should probably fetch the user's role.
+
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('is_super_admin')
+            .eq('id', user.id)
+            .single()
+
+        const isSuperAdmin = profile?.is_super_admin
+
         if (type === 'OUT' && newStock <= item.min_stock) {
-            if (plan !== 'FREE') {
+            if (plan !== 'FREE' || isSuperAdmin) {
                 console.log('Triggering low stock alert...')
                 await sendLowStockAlert(
                     user.email || '',

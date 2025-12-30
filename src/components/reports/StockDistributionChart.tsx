@@ -16,7 +16,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'
 
 export function StockDistributionChart({ data }: StockDistributionChartProps) {
     return (
-        <Card className="col-span-1">
+        <Card className="col-span-1 shadow-sm border-none bg-gradient-to-br from-card to-muted/20">
             <CardHeader>
                 <CardTitle>Stock by Category</CardTitle>
             </CardHeader>
@@ -28,17 +28,19 @@ export function StockDistributionChart({ data }: StockDistributionChartProps) {
                                 data={data as any[]}
                                 cx="50%"
                                 cy="50%"
-                                labelLine={false}
+                                innerRadius={60}
                                 outerRadius={80}
-                                fill="#8884d8"
+                                paddingAngle={5}
                                 dataKey="value"
                             >
                                 {data.map((_entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} strokeWidth={2} stroke="hsl(var(--card))" />
                                 ))}
                             </Pie>
-                            <Tooltip />
-                            <Legend />
+                            <Tooltip
+                                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                            />
+                            <Legend verticalAlign="bottom" height={36} iconType="circle" />
                         </PieChart>
                     </ResponsiveContainer>
                 </div>

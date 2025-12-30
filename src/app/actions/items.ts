@@ -39,7 +39,7 @@ export async function createItem(prevState: any, formData: FormData) {
         // 1. Get Organization and Plan
         const { data: profile } = await supabase
             .from('profiles')
-            .select('organization_id, organizations(plan_type, max_items)')
+            .select('organization_id, is_super_admin, organizations(plan_type, max_items)')
             .eq('id', user.id)
             .single()
 
@@ -50,9 +50,10 @@ export async function createItem(prevState: any, formData: FormData) {
         const org = profile.organizations as any
         const plan = org?.plan_type || 'FREE'
         const maxItems = org?.max_items || 50
+        const isSuperAdmin = profile.is_super_admin
 
         // 2. Check Item Limit (Only for Free Plan)
-        if (plan === 'FREE') {
+        if (plan === 'FREE' && !isSuperAdmin) {
             const { count, error: countError } = await supabase
                 .from('items')
                 .select('*', { count: 'exact', head: true })

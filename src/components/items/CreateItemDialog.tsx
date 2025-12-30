@@ -15,11 +15,28 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Plus, Loader2 } from 'lucide-react'
+import { Plus, Loader2, ChevronsUpDown, Check } from 'lucide-react'
 import { createItem } from '@/app/actions/items'
+import { cn } from '@/lib/utils'
+import { ITEM_CATEGORIES, ITEM_UNITS } from '@/lib/constants'
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/ui/command"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
 
 export function CreateItemDialog() {
     const [open, setOpen] = useState(false)
+    const [category, setCategory] = useState("")
+    const [unit, setUnit] = useState("pcs")
     const [isPending, startTransition] = useTransition()
     const router = useRouter()
 
@@ -63,13 +80,98 @@ export function CreateItemDialog() {
                         <Input id="sku" name="sku" placeholder="APL-001" required />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="category">Category</Label>
-                            <Input id="category" name="category" placeholder="Fruits" />
+                        <div className="space-y-2 flex flex-col">
+                            <Label>Category</Label>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        role="combobox"
+                                        className={cn(
+                                            "justify-between font-normal",
+                                            !category && "text-muted-foreground"
+                                        )}
+                                    >
+                                        {category || "Select category"}
+                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[200px] p-0">
+                                    <Command>
+                                        <CommandInput placeholder="Search category..." />
+                                        <CommandList>
+                                            <CommandEmpty>No category found.</CommandEmpty>
+                                            <CommandGroup>
+                                                {ITEM_CATEGORIES.map((cat) => (
+                                                    <CommandItem
+                                                        key={cat}
+                                                        value={cat}
+                                                        onSelect={(currentValue) => {
+                                                            setCategory(currentValue === category ? "" : currentValue)
+                                                        }}
+                                                    >
+                                                        <Check
+                                                            className={cn(
+                                                                "mr-2 h-4 w-4",
+                                                                category === cat ? "opacity-100" : "opacity-0"
+                                                            )}
+                                                        />
+                                                        {cat}
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandGroup>
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
+                            <input type="hidden" name="category" value={category} />
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="unit">Unit</Label>
-                            <Input id="unit" name="unit" placeholder="kg" required defaultValue="pcs" />
+
+                        <div className="space-y-2 flex flex-col">
+                            <Label>Unit</Label>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        role="combobox"
+                                        className={cn(
+                                            "justify-between font-normal",
+                                            !unit && "text-muted-foreground"
+                                        )}
+                                    >
+                                        {unit || "Select unit"}
+                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[200px] p-0">
+                                    <Command>
+                                        <CommandInput placeholder="Search unit..." />
+                                        <CommandList>
+                                            <CommandEmpty>No unit found.</CommandEmpty>
+                                            <CommandGroup>
+                                                {ITEM_UNITS.map((u) => (
+                                                    <CommandItem
+                                                        key={u}
+                                                        value={u}
+                                                        onSelect={(currentValue) => {
+                                                            setUnit(currentValue === unit ? "" : currentValue)
+                                                        }}
+                                                    >
+                                                        <Check
+                                                            className={cn(
+                                                                "mr-2 h-4 w-4",
+                                                                unit === u ? "opacity-100" : "opacity-0"
+                                                            )}
+                                                        />
+                                                        {u}
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandGroup>
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
+                            <input type="hidden" name="unit" value={unit} />
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">

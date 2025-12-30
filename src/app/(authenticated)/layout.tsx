@@ -1,4 +1,5 @@
 import { AppLayout } from '@/components/layout/AppLayout'
+import { AnnouncementBanner } from '@/components/layout/AnnouncementBanner'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
@@ -30,5 +31,11 @@ export default async function AuthenticatedLayout({
         redirect('/onboarding')
     }
 
-    return <AppLayout>{children}</AppLayout>
+    return (
+        <div className="flex h-screen flex-col overflow-hidden">
+            <div className="flex-1 overflow-hidden">
+                <AppLayout>{children}</AppLayout>
+            </div>
+        </div>
+    )
 }

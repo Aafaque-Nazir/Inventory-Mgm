@@ -61,7 +61,7 @@ export function Topbar() {
                 setEmail(user.email || null)
                 const { data } = await supabase
                     .from('profiles')
-                    .select('*')
+                    .select('*, organization:organizations(plan_type)')
                     .eq('id', user.id)
                     .single()
                 setProfile(data)
@@ -142,7 +142,28 @@ export function Topbar() {
                         </nav>
                     </SheetContent>
                 </Sheet>
-                <h2 className="text-lg font-semibold">Dashboard</h2>
+                <div className="flex items-center gap-3">
+                    <h2 className="text-lg font-semibold">Dashboard</h2>
+                    {profile?.is_super_admin ? (
+                        <Badge
+                            className="bg-purple-600 hover:bg-purple-700 text-[10px] px-2 h-5 font-semibold tracking-wide uppercase border-purple-500/20"
+                        >
+                            SUPER ADMIN
+                        </Badge>
+                    ) : profile?.organization?.plan_type && (
+                        <Badge
+                            variant="secondary"
+                            className={cn(
+                                "text-[10px] px-2 h-5 font-semibold tracking-wide uppercase",
+                                profile.organization.plan_type === 'FREE' && "bg-blue-500/10 text-blue-500 border-blue-500/20",
+                                profile.organization.plan_type === 'PRO' && "bg-amber-500/10 text-amber-500 border-amber-500/20",
+                                profile.organization.plan_type === 'ENTERPRISE' && "bg-purple-500/10 text-purple-500 border-purple-500/20",
+                            )}
+                        >
+                            {profile.organization.plan_type} PLAN
+                        </Badge>
+                    )}
+                </div>
             </div>
             <div className="flex items-center gap-4">
                 <DropdownMenu>

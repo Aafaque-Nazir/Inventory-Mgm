@@ -2,9 +2,13 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+    // Create a new Headers object to modify request headers
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set('x-current-path', request.nextUrl.pathname)
+
     let response = NextResponse.next({
         request: {
-            headers: request.headers,
+            headers: requestHeaders,
         },
     })
 

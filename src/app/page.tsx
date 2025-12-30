@@ -8,14 +8,12 @@ import {
   BarChart3,
   ShieldCheck,
   ChevronRight,
-  Layers,
   Zap,
-  Search,
-  RefreshCcw,
-  AlertTriangle,
   CheckCircle2,
-  TrendingDown,
-  Clock
+  Mail,
+  Users,
+  CreditCard,
+  Lock
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
@@ -49,13 +47,13 @@ export default function Home() {
             </span>
           </div>
           <div className="hidden md:flex items-center gap-8">
-            <Link href="#problem" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Problem</Link>
-            <Link href="#solution" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Solution</Link>
             <Link href="#features" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Features</Link>
+            <Link href="#pricing" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Pricing</Link>
+            <Link href="#how-it-works" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">How it Works</Link>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/login" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Sign In</Link>
-            <Link href="/login">
+            <Link href="/signup">
               <Button size="sm" className="rounded-full px-6">Get Started</Button>
             </Link>
           </div>
@@ -79,19 +77,19 @@ export default function Home() {
           >
             <motion.div variants={fadeIn} className="mx-auto mb-6 flex max-w-fit items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 backdrop-blur-sm">
               <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75"></span>
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
               </span>
-              <span className="text-xs font-medium text-slate-300">Next-Gen Inventory Control</span>
+              <span className="text-xs font-medium text-slate-300">Free Tier Available Now</span>
             </motion.div>
 
             <motion.h1
               variants={fadeIn}
               className="mx-auto max-w-4xl text-5xl font-bold tracking-tight sm:text-7xl md:text-8xl"
             >
-              Control Your Chaos, <br />
-              <span className="bg-gradient-to-r from-primary via-blue-400 to-purple-500 bg-clip-text text-transparent">
-                Scale Your Business
+              Inventory Management <br />
+              <span className="text-white">
+                For Modern Teams
               </span>
             </motion.h1>
 
@@ -99,105 +97,115 @@ export default function Home() {
               variants={fadeIn}
               className="mx-auto mt-8 max-w-2xl text-lg text-slate-400 md:text-xl"
             >
-              Stop wrestling with spreadsheets. Experience a premium inventory management system designed for speed, clarity, and growth.
+              Collaborate with your storekeepers, get automated low-stock alerts, and track every movement. Visual, Fast, and Secure.
             </motion.p>
 
             <motion.div
               variants={fadeIn}
               className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row"
             >
-              <Link href="/login">
+              <Link href="/signup">
                 <Button size="lg" className="h-14 rounded-full px-10 text-lg shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95">
-                  Start Free Trial <ChevronRight className="ml-2 h-5 w-5" />
+                  Start for Free <ChevronRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Link href="#problem">
+              <Link href="#features">
                 <Button size="lg" variant="outline" className="h-14 rounded-full border-white/10 bg-white/5 px-10 text-lg backdrop-blur-sm transition-all hover:bg-white/10">
-                  See the Difference
+                  Explore Features
                 </Button>
               </Link>
             </motion.div>
 
+            {/* Dashboard Preview */}
             <motion.div
               variants={fadeIn}
-              className="mt-20 flex justify-center opacity-40 grayscale transition-all hover:opacity-100 hover:grayscale-0"
+              className="mt-20 relative mx-auto max-w-5xl rounded-xl border border-white/10 bg-slate-900/50 shadow-2xl backdrop-blur-sm p-2"
             >
-              <div className="grid grid-cols-2 items-center gap-12 md:grid-cols-4 lg:gap-24">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="h-6 w-6" /> <span className="font-semibold">SECURE</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Zap className="h-6 w-6 text-yellow-500" /> <span className="font-semibold">ULTRA FAST</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <RefreshCcw className="h-6 w-6 text-blue-500" /> <span className="font-semibold">REAL-TIME</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Layers className="h-6 w-6 text-purple-500" /> <span className="font-semibold">SCALABLE</span>
-                </div>
-              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-10" />
+              <img
+                src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2670&auto=format&fit=crop"
+                alt="Dashboard Preview"
+                className="rounded-lg opacity-80"
+              />
             </motion.div>
           </motion.div>
         </section>
 
         {/* The Problem Section */}
-        <section id="problem" className="relative py-24 md:py-32 overflow-hidden">
+        <section className="relative py-24 overflow-hidden">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
               initial="initial"
               whileInView="animate"
               viewport={{ once: true }}
               variants={stagger}
-              className="flex flex-col gap-12 lg:flex-row lg:items-center"
+              className="grid lg:grid-cols-2 gap-12 items-center"
             >
-              <motion.div variants={fadeIn} className="flex-1 space-y-6">
+              <motion.div variants={fadeIn} className="space-y-6">
                 <div className="inline-block rounded-lg bg-red-500/10 px-3 py-1 text-sm font-medium text-red-500 ring-1 ring-inset ring-red-500/20">
                   The Problem
                 </div>
                 <h2 className="text-3xl font-bold tracking-tight sm:text-5xl">
-                  Inventory Shouldn't Feel Like A Losing Battle
+                  Inventory Chaos is Costing You Money
                 </h2>
-                <div className="space-y-4">
-                  <div className="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/10">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-500/20 text-red-500">
-                      <AlertTriangle className="h-5 w-5" />
+                <p className="text-lg text-slate-400">
+                  Spreadsheets are prone to errors. Sticky notes get lost. Without a system, you are flying blind.
+                </p>
+
+                <div className="space-y-4 pt-4">
+                  <div className="flex gap-4">
+                    <div className="h-10 w-10 shrink-0 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500">
+                      <BarChart3 className="h-5 w-5" />
                     </div>
                     <div>
-                      <h4 className="font-bold">Stock-out Disasters</h4>
-                      <p className="text-slate-400">Losing sales because you didn't know you were out of stock? It happens more than you think.</p>
+                      <h4 className="font-bold text-slate-200">Stockouts & Lost Sales</h4>
+                      <p className="text-sm text-slate-500">Running out of popular items means customers go to competitors.</p>
                     </div>
                   </div>
-                  <div className="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/10">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-500/20 text-red-500">
-                      <TrendingDown className="h-5 w-5" />
+                  <div className="flex gap-4">
+                    <div className="h-10 w-10 shrink-0 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500">
+                      <Box className="h-5 w-5" />
                     </div>
                     <div>
-                      <h4 className="font-bold">Tied-up Capital</h4>
-                      <p className="text-slate-400">Overstocking items that don't sell is like burning money in your warehouse.</p>
+                      <h4 className="font-bold text-slate-200">Overstocking Waste</h4>
+                      <p className="text-sm text-slate-500">Cash tied up in dust-gathering inventory that never sells.</p>
                     </div>
                   </div>
-                  <div className="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/10">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-500/20 text-red-500">
-                      <Clock className="h-5 w-5" />
+                  <div className="flex gap-4">
+                    <div className="h-10 w-10 shrink-0 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500">
+                      <Users className="h-5 w-5" />
                     </div>
                     <div>
-                      <h4 className="font-bold">Manual Error Fatigue</h4>
-                      <p className="text-slate-400">Spending hours on spreadsheets just to find one typo that ruined your whole month's report.</p>
+                      <h4 className="font-bold text-slate-200">Theft & unaccountability</h4>
+                      <p className="text-sm text-slate-500">Without logs, items disappear and no one knows who took them.</p>
                     </div>
                   </div>
                 </div>
               </motion.div>
-              <motion.div variants={fadeIn} className="flex-1 relative">
-                <div className="aspect-square relative rounded-3xl overflow-hidden border border-white/10 bg-slate-900 group">
-                  <img
-                    src="https://images.unsplash.com/photo-1553413077-190dd305871c?q=80&w=1000&auto=format&fit=crop"
-                    alt="Man looking frustrated at boxes"
-                    className="object-cover w-full h-full opacity-60 grayscale group-hover:scale-105 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
-                  <div className="absolute bottom-6 left-6 right-6 p-6 rounded-2xl bg-slate-900/80 backdrop-blur-md border border-white/10">
-                    <p className="text-sm italic text-slate-300">"Prior to using InvMaster, we were losing roughly 15% of our revenue to inventory mismanagement. It was a nightmare."</p>
-                    <p className="mt-2 text-xs font-bold text-slate-500 tracking-wider">— SUPPLY CHAIN MANAGER</p>
+              <motion.div variants={fadeIn} className="relative">
+                <div className="absolute -inset-4 bg-gradient-to-r from-red-500/20 to-orange-500/20 blur-2xl opacity-50 rounded-full" />
+                <div className="relative rounded-2xl border border-white/10 bg-slate-900/80 p-6 backdrop-blur-sm">
+                  {/* Abstract visuals representing chaos */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 rounded bg-red-500/5 border border-red-500/10">
+                      <div className="flex items-center gap-3">
+                        <div className="h-2 w-2 rounded-full bg-red-500" />
+                        <span className="text-sm text-red-200 font-mono">CRITICAL: Stock mismatch (SKU-102)</span>
+                      </div>
+                      <span className="text-xs text-red-400">Just now</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 rounded bg-slate-800/50 border border-white/5 opacity-60">
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm text-slate-400 font-mono">Excel_Sheet_Final_v2_FINAL.xlsx</span>
+                      </div>
+                      <span className="text-xs text-slate-500">Corrupted</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 rounded bg-slate-800/50 border border-white/5 opacity-60">
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm text-slate-400 font-mono">Stock Count (Sticky Note)</span>
+                      </div>
+                      <span className="text-xs text-slate-500">Lost</span>
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -206,72 +214,51 @@ export default function Home() {
         </section>
 
         {/* The Solution Section */}
-        <section id="solution" className="relative py-24 md:py-32 bg-slate-900/50">
+        <section className="relative py-24 bg-slate-900/30 border-y border-white/5">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
               initial="initial"
               whileInView="animate"
               viewport={{ once: true }}
               variants={stagger}
-              className="flex flex-col-reverse gap-12 lg:flex-row lg:items-center"
+              className="text-center mb-16"
             >
-              <motion.div variants={fadeIn} className="flex-1">
-                <div className="aspect-video relative rounded-3xl overflow-hidden border border-primary/20 bg-slate-900 shadow-2xl shadow-primary/10">
-                  <img
-                    src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop"
-                    alt="Clean analytics dashboard"
-                    className="object-cover w-full h-full"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-transparent to-transparent" />
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
-                    <div className="h-20 w-20 rounded-full bg-primary flex items-center justify-center animate-pulse shadow-2xl shadow-primary">
-                      <Box className="h-10 w-10 text-white" />
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-              <motion.div variants={fadeIn} className="flex-1 space-y-6">
-                <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm font-medium text-primary ring-1 ring-inset ring-primary/20">
-                  The Solution
-                </div>
-                <h2 className="text-3xl font-bold tracking-tight sm:text-5xl">
-                  Intelligent Control For The Modern Enterprise
-                </h2>
-                <p className="text-lg text-slate-400">
-                  InvMaster transforms your operations from reactive to proactive. Get visibility into every corner of your warehouse, instantly.
-                </p>
-                <ul className="space-y-4">
-                  {[
-                    "One source of truth for all locations",
-                    "Automated low-stock alerts and reordering",
-                    "Predictive analytics to forecast demand",
-                    "Seamless supplier collaboration portal"
-                  ].map((item, i) => (
-                    <motion.li
-                      key={i}
-                      variants={fadeIn}
-                      className="flex items-center gap-3"
-                    >
-                      <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center text-primary">
-                        <CheckCircle2 className="h-4 w-4" />
-                      </div>
-                      <span className="font-medium">{item}</span>
-                    </motion.li>
-                  ))}
-                </ul>
-                <div className="pt-6">
-                  <Link href="/login">
-                    <Button className="group rounded-full bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20">
-                      Experience the Clarity <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </Link>
-                </div>
-              </motion.div>
+              <div className="inline-block rounded-lg bg-green-500/10 px-3 py-1 text-sm font-medium text-green-500 ring-1 ring-inset ring-green-500/20 mb-4">
+                The Solution
+              </div>
+              <motion.h2 variants={fadeIn} className="text-3xl font-bold tracking-tight sm:text-5xl">
+                Turn Chaos into Control
+              </motion.h2>
+              <motion.p variants={fadeIn} className="mx-auto mt-4 max-w-2xl text-slate-400">
+                InvMaster replaces guesswork with data. It travels with you, scales with you, and keeps your team aligned.
+              </motion.p>
             </motion.div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              <motion.div variants={fadeIn} className="bg-slate-950 border border-white/10 p-8 rounded-3xl relative overflow-hidden group hover:border-green-500/30 transition-colors">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <Zap className="h-24 w-24 text-green-500" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Real-Time Sync</h3>
+                <p className="text-slate-400 text-sm">Update stock on mobile, see it on desktop instantly. Everyone sees the same numbers.</p>
+              </motion.div>
+              <motion.div variants={fadeIn} className="bg-slate-950 border border-white/10 p-8 rounded-3xl relative overflow-hidden group hover:border-blue-500/30 transition-colors">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <ShieldCheck className="h-24 w-24 text-blue-500" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Smart Safety Nets</h3>
+                <p className="text-slate-400 text-sm">Permission controls prevent unauthorized edits. Logs capture every mistake.</p>
+              </motion.div>
+              <motion.div variants={fadeIn} className="bg-slate-950 border border-white/10 p-8 rounded-3xl relative overflow-hidden group hover:border-purple-500/30 transition-colors">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <BarChart3 className="h-24 w-24 text-purple-500" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Growth Ready</h3>
+                <p className="text-slate-400 text-sm">Start with 50 items. Scale to 50,000. We handle the infrastructure.</p>
+              </motion.div>
+            </div>
           </div>
         </section>
-
-        {/* Features Section */}
         <section id="features" className="container mx-auto py-24 md:py-32 px-4 md:px-6">
           <motion.div
             initial="initial"
@@ -280,8 +267,10 @@ export default function Home() {
             variants={stagger}
             className="text-center mb-16 space-y-4"
           >
-            <motion.h2 variants={fadeIn} className="text-3xl font-bold tracking-tight sm:text-5xl">Powerful Tools, Simplified</motion.h2>
-            <motion.p variants={fadeIn} className="mx-auto max-w-2xl text-slate-400">Everything you need to manage your business at scale, without the complexity.</motion.p>
+            <motion.h2 variants={fadeIn} className="text-3xl font-bold tracking-tight sm:text-5xl">Everything You Need</motion.h2>
+            <motion.p variants={fadeIn} className="mx-auto max-w-2xl text-slate-400">
+              Built for growing businesses. Start simple, scale up when you need to.
+            </motion.p>
           </motion.div>
 
           <motion.div
@@ -293,46 +282,46 @@ export default function Home() {
           >
             {[
               {
-                icon: Box,
-                title: "Smart Inventory",
-                desc: "Real-time tracking with barcode support and multi-location management.",
+                icon: Users,
+                title: "Team Permissions",
+                desc: "Invite storekeepers and managers. Control who can edit items vs just view stock.",
                 color: "text-blue-500",
                 bg: "bg-blue-500/10"
               },
               {
+                icon: Mail,
+                title: "Email Alerts",
+                desc: "Never run out of stock. Get automated emails when items dip below minimum levels.",
+                color: "text-orange-500",
+                bg: "bg-orange-500/10"
+              },
+              {
                 icon: BarChart3,
-                title: "Deep Analytics",
-                desc: "Visual charts and reports to understand your stock levels and trends.",
+                title: "Advanced Reports",
+                desc: "Visualize your usage trends. See what's moving fast and what's stuck.",
                 color: "text-purple-500",
                 bg: "bg-purple-500/10"
               },
               {
+                icon: Box,
+                title: "Unlimited Items",
+                desc: "Scale without limits. Pro plan supports unlimited inventory items and SKUs.",
+                color: "text-green-500",
+                bg: "bg-green-500/10"
+              },
+              {
                 icon: ShieldCheck,
-                title: "Enterprise Security",
-                desc: "Role-based access control and detailed audit logs for full compliance.",
+                title: "Audit Logs",
+                desc: "Track every movement. See exactly who added or removed stock and when.",
                 color: "text-emerald-500",
                 bg: "bg-emerald-500/10"
               },
               {
-                icon: Search,
-                title: "Advanced Search",
-                desc: "Find anything in seconds with powerful filtering and search queries.",
+                icon: Zap,
+                title: "Instant Search",
+                desc: "Find any item by Name, SKU, or Category in milliseconds.",
                 color: "text-yellow-500",
                 bg: "bg-yellow-500/10"
-              },
-              {
-                icon: RefreshCcw,
-                title: "Automatic Sync",
-                desc: "Everything stays in sync across all devices and team members instantly.",
-                color: "text-rose-500",
-                bg: "bg-rose-500/10"
-              },
-              {
-                icon: Layers,
-                title: "Bulk Operations",
-                desc: "Save time with powerful bulk adjustment and import/export tools.",
-                color: "text-sky-500",
-                bg: "bg-sky-500/10"
               }
             ].map((f, i) => (
               <motion.div
@@ -350,12 +339,109 @@ export default function Home() {
           </motion.div>
         </section>
 
+        {/* Pricing Section */}
+        <section id="pricing" className="relative py-24 bg-slate-900/50">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="flex flex-col items-center text-center space-y-4 mb-16">
+              <h2 className="text-3xl font-bold tracking-tight sm:text-5xl">Simple, Transparent Pricing</h2>
+              <p className="text-slate-400 max-w-2xl">Start for free, upgrade when you grow. No hidden fees.</p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              {/* Free Plan */}
+              <div className="rounded-3xl border border-white/10 bg-slate-950 p-8 flex flex-col gap-6">
+                <div>
+                  <h3 className="text-xl font-semibold text-slate-200">Starter</h3>
+                  <div className="mt-2 flex items-baseline gap-1">
+                    <span className="text-4xl font-bold text-white">$0</span>
+                    <span className="text-sm text-slate-500">/month</span>
+                  </div>
+                  <p className="mt-4 text-sm text-slate-400">For small shops and solo founders.</p>
+                </div>
+                <ul className="space-y-3 flex-1">
+                  <li className="flex gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" /> 1 User (Admin)
+                  </li>
+                  <li className="flex gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" /> Up to 50 Items
+                  </li>
+                  <li className="flex gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" /> Basic Tracking
+                  </li>
+                </ul>
+                <Link href="/signup">
+                  <Button variant="outline" className="w-full rounded-full h-12 border-white/20 hover:bg-white/10 text-white">
+                    Start for Free
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Pro Plan */}
+              <div className="relative rounded-3xl border border-primary/50 bg-slate-900 p-8 flex flex-col gap-6 shadow-2xl shadow-primary/10">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
+                  Most Popular
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-white">Pro</h3>
+                  <div className="mt-2 flex items-baseline gap-1">
+                    <span className="text-4xl font-bold text-white">$19</span>
+                    <span className="text-sm text-slate-500">/month</span>
+                  </div>
+                  <p className="mt-4 text-sm text-slate-400">For growing teams and serious businesses.</p>
+                </div>
+                <ul className="space-y-3 flex-1">
+                  <li className="flex gap-3 text-sm text-white">
+                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> <strong>5 Team Members</strong>
+                  </li>
+                  <li className="flex gap-3 text-sm text-white">
+                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> <strong>Unlimited Items</strong>
+                  </li>
+                  <li className="flex gap-3 text-sm text-white">
+                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> Low Stock Email Alerts
+                  </li>
+                  <li className="flex gap-3 text-sm text-white">
+                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> Advanced Reports
+                  </li>
+                </ul>
+                <Link href="/signup">
+                  <Button className="w-full rounded-full h-12 bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/25">
+                    Get Started with Pro
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* How It Works Section */}
+        <section id="how-it-works" className="py-24 relative overflow-hidden">
+          <div className="container mx-auto px-4 md:px-6 relative z-10">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-bold tracking-tight sm:text-5xl">Get Started in 3 Steps</h2>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-12">
+              <div className="text-center space-y-4">
+                <div className="mx-auto h-16 w-16 rounded-2xl bg-slate-800 flex items-center justify-center text-2xl font-bold text-white border border-white/10">1</div>
+                <h3 className="text-xl font-bold">Sign Up</h3>
+                <p className="text-slate-400">Create your account. No credit card required for the Free plan.</p>
+              </div>
+              <div className="text-center space-y-4">
+                <div className="mx-auto h-16 w-16 rounded-2xl bg-slate-800 flex items-center justify-center text-2xl font-bold text-white border border-white/10">2</div>
+                <h3 className="text-xl font-bold">Create Organization</h3>
+                <p className="text-slate-400">Name your workspace. You'll be the Admin automatically.</p>
+              </div>
+              <div className="text-center space-y-4">
+                <div className="mx-auto h-16 w-16 rounded-2xl bg-slate-800 flex items-center justify-center text-2xl font-bold text-white border border-white/10">3</div>
+                <h3 className="text-xl font-bold">Invite Team</h3>
+                <p className="text-slate-400">Add your managers and storekeepers to start collaborating.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Final CTA */}
         <section className="relative py-24 md:py-32 overflow-hidden">
-          <div className="absolute inset-0 z-0">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] bg-primary/10 rounded-full blur-[120px]" />
-          </div>
-
           <div className="container mx-auto relative z-10 px-4 md:px-6">
             <motion.div
               initial="initial"
@@ -366,22 +452,15 @@ export default function Home() {
             >
               <motion.h2 variants={fadeIn} className="text-4xl font-bold tracking-tight sm:text-6xl">Ready to take control?</motion.h2>
               <motion.p variants={fadeIn} className="text-xl text-slate-400">
-                Join hundreds of businesses that have transformed their inventory management with InvMaster.
-                Start your 14-day free trial today.
+                Join our premium inventory platform. Stop guessing, start tracking.
               </motion.p>
               <motion.div variants={fadeIn} className="flex flex-col gap-4 sm:flex-row">
-                <Link href="/login">
+                <Link href="/signup">
                   <Button size="lg" className="h-16 rounded-full px-12 text-lg shadow-2xl shadow-primary/30">
                     Get Started Now
                   </Button>
                 </Link>
-                <Link href="/login">
-                  <Button size="lg" variant="outline" className="h-16 rounded-full px-12 text-lg border-white/10 bg-white/5 backdrop-blur-sm">
-                    Book a Demo
-                  </Button>
-                </Link>
               </motion.div>
-              <motion.p variants={fadeIn} className="text-sm text-slate-500">No credit card required. Cancel anytime.</motion.p>
             </motion.div>
           </div>
         </section>
@@ -399,33 +478,28 @@ export default function Home() {
                 <span>InvMaster</span>
               </div>
               <p className="max-w-xs text-sm text-slate-500">
-                The world's most elegant inventory management system. Built for speed, designed for humans.
+                The modern inventory OS for growing businesses.
               </p>
             </div>
             <div className="space-y-4">
               <h4 className="font-bold text-sm uppercase tracking-widest text-slate-500">Product</h4>
               <ul className="space-y-2 text-sm text-slate-400">
                 <li><Link href="#features" className="hover:text-white transition-colors">Features</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Pricing</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Changelog</Link></li>
+                <li><Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link></li>
+                <li><Link href="#how-it-works" className="hover:text-white transition-colors">How it Works</Link></li>
               </ul>
             </div>
             <div className="space-y-4">
-              <h4 className="font-bold text-sm uppercase tracking-widest text-slate-500">Company</h4>
+              <h4 className="font-bold text-sm uppercase tracking-widest text-slate-500">Contact</h4>
               <ul className="space-y-2 text-sm text-slate-400">
-                <li><Link href="#" className="hover:text-white transition-colors">About Us</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Terms of Service</Link></li>
+                <li><a href="mailto:aafaquebuisness@gmail.com" className="hover:text-white transition-colors">aafaquebuisness@gmail.com</a></li>
               </ul>
             </div>
           </div>
           <div className="mt-12 flex flex-col items-center justify-between border-t border-white/5 pt-8 md:flex-row">
             <p className="text-sm text-slate-500">
-              &copy; 2025 InvMaster. All rights reserved. Made by Aafaque.
+              &copy; 2025 InvMaster. All rights reserved.
             </p>
-            <div className="flex gap-6 mt-4 md:mt-0">
-              {/* social links placeholder */}
-            </div>
           </div>
         </div>
       </footer>

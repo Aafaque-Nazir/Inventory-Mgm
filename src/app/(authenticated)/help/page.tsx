@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from 'sonner'
 import { submitSupportTicket } from '@/app/actions/support'
 import { Loader2, Send } from 'lucide-react'
+import { UserTickets } from '@/components/support/UserTickets'
 
 export default function HelpPage() {
     const [isPending, startTransition] = useTransition()
@@ -45,6 +46,7 @@ export default function HelpPage() {
                     <TabsTrigger value="report">Report a Bug</TabsTrigger>
                     <TabsTrigger value="feature">Feature Request</TabsTrigger>
                     <TabsTrigger value="contact">Contact Support</TabsTrigger>
+                    <TabsTrigger value="history">My Activity</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="report" className="space-y-4">
@@ -148,7 +150,11 @@ export default function HelpPage() {
                         </CardContent>
                     </Card>
                 </TabsContent>
+
+                <TabsContent value="history">
+                    <UserTickets />
+                </TabsContent>
             </Tabs>
-        </div>
+        </div >
     )
 }

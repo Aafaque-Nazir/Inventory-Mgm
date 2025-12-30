@@ -44,13 +44,17 @@ export default function SignupPage() {
             }
 
             // If email confirmation is enabled in Supabase, data.user will be present but session might be null
+            // If email confirmation is enabled in Supabase, data.user will be present but session might be null
             if (data.user && !data.session) {
                 setIsSuccess(true)
-                toast.success("Account created! Please check your email.")
+                toast.success("Signup successful! Please verify your email to continue.")
             } else if (data.session) {
                 // If email confirmation is disabled or auto-confirmed
                 toast.success("Account created successfully!")
                 router.push("/onboarding")
+            } else if (!data.user && !data.session) {
+                // Edge case
+                toast.error("Something went wrong. Please try again.")
             }
         })
     }
@@ -79,19 +83,19 @@ export default function SignupPage() {
             <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
                 <div className="absolute inset-0 bg-zinc-900">
                     <img
-                        src="https://images.unsplash.com/photo-1586771107445-d3ca888129ff?q=80&w=2072&auto=format&fit=crop"
+                        src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2670&auto=format&fit=crop"
                         alt="Signup Background"
-                        className="h-full w-full object-cover opacity-40 mix-blend-overlay"
+                        className="h-full w-full object-cover opacity-30 mix-blend-color-dodge"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-900/90 via-slate-900/90 to-black/90 mix-blend-multiply" />
+                    <div className="absolute inset-0 bg-gradient-to-tr from-indigo-950/90 via-slate-950/90 to-black/90" />
                 </div>
                 <div className="relative z-20 flex items-center text-2xl font-bold tracking-tight">
-                    <LayoutDashboard className="mr-2 h-8 w-8 text-blue-400" />
+                    <LayoutDashboard className="mr-2 h-8 w-8 text-indigo-400" />
                     Inventory Management
                 </div>
                 <div className="relative z-20 mt-auto">
-                    <blockquote className="space-y-2 border-l-2 border-blue-500 pl-6">
-                        <p className="text-xl font-medium leading-relaxed italic text-blue-100">
+                    <blockquote className="space-y-2 border-l-2 border-indigo-500 pl-6">
+                        <p className="text-xl font-medium leading-relaxed italic text-indigo-100">
                             &ldquo;Join thousands of businesses streamlining their operations with our advanced inventory solutions.&rdquo;
                         </p>
                     </blockquote>
@@ -121,6 +125,7 @@ export default function SignupPage() {
                                     autoCorrect="off"
                                     disabled={isPending}
                                     required
+                                    className="h-11 bg-background"
                                 />
                             </div>
                             <div className="grid gap-2">
@@ -135,6 +140,7 @@ export default function SignupPage() {
                                     autoCorrect="off"
                                     disabled={isPending}
                                     required
+                                    className="h-11 bg-background"
                                 />
                             </div>
                             <div className="grid gap-2">
@@ -147,22 +153,23 @@ export default function SignupPage() {
                                     disabled={isPending}
                                     required
                                     minLength={8}
+                                    className="h-11 bg-background"
                                 />
                             </div>
-                            <Button disabled={isPending}>
+                            <Button disabled={isPending} className="h-11 font-medium bg-primary hover:bg-primary/90">
                                 {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 Sign Up with Email
                             </Button>
                         </div>
                     </form>
 
-                    <p className="px-8 text-center text-sm text-muted-foreground">
-                        By clicking continue, you agree to our{" "}
-                        <Link href="/terms" className="underline underline-offset-4 hover:text-primary">
+                    <p className="px-8 text-center text-xs text-muted-foreground">
+                        By clicking continue, you agree to our{' '}
+                        <Link href="/terms" className="underline underline-offset-4 hover:text-primary transition-colors">
                             Terms of Service
-                        </Link>{" "}
-                        and{" "}
-                        <Link href="/privacy" className="underline underline-offset-4 hover:text-primary">
+                        </Link>{' '}
+                        and{' '}
+                        <Link href="/privacy" className="underline underline-offset-4 hover:text-primary transition-colors">
                             Privacy Policy
                         </Link>
                         .

@@ -1,4 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
+import Link from 'next/link'
+import { BarChart3 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { StockDistributionChart } from '@/components/reports/StockDistributionChart'
 import { MovementTrendChart } from '@/components/reports/MovementTrendChart'
 import { LowStockTable } from '@/components/reports/LowStockTable'
@@ -16,19 +19,42 @@ export default async function ReportsPage() {
 
     let organizationId: string | null = null
     let isSuperAdmin = false
+    let planType = 'FREE'
 
     if (user) {
         const { data: profile } = await supabase
             .from('profiles')
-            .select('organization_id, is_super_admin')
+            .select('organization_id, is_super_admin, organizations(plan_type)')
             .eq('id', user.id)
             .single()
         organizationId = profile?.organization_id || null
         isSuperAdmin = profile?.is_super_admin || false
+        // @ts-ignore
+        if (profile?.organizations?.plan_type) {
+            // @ts-ignore
+            planType = profile.organizations.plan_type
+        }
     }
 
     if (!organizationId && !isSuperAdmin) {
         return <div className="p-8">No organization found for reports/analytics.</div>
+    }
+
+    if (planType === 'FREE' && !isSuperAdmin) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
+                <div className="p-4 bg-muted rounded-full">
+                    <BarChart3 className="h-12 w-12 text-muted-foreground" />
+                </div>
+                <h2 className="text-2xl font-bold tracking-tight">Advanced Analytics is a Pro Feature</h2>
+                <p className="text-muted-foreground max-w-md">
+                    Upgrade your plan to unlock detailed reports, stock movement trends, and predictive analytics.
+                </p>
+                <Button asChild>
+                    <Link href="/pricing">Upgrade to Pro</Link>
+                </Button>
+            </div>
+        )
     }
 
     // --- Fetch All Items ---

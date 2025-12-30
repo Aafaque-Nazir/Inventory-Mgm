@@ -12,8 +12,10 @@ import {
     Users,
     ShoppingCart,
     BarChart3,
+    CreditCard,
     Lock,
-    HelpCircle
+    HelpCircle,
+    Settings
 } from 'lucide-react'
 
 const navigation = [
@@ -23,7 +25,9 @@ const navigation = [
     { name: 'Suppliers', href: '/suppliers', icon: Users },
     { name: 'Purchase Orders', href: '/purchase-orders', icon: ShoppingCart },
     { name: 'Reports', href: '/reports', icon: BarChart3 },
+    { name: 'Pricing', href: '/pricing', icon: CreditCard },
     { name: 'Help & Support', href: '/help', icon: HelpCircle },
+    { name: 'Settings', href: '/settings', icon: Settings },
 ]
 
 export function Sidebar() {
@@ -66,7 +70,7 @@ export function Sidebar() {
             <nav className="flex-1 space-y-1 px-3 py-4">
                 {finalNavigation.map((item) => {
                     const isActive = pathname.startsWith(item.href)
-                    const isLocked = item.name === 'Reports' && planType === 'FREE'
+                    const isLocked = item.name === 'Reports' && planType === 'FREE' && !isSuperAdmin
 
                     return (
                         <Link

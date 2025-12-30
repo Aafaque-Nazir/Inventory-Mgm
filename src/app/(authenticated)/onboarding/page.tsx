@@ -1,9 +1,10 @@
 'use client'
 
 import { useTransition } from "react"
-import { LayoutDashboard, Loader2, ArrowRight } from "lucide-react"
+import { LayoutDashboard, Loader2, ArrowRight, LogOut } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import { createClient } from "@/lib/supabase/client"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createOrganization } from "@/app/actions/onboarding"
@@ -56,6 +57,19 @@ export default function OnboardingPage() {
                         <h1 className="text-2xl font-semibold tracking-tight">
                             Create your Organization
                         </h1>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-8 top-8 text-muted-foreground hover:text-foreground"
+                            onClick={async () => {
+                                const supabase = createClient()
+                                await supabase.auth.signOut()
+                                window.location.href = '/login'
+                            }}
+                        >
+                            <LogOut className="mr-2 h-4 w-4" />
+                            Sign Out
+                        </Button>
                         <p className="text-sm text-muted-foreground">
                             Enter the name of your company or shop. We&apos;ll create a Free account for you to get started.
                         </p>
