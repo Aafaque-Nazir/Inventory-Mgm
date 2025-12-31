@@ -59,7 +59,7 @@ export default function SuperAdminPage() {
                                 <DollarSign className="h-4 w-4 text-green-500" />
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold">{loading ? '...' : `$${stats?.mrr || 0}`}</div>
+                                <div className="text-2xl font-bold">{loading ? '...' : `₹${stats?.mrr || 0}`}</div>
                             </CardContent>
                         </Card>
                         <Card>
