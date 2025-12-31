@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 import { useState, useEffect } from 'react'
 import Script from 'next/script'
 import { toast } from 'sonner'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 declare global {
@@ -21,8 +21,9 @@ export default function PricingPage() {
     const [currentPlan, setCurrentPlan] = useState<string>('FREE')
     const [isLoadingPlan, setIsLoadingPlan] = useState(true)
     const router = useRouter()
+    const searchParams = useSearchParams()
+    // const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null // BROKEN: Causes infinite loop
     const supabase = createClient()
-    const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
 
     // Verify Payment Effect
     useEffect(() => {
@@ -52,8 +53,10 @@ export default function PricingPage() {
                 toast.error(data.error || "Payment verification failed")
             }
         } catch (error) {
-            toast.error("Verification failed")
+            toast.error("Verification failed or Payment was cancelled")
         } finally {
+            // Clean URL even on failure to prevent loop/retry on refresh
+            window.history.replaceState({}, document.title, window.location.pathname)
             setLoading(false)
         }
     }
