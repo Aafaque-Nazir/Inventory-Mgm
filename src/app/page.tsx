@@ -353,7 +353,7 @@ export default function Home() {
                 <div>
                   <h3 className="text-xl font-semibold text-slate-200">Starter</h3>
                   <div className="mt-2 flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-white">$0</span>
+                    <span className="text-4xl font-bold text-white">₹0</span>
                     <span className="text-sm text-slate-500">/month</span>
                   </div>
                   <p className="mt-4 text-sm text-slate-400">For small shops and solo founders.</p>
@@ -384,7 +384,7 @@ export default function Home() {
                 <div>
                   <h3 className="text-xl font-semibold text-white">Pro</h3>
                   <div className="mt-2 flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-white">$19</span>
+                    <span className="text-4xl font-bold text-white">₹1499</span>
                     <span className="text-sm text-slate-500">/month</span>
                   </div>
                   <p className="mt-4 text-sm text-slate-400">For growing teams and serious businesses.</p>
@@ -400,12 +400,18 @@ export default function Home() {
                     <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> Low Stock Email Alerts
                   </li>
                   <li className="flex gap-3 text-sm text-white">
-                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> Advanced Reports
+                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> <strong>Profit & Margin Analytics</strong> 💰
+                  </li>
+                  <li className="flex gap-3 text-sm text-white">
+                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> <strong>AI Stock Predictions</strong> 🤖
+                  </li>
+                  <li className="flex gap-3 text-sm text-white">
+                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> Bulk CSV Export 📤
                   </li>
                 </ul>
                 <Link href="/signup">
                   <Button className="w-full rounded-full h-12 bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/25">
-                    Get Started with Pro
+                    Upgrade to Pro
                   </Button>
                 </Link>
               </div>
