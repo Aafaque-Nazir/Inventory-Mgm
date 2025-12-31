@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { ItemsTable } from '@/components/items/ItemsTable'
 import { CreateItemDialog } from '@/components/items/CreateItemDialog'
+import { ExportButton } from '@/components/items/ExportButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,16 +13,27 @@ export default async function ItemsPage() {
 
     let organizationId: string | null = null
     let isSuperAdmin = false
+    let isPro = false
 
     if (user) {
         const { data: profile } = await supabase
             .from('profiles')
-            .select('organization_id, is_super_admin')
+            .select('organization_id, is_super_admin, organizations(plan_type, subscription_end_date)')
             .eq('id', user.id)
             .single()
 
         organizationId = profile?.organization_id || null
         isSuperAdmin = profile?.is_super_admin || false
+
+        // Check Pro Status
+        // @ts-ignore
+        if (profile?.organizations?.plan_type === 'PRO') {
+            // @ts-ignore
+            const endDate = profile.organizations.subscription_end_date
+            if (endDate && new Date(endDate) > new Date()) {
+                isPro = true
+            }
+        }
     }
 
     // Build query with tenant filter (unless Super Admin)
@@ -44,8 +56,14 @@ export default async function ItemsPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold tracking-tight">Inventory</h1>
-                <CreateItemDialog />
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">Inventory</h1>
+                    <p className="text-muted-foreground">Manage your stock and items.</p>
+                </div>
+                <div className="flex gap-2">
+                    <ExportButton items={items || []} isPro={isPro || isSuperAdmin} />
+                    <CreateItemDialog />
+                </div>
             </div>
             <ItemsTable items={items || []} />
         </div>

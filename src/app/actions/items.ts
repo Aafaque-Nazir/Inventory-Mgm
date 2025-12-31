@@ -11,6 +11,8 @@ const itemSchema = z.object({
     unit: z.string().min(1),
     min_stock: z.coerce.number().min(0),
     initial_stock: z.coerce.number().min(0).optional(),
+    cost_price: z.coerce.number().min(0).optional().default(0),
+    selling_price: z.coerce.number().min(0).optional().default(0),
 })
 
 export async function createItem(prevState: any, formData: FormData) {
@@ -24,6 +26,8 @@ export async function createItem(prevState: any, formData: FormData) {
         unit: formData.get('unit'),
         min_stock: formData.get('min_stock'),
         initial_stock: formData.get('initial_stock'),
+        cost_price: formData.get('cost_price'),
+        selling_price: formData.get('selling_price'),
     }
 
     const validatedFields = itemSchema.safeParse(rawData)
@@ -39,7 +43,7 @@ export async function createItem(prevState: any, formData: FormData) {
         // 1. Get Organization and Plan
         const { data: profile } = await supabase
             .from('profiles')
-            .select('organization_id, is_super_admin, organizations(plan_type, max_items)')
+            .select('organization_id, is_super_admin, organizations(plan_type, max_items, subscription_end_date)')
             .eq('id', user.id)
             .single()
 
@@ -48,9 +52,17 @@ export async function createItem(prevState: any, formData: FormData) {
         const orgId = profile.organization_id
         // TypeScript workaround for nested join
         const org = profile.organizations as any
-        const plan = org?.plan_type || 'FREE'
+        let plan = org?.plan_type || 'FREE'
         const maxItems = org?.max_items || 50
         const isSuperAdmin = profile.is_super_admin
+
+        // Check for Expiry
+        if (plan === 'PRO' && org?.subscription_end_date) {
+            const expiry = new Date(org.subscription_end_date)
+            if (expiry < new Date()) {
+                plan = 'FREE' // Treat as FREE if expired
+            }
+        }
 
         // 2. Check Item Limit (Only for Free Plan)
         if (plan === 'FREE' && !isSuperAdmin) {
@@ -89,6 +101,8 @@ export async function createItem(prevState: any, formData: FormData) {
                 quantity: initial_stock,
                 type: 'IN',
                 reason: 'Initial stock',
+                // For initial stock, we assume the unit price is the COST price
+                unit_price: itemData.cost_price,
                 created_by: user.id
             })
         }

@@ -30,7 +30,10 @@ import {
     Users,
     ShoppingCart,
     BarChart3,
-    Shield
+    Shield,
+    CreditCard,
+    HelpCircle,
+    Crown
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { useEffect, useState } from 'react'
@@ -52,6 +55,9 @@ export function Topbar() {
         { name: 'Suppliers', href: '/suppliers', icon: Users },
         { name: 'Purchase Orders', href: '/purchase-orders', icon: ShoppingCart },
         { name: 'Reports', href: '/reports', icon: BarChart3 },
+        { name: 'Pricing', href: '/pricing', icon: CreditCard },
+        { name: 'Help & Support', href: '/help', icon: HelpCircle },
+        { name: 'Settings', href: '/settings', icon: Settings },
     ]
 
     useEffect(() => {
@@ -101,25 +107,30 @@ export function Topbar() {
                         <nav className="flex-1 space-y-1 px-3 py-4">
                             {navigation.map((item) => {
                                 const isActive = pathname.startsWith(item.href)
+                                const isLocked = item.name === 'Reports' && (!profile?.organization?.plan_type || profile.organization.plan_type === 'FREE') && !profile?.is_super_admin
+
                                 return (
                                     <Link
                                         key={item.name}
                                         href={item.href}
                                         onClick={() => setOpen(false)}
                                         className={cn(
-                                            'group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                                            'group flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-colors',
                                             isActive
                                                 ? 'bg-primary/10 text-primary'
                                                 : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                                         )}
                                     >
-                                        <item.icon
-                                            className={cn(
-                                                'mr-3 h-5 w-5 flex-shrink-0',
-                                                isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-accent-foreground'
-                                            )}
-                                        />
-                                        {item.name}
+                                        <div className="flex items-center">
+                                            <item.icon
+                                                className={cn(
+                                                    'mr-3 h-5 w-5 flex-shrink-0',
+                                                    isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-accent-foreground'
+                                                )}
+                                            />
+                                            {item.name}
+                                        </div>
+                                        {isLocked && <Crown className="h-4 w-4 text-amber-500 fill-amber-500/20" />}
                                     </Link>
                                 )
                             })}

@@ -2,7 +2,9 @@ import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Package, Users, AlertTriangle, ArrowRightLeft } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { format } from 'date-fns'
+import { format, subDays } from 'date-fns'
+import { calculateForecasts } from '@/lib/ai-forecast'
+import { AiInsightsCard } from '@/components/dashboard/AiInsightsCard'
 
 export const dynamic = 'force-dynamic'
 
@@ -56,6 +58,21 @@ export default async function DashboardPage() {
     const lowStockCount = allItems?.filter(i => i.current_stock < i.min_stock).length || 0
     const lowStockList = allItems?.filter(i => i.current_stock < i.min_stock).slice(0, 5) || []
 
+    // --- AI Forecast Data Fetching ---
+    // Fetch last 30 days of movements for analysis
+    const thirtyDaysAgo = subDays(new Date(), 30).toISOString()
+    let historyQuery = supabase
+        .from('stock_movements')
+        .select('*')
+        .gte('created_at', thirtyDaysAgo)
+    if (!isSuperAdmin && organizationId) {
+        historyQuery = historyQuery.eq('organization_id', organizationId)
+    }
+    const { data: historyMovements } = await historyQuery
+
+    // Calculate AI Forecasts
+    const forecasts = calculateForecasts(allItems || [], historyMovements || [])
+
     return (
         <div className="space-y-6">
             <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
@@ -99,6 +116,9 @@ export default async function DashboardPage() {
                     </CardContent>
                 </Card>
             </div >
+
+            {/* AI Insights Section - Only render if we have forecasts */}
+            <AiInsightsCard forecasts={forecasts} />
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                 <Card className="col-span-4">

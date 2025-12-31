@@ -16,7 +16,7 @@ export async function sendLowStockAlert(
 
     try {
         const { data, error } = await resend.emails.send({
-            from: 'InvMaster Alerts <alerts@resend.dev>', // Or a verified domain
+            from: 'InvMaster Alerts <onboarding@resend.dev>', // Default Resend test domain
             to: [email],
             subject: `⚠️ Low Stock Alert: ${itemName}`,
             html: `
@@ -33,10 +33,13 @@ export async function sendLowStockAlert(
 
         if (error) {
             console.error('Resend error:', error)
+            return { success: false, error }
         } else {
             console.log('Low stock alert sent:', data)
+            return { success: true }
         }
     } catch (err) {
         console.error('Failed to send email alert:', err)
+        return { success: false, error: err }
     }
 }

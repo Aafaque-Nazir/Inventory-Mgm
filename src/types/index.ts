@@ -21,6 +21,8 @@ export interface Item {
     min_stock: number
     max_stock: number | null
     current_stock: number
+    cost_price: number // New field
+    selling_price: number // New field
     created_at: string
     updated_at: string
 }
@@ -69,6 +71,7 @@ export interface StockMovement {
     type: StockMovementType
     reason: string | null
     reference_id: string | null
+    unit_price?: number // New field (at time of movement)
     created_by: string | null
     created_at: string
     item?: Item // Joined

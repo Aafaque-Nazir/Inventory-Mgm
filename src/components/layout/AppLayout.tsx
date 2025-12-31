@@ -46,14 +46,24 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 return
             }
 
-            // Get organization subscription status
+            // Get organization subscription status and end date
             const { data: org } = await supabase
                 .from('organizations')
-                .select('subscription_status')
+                .select('subscription_status, subscription_end_date')
                 .eq('id', profile.organization_id)
                 .single()
 
-            setSubscriptionStatus(org?.subscription_status || 'NONE')
+            let status = org?.subscription_status || 'NONE'
+
+            // Check for Expiry
+            if (status === 'ACTIVE' && org?.subscription_end_date) {
+                const expiryDate = new Date(org.subscription_end_date)
+                if (expiryDate < new Date()) {
+                    status = 'EXPIRED'
+                }
+            }
+
+            setSubscriptionStatus(status)
             setLoading(false)
         }
 
@@ -74,61 +84,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         )
     }
 
-    // Block access if subscription is not active (unless super admin)
-    if (!isSuperAdmin && subscriptionStatus !== 'ACTIVE') {
-        return (
-            <div className="flex h-screen w-full items-center justify-center bg-gradient-to-br from-background to-muted p-4">
-                <Card className="max-w-md w-full shadow-lg border-destructive/20">
-                    <CardHeader className="text-center pb-2">
-                        <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center">
-                            <AlertCircle className="h-8 w-8 text-destructive" />
-                        </div>
-                        <CardTitle className="text-2xl">Subscription {subscriptionStatus === 'EXPIRED' ? 'Expired' : 'Inactive'}</CardTitle>
-                        <CardDescription className="text-base">
-                            Your organization's subscription is currently not active. Your data is safe and will be available once renewed.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="bg-muted/50 rounded-lg p-4 space-y-3">
-                            <p className="text-sm font-medium text-center">Contact to renew your subscription:</p>
-                            <div className="space-y-2">
-                                <a
-                                    href="mailto:aafaque@example.com"
-                                    className="flex items-center gap-3 p-3 rounded-md bg-background hover:bg-accent transition-colors"
-                                >
-                                    <Mail className="h-5 w-5 text-primary" />
-                                    <div>
-                                        <p className="text-sm font-medium">Email</p>
-                                        <p className="text-xs text-muted-foreground">aafaque@example.com</p>
-                                    </div>
-                                </a>
-                                <a
-                                    href="tel:+919876543210"
-                                    className="flex items-center gap-3 p-3 rounded-md bg-background hover:bg-accent transition-colors"
-                                >
-                                    <Phone className="h-5 w-5 text-primary" />
-                                    <div>
-                                        <p className="text-sm font-medium">Phone</p>
-                                        <p className="text-xs text-muted-foreground">+91 98765 43210</p>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        <Button
-                            variant="outline"
-                            className="w-full"
-                            onClick={async () => {
-                                await supabase.auth.signOut()
-                                window.location.href = '/login'
-                            }}
-                        >
-                            Sign Out
-                        </Button>
-                    </CardContent>
-                </Card>
-            </div>
-        )
-    }
 
     return (
         <div className="flex h-screen overflow-hidden bg-background">

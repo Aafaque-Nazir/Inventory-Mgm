@@ -40,12 +40,15 @@ export async function recordStockMovement(
         }
 
         // 2. Insert movement
+        const unitPrice = type === 'OUT' ? item.selling_price : item.cost_price
+
         const { error: moveError } = await supabase.from('stock_movements').insert({
             item_id,
             quantity,
             type,
             reason,
             organization_id: item.organization_id, // Ensure it matches item's org
+            unit_price: unitPrice || 0, // Save price at time of movement
             created_by: user.id
         })
 
@@ -81,18 +84,21 @@ export async function recordStockMovement(
 
         const isSuperAdmin = profile?.is_super_admin
 
+        let alertMessage = ''
         if (type === 'OUT' && newStock <= item.min_stock) {
             if (plan !== 'FREE' || isSuperAdmin) {
-                console.log('Triggering low stock alert...')
-                await sendLowStockAlert(
+                const emailResult = await sendLowStockAlert(
                     user.email || '',
                     item.name,
                     newStock,
                     item.min_stock,
                     item.organization?.name || 'Your Organization'
                 )
-            } else {
-                console.log('Low stock alert skipped (Free Plan)')
+                if (emailResult?.success) {
+                    alertMessage = ' (Low stock alert sent - Check Spam folder if missing)'
+                } else {
+                    alertMessage = ' (Failed to send email alert - check system logs)'
+                }
             }
         }
 
@@ -100,7 +106,7 @@ export async function recordStockMovement(
         revalidatePath('/dashboard')
         revalidatePath('/items')
 
-        return { message: 'Stock movement recorded successfully' }
+        return { message: `Stock updated successfully${alertMessage}` }
     } catch (error: any) {
         console.error('Server Action Error:', error)
         return { error: error.message || 'Failed to record movement' }

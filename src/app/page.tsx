@@ -495,6 +495,14 @@ export default function Home() {
                 <li><a href="mailto:aafaquebuisness@gmail.com" className="hover:text-white transition-colors">aafaquebuisness@gmail.com</a></li>
               </ul>
             </div>
+            <div className="space-y-4">
+              <h4 className="font-bold text-sm uppercase tracking-widest text-slate-500">Legal</h4>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
+                <li><Link href="/refund" className="hover:text-white transition-colors">Refund Policy</Link></li>
+              </ul>
+            </div>
           </div>
           <div className="mt-12 flex flex-col items-center justify-between border-t border-white/5 pt-8 md:flex-row">
             <p className="text-sm text-slate-500">

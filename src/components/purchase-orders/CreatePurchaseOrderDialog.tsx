@@ -64,12 +64,23 @@ export function CreatePurchaseOrderDialog() {
 
     useEffect(() => {
         async function fetchData() {
-            const [itemsRes, suppliersRes] = await Promise.all([
-                supabase.from('items').select('*').order('name'),
-                supabase.from('suppliers').select('*').order('name'),
-            ])
-            if (itemsRes.data) setItems(itemsRes.data)
-            if (suppliersRes.data) setSuppliers(suppliersRes.data)
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) return
+
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('organization_id')
+                .eq('id', user.id)
+                .single()
+
+            if (profile?.organization_id) {
+                const [itemsRes, suppliersRes] = await Promise.all([
+                    supabase.from('items').select('*').eq('organization_id', profile.organization_id).order('name'),
+                    supabase.from('suppliers').select('*').eq('organization_id', profile.organization_id).order('name'),
+                ])
+                if (itemsRes.data) setItems(itemsRes.data)
+                if (suppliersRes.data) setSuppliers(suppliersRes.data)
+            }
         }
         if (open) fetchData()
     }, [open, supabase])

@@ -15,7 +15,8 @@ import {
     CreditCard,
     Lock,
     HelpCircle,
-    Settings
+    Settings,
+    Crown
 } from 'lucide-react'
 
 const navigation = [
@@ -43,14 +44,30 @@ export function Sidebar() {
                 // Fetch Profile and Org Plan
                 const { data: profile } = await supabase
                     .from('profiles')
-                    .select('is_super_admin, organizations(plan_type)')
+                    .select('is_super_admin, organizations(plan_type, subscription_end_date)')
                     .eq('id', user.id)
                     .single()
 
                 if (profile) {
                     if (profile.is_super_admin) setIsSuperAdmin(true)
+
+                    let effectivePlan = 'FREE'
                     // @ts-ignore
-                    if (profile.organizations?.plan_type) setPlanType(profile.organizations.plan_type)
+                    if (profile.organizations?.plan_type) {
+                        // @ts-ignore
+                        effectivePlan = profile.organizations.plan_type
+
+                        // Check for Expiry
+                        // @ts-ignore
+                        if (profile.organizations?.subscription_end_date) {
+                            // @ts-ignore
+                            const expiry = new Date(profile.organizations.subscription_end_date)
+                            if (expiry < new Date()) {
+                                effectivePlan = 'FREE' // Downgrade locally
+                            }
+                        }
+                    }
+                    setPlanType(effectivePlan)
                 }
             }
         }
@@ -92,7 +109,7 @@ export function Sidebar() {
                                 />
                                 {item.name}
                             </div>
-                            {isLocked && <Lock className="h-3 w-3 text-muted-foreground" />}
+                            {isLocked && <Crown className="h-3.5 w-3.5 text-amber-500 fill-amber-500/20" />}
                         </Link>
                     )
                 })}

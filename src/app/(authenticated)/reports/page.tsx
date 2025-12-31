@@ -24,7 +24,7 @@ export default async function ReportsPage() {
     if (user) {
         const { data: profile } = await supabase
             .from('profiles')
-            .select('organization_id, is_super_admin, organizations(plan_type)')
+            .select('organization_id, is_super_admin, organizations(plan_type, subscription_end_date)')
             .eq('id', user.id)
             .single()
         organizationId = profile?.organization_id || null
@@ -33,6 +33,16 @@ export default async function ReportsPage() {
         if (profile?.organizations?.plan_type) {
             // @ts-ignore
             planType = profile.organizations.plan_type
+
+            // Check Expiry
+            // @ts-ignore
+            if (profile.organizations?.subscription_end_date) {
+                // @ts-ignore
+                const expiry = new Date(profile.organizations.subscription_end_date)
+                if (expiry < new Date()) {
+                    planType = 'FREE' // Treat as free if expired
+                }
+            }
         }
     }
 
@@ -71,6 +81,8 @@ export default async function ReportsPage() {
     const totalItems = items?.length || 0
     const totalStock = items?.reduce((sum, i) => sum + Number(i.current_stock || 0), 0) || 0
     const lowStockItems = items?.filter(i => i.current_stock < i.min_stock) || []
+
+    // --- Restored Data Aggregation Logic ---
     const outOfStockItems = items?.filter(i => i.current_stock === 0) || []
 
     // --- Stock Distribution Data (by Category) ---
@@ -88,7 +100,7 @@ export default async function ReportsPage() {
     const startDate = subDays(new Date(), 7).toISOString()
     let moveQuery = supabase
         .from('stock_movements')
-        .select('created_at, type, quantity, item_id')
+        .select('created_at, type, quantity, item_id, unit_price')
         .gte('created_at', startDate)
         .order('created_at', { ascending: true })
     if (!isSuperAdmin) moveQuery = moveQuery.eq('organization_id', organizationId!)
@@ -137,6 +149,20 @@ export default async function ReportsPage() {
         min_stock: Number(i.min_stock),
         unit: i.unit
     }))
+    // ----------------------------------------
+
+    // Financial Metrics
+    const totalValuation = items?.reduce((sum, i) => sum + (Number(i.current_stock || 0) * Number(i.cost_price || 0)), 0) || 0
+    const totalPotentialRevenue = items?.reduce((sum, i) => sum + (Number(i.current_stock || 0) * Number(i.selling_price || 0)), 0) || 0
+    const estimatedProfit = totalPotentialRevenue - totalValuation
+
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+            maximumFractionDigits: 0,
+        }).format(amount)
+    }
 
     return (
         <div className="space-y-6">
@@ -145,9 +171,36 @@ export default async function ReportsPage() {
             {/* KPI Summary Cards */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <SummaryCard title="Total Items" value={totalItems} icon="package" />
-                <SummaryCard title="Total Stock Units" value={totalStock} icon="trendingUp" />
+                <SummaryCard title="Inventory Value" value={formatCurrency(totalValuation)} icon="trendingUp" />
+                <SummaryCard title="Est. Profit" value={formatCurrency(estimatedProfit)} icon="trendingUp" trend={estimatedProfit > 0 ? 'up' : 'neutral'} />
                 <SummaryCard title="Low Stock Alerts" value={lowStockItems.length} icon="alertTriangle" trend={lowStockItems.length > 0 ? 'down' : 'neutral'} />
-                <SummaryCard title="Out of Stock" value={outOfStockItems.length} icon="trendingDown" trend={outOfStockItems.length > 0 ? 'down' : 'neutral'} />
+            </div>
+
+            {/* Financial Performance Section */}
+            <h2 className="text-xl font-bold tracking-tight pt-4">Financial Performance (Realized)</h2>
+            <div className="grid gap-4 md:grid-cols-3">
+                <SummaryCard
+                    title="Total Sales (Revenue)"
+                    value={formatCurrency(movements?.filter(m => m.type === 'OUT').reduce((sum, m) => sum + (Number(m.quantity) * Number(m.unit_price || 0)), 0) || 0)}
+                    icon="trendingUp"
+                />
+                <SummaryCard
+                    title="Stock Purchases (Cost)"
+                    value={formatCurrency(movements?.filter(m => m.type === 'IN').reduce((sum, m) => sum + (Number(m.quantity) * Number(m.unit_price || 0)), 0) || 0)}
+                    icon="package"
+                />
+                <SummaryCard
+                    title="Net Profit (Est.)"
+                    value={formatCurrency(
+                        movements?.filter(m => m.type === 'OUT' && Number(m.unit_price) > 0).reduce((profit, m) => {
+                            const revenue = Number(m.quantity) * Number(m.unit_price || 0)
+                            const item = items?.find(i => i.id === m.item_id)
+                            const cost = Number(m.quantity) * Number(item?.cost_price || 0)
+                            return profit + (revenue - cost)
+                        }, 0) || 0
+                    )}
+                    icon="trendingUp"
+                />
             </div>
 
             {/* Charts Row */}

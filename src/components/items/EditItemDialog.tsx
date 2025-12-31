@@ -32,6 +32,8 @@ const formSchema = z.object({
     category: z.string().optional(),
     unit: z.string().min(1),
     min_stock: z.coerce.number().min(0),
+    cost_price: z.coerce.number().min(0),
+    selling_price: z.coerce.number().min(0),
 })
 
 interface EditItemDialogProps {
@@ -52,6 +54,8 @@ export function EditItemDialog({ item, open, onOpenChange }: EditItemDialogProps
             category: item.category || '',
             unit: item.unit,
             min_stock: item.min_stock,
+            cost_price: item.cost_price || 0,
+            selling_price: item.selling_price || 0,
         },
     })
 
@@ -132,6 +136,34 @@ export function EditItemDialog({ item, open, onOpenChange }: EditItemDialogProps
                                         <FormLabel>Unit</FormLabel>
                                         <FormControl>
                                             <Input {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="cost_price"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Cost Price (₹)</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" step="0.01" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="selling_price"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Selling Price (₹)</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" step="0.01" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
