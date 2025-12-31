@@ -58,24 +58,17 @@ export default async function DashboardPage() {
     const lowStockCount = allItems?.filter(i => i.current_stock < i.min_stock).length || 0
     const lowStockList = allItems?.filter(i => i.current_stock < i.min_stock).slice(0, 5) || []
 
-    // --- AI Forecast Data Fetching ---
-    // Fetch last 30 days of movements for analysis
-    const thirtyDaysAgo = subDays(new Date(), 30).toISOString()
-    let historyQuery = supabase
-        .from('stock_movements')
-        .select('*')
-        .gte('created_at', thirtyDaysAgo)
-    if (!isSuperAdmin && organizationId) {
-        historyQuery = historyQuery.eq('organization_id', organizationId)
-    }
-    const { data: historyMovements } = await historyQuery
-
-    // Calculate AI Forecasts
-    const forecasts = calculateForecasts(allItems || [], historyMovements || [])
+    // --- AI Forecast Data Fetching (Legacy Code Removed) ---
+    // Fetching Real AI Insights
+    const { getAiInsights } = await import('@/app/actions/ai')
+    const insights = await getAiInsights()
 
     return (
         <div className="space-y-6">
             <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+
+            {/* AI Insights Section */}
+            <AiInsightsCard insights={insights} />
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
@@ -116,9 +109,6 @@ export default async function DashboardPage() {
                     </CardContent>
                 </Card>
             </div >
-
-            {/* AI Insights Section - Only render if we have forecasts */}
-            <AiInsightsCard forecasts={forecasts} />
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                 <Card className="col-span-4">
