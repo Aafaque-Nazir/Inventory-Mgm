@@ -50,6 +50,11 @@ export const metadata: Metadata = {
     description: "Stop guessing, start tracking. Switch to InvMaster today.",
     images: ["https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&h=630&auto=format&fit=crop"],
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "InvMaster",
+  },
 };
 
 export default function RootLayout({
