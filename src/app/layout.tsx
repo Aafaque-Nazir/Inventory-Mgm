@@ -16,8 +16,40 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Inventory Management System",
-  description: "Manage your inventory, suppliers, and purchase orders",
+  title: {
+    default: "InvMaster | Intelligent Inventory Management",
+    template: "%s | InvMaster"
+  },
+  description: "Stop guessing, start tracking. InvMaster is the AI-powered inventory OS for modern businesses. Features real-time sync, profit analytics, and smart stock predictions.",
+  applicationName: "InvMaster",
+  authors: [{ name: "Aafaque" }],
+  generator: "Next.js",
+  keywords: ["inventory management", "stock tracking", "warehouse management", "POS", "supply chain", "business software", "SaaS"],
+  referrer: "origin-when-cross-origin",
+  creator: "Aafaque",
+  publisher: "InvMaster Inc.",
+  openGraph: {
+    title: "InvMaster | Intelligent Inventory Management",
+    description: "AI-powered inventory tracking, profit analytics, and team collaboration. Scale your business with InvMaster.",
+    url: "https://nvntory-mgm.vercel.app",
+    siteName: "InvMaster",
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&h=630&auto=format&fit=crop",
+        width: 1200,
+        height: 630,
+        alt: "InvMaster Dashboard Preview",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "InvMaster | Intelligent Inventory Management",
+    description: "Stop guessing, start tracking. Switch to InvMaster today.",
+    images: ["https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&h=630&auto=format&fit=crop"],
+  },
 };
 
 export default function RootLayout({

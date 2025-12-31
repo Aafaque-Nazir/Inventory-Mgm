@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import {
   ArrowRight,
@@ -122,10 +123,14 @@ export default function Home() {
               className="mt-20 relative mx-auto max-w-5xl rounded-xl border border-white/10 bg-slate-900/50 shadow-2xl backdrop-blur-sm p-2"
             >
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-10" />
-              <img
+              <Image
                 src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2670&auto=format&fit=crop"
                 alt="Dashboard Preview"
                 className="rounded-lg opacity-80"
+                width={1200}
+                height={600}
+                style={{ width: '100%', height: 'auto' }}
+                priority
               />
             </motion.div>
           </motion.div>
