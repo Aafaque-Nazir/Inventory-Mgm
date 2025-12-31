@@ -36,12 +36,12 @@ export function RevenueChart({ data }: RevenueChartProps) {
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
-                                tickFormatter={(value) => `$${value}`}
+                                tickFormatter={(value) => `₹${value}`}
                             />
                             <Tooltip
                                 contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #1e293b" }}
                                 itemStyle={{ color: "#fff" }}
-                                formatter={(value: number | undefined) => [`$${value || 0}`, "Revenue"]}
+                                formatter={(value: number | undefined) => [`₹${value || 0}`, "Revenue"]}
                             />
                             <Line
                                 type="monotone"
