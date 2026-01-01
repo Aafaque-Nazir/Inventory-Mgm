@@ -7,6 +7,7 @@ import { Topbar } from './Topbar'
 import { Loader2, AlertCircle, Phone, Mail } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { WarehouseProvider } from '@/context/WarehouseContext'
 
 import { usePathname } from 'next/navigation'
 
@@ -86,14 +87,16 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
 
     return (
-        <div className="flex h-screen overflow-hidden bg-background">
-            <Sidebar />
-            <div className="flex flex-1 flex-col overflow-hidden">
-                <Topbar />
-                <main className="flex-1 overflow-y-auto p-4 md:p-6">
-                    {children}
-                </main>
+        <WarehouseProvider>
+            <div className="flex h-screen overflow-hidden bg-background">
+                <Sidebar />
+                <div className="flex flex-1 flex-col overflow-hidden">
+                    <Topbar />
+                    <main className="flex-1 overflow-y-auto p-4 md:p-6">
+                        {children}
+                    </main>
+                </div>
             </div>
-        </div>
+        </WarehouseProvider>
     )
 }

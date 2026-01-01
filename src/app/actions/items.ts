@@ -20,6 +20,8 @@ const itemSchema = z.object({
     gst_rate: z.coerce.number().min(0).max(100).optional().default(0),
 })
 
+import { getWarehouseCookie } from './warehouse-cookie'
+
 export async function createItem(prevState: any, formData: FormData) {
     const supabase = await createClient()
 
@@ -102,21 +104,59 @@ export async function createItem(prevState: any, formData: FormData) {
 
         if (insertError) throw insertError
 
-        // 4. Initial Stock Movement
+        // 4. Initial Stock Movement & Item Stock Entry
         if (initial_stock && initial_stock > 0) {
-            await supabase.from('stock_movements').insert({
-                organization_id: orgId,
-                item_id: newItem.id,
-                quantity: initial_stock,
-                type: 'IN',
-                reason: 'Initial stock',
-                // For initial stock, we assume the unit price is the COST price
-                unit_price: itemData.cost_price,
-                created_by: user.id
-            })
+
+            // Determine Location for Initial Stock
+            let location_id = await getWarehouseCookie() // From Cookie
+
+            if (!location_id) {
+                const { data: defaultLoc } = await supabase
+                    .from('locations')
+                    .select('id')
+                    .eq('organization_id', orgId)
+                    .eq('is_default', true)
+                    .single()
+                location_id = defaultLoc?.id
+            }
+
+            if (location_id) {
+                // A. Insert into item_stock
+                await supabase.from('item_stock').insert({
+                    item_id: newItem.id,
+                    location_id: location_id,
+                    quantity: initial_stock,
+                })
+
+                // B. Insert Movement
+                await supabase.from('stock_movements').insert({
+                    organization_id: orgId,
+                    item_id: newItem.id,
+                    quantity: initial_stock,
+                    type: 'IN',
+                    reason: 'Initial stock',
+                    location_id: location_id,
+                    unit_price: itemData.cost_price,
+                    created_by: user.id
+                })
+            } else {
+                // Fallback if no location found (shouldn't happen with default logic): 
+                // Just creates global logs or maybe fails silently on location specific logic
+                // But we want to be safe.
+                await supabase.from('stock_movements').insert({
+                    organization_id: orgId,
+                    item_id: newItem.id,
+                    quantity: initial_stock,
+                    type: 'IN',
+                    reason: 'Initial stock (No Location)',
+                    unit_price: itemData.cost_price,
+                    created_by: user.id
+                })
+            }
         }
 
         revalidatePath('/dashboard')
+        revalidatePath('/items')
 
         // Audit Log
         await logAction('ITEM_CREATE', 'ITEM', newItem.id, { name: newItem.name, sku: newItem.sku })

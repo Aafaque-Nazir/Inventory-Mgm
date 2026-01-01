@@ -28,6 +28,10 @@ export function TrialOfferDialog({ open, onOpenChange, organizationId, trialUsed
     const setOpen = onOpenChange || setInternalOpen
 
     const handleStartTrial = async () => {
+        if (!organizationId) {
+            toast.error("Organization ID missing. Please refresh the page.")
+            return
+        }
         setLoading(true)
         try {
             const result = await startFreeTrial(organizationId)
@@ -37,7 +41,8 @@ export function TrialOfferDialog({ open, onOpenChange, organizationId, trialUsed
             } else {
                 toast.success('🎉 Welcome to Pro! 5-Day Trial Activated.')
                 setOpen(false)
-                router.refresh()
+                // Force reload to ensure all Pro features unlock immediately
+                window.location.reload()
             }
         } catch (error) {
             toast.error('Something went wrong. Please try again.')

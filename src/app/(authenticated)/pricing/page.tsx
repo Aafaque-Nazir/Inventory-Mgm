@@ -25,6 +25,7 @@ export default function PricingPage() {
     const searchParams = useSearchParams()
     // const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null // BROKEN: Causes infinite loop
     const [trialUsed, setTrialUsed] = useState(false)
+    const [subStatus, setSubStatus] = useState<string>('')
     const [orgId, setOrgId] = useState<string>('')
     const [showTrialDialog, setShowTrialDialog] = useState(false)
     const supabase = createClient()
@@ -72,17 +73,18 @@ export default function PricingPage() {
             if (user) {
                 const { data: profile } = await supabase
                     .from('profiles')
-                    .select('organization_id, organizations(plan_type, trial_used)')
+                    .select('organization_id, organizations(plan_type, trial_used, subscription_status)')
                     .eq('id', user.id)
                     .single()
 
                 // @ts-ignore
                 if (profile?.organizations?.plan_type) {
                     // @ts-ignore
-                    // @ts-ignore
                     setCurrentPlan(profile.organizations.plan_type)
                     // @ts-ignore
                     setTrialUsed(profile.organizations.trial_used || false)
+                    // @ts-ignore
+                    setSubStatus(profile.organizations.subscription_status || '')
                 }
                 if (profile?.organization_id) setOrgId(profile.organization_id)
             }
@@ -149,7 +151,7 @@ export default function PricingPage() {
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:gap-8">
                 {/* Free Plan */}
-                <Card className={cn("flex flex-col", currentPlan === 'FREE' ? "border-primary" : "")}>
+                <Card className={cn("flex flex-col", currentPlan === 'FREE' ? "border-primary border-2 shadow-lg ring-1 ring-primary/20" : "")}>
                     <CardHeader>
                         <CardTitle className="text-xl">Starter</CardTitle>
                         <CardDescription>Perfect for small shops just starting out.</CardDescription>
@@ -173,13 +175,18 @@ export default function PricingPage() {
                 </Card>
 
                 {/* Pro Plan - Highlighted */}
-                <Card className={cn("flex flex-col shadow-lg relative overflow-hidden", currentPlan === 'PRO' ? "border-green-500 border-2" : "border-primary")}>
+                <Card className={cn("flex flex-col shadow-lg relative overflow-hidden", currentPlan === 'PRO' ? "border-green-500 border-2 ring-1 ring-green-500/20" : "border-primary")}>
                     <div className="absolute top-0 right-0 bg-primary text-white text-xs px-3 py-1 rounded-bl-lg font-medium">
                         MOST POPULAR
                     </div>
                     <CardHeader>
                         <CardTitle className="text-xl flex items-center gap-2">
                             Pro <Zap className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                            {currentPlan === 'PRO' && subStatus === 'TRIALING' && (
+                                <span className="ml-auto text-xs font-semibold px-2 py-0.5 rounded-full bg-orange-100 text-orange-600 border border-orange-200">
+                                    Trial Active
+                                </span>
+                            )}
                         </CardTitle>
                         <CardDescription>For growing businesses that need control.</CardDescription>
                     </CardHeader>
@@ -194,22 +201,39 @@ export default function PricingPage() {
                             <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> Bulk CSV Import/Export 📤</li>
                         </ul>
                     </CardContent>
-                    <CardFooter>
-                        {currentPlan === 'PRO' ? (
+                    <CardFooter className="flex flex-col gap-3">
+                        {currentPlan === 'PRO' && subStatus !== 'TRIALING' ? (
                             <Button className="w-full bg-green-600 hover:bg-green-700 cursor-default" disabled>
                                 <Check className="mr-2 h-4 w-4" /> Current Plan
                             </Button>
                         ) : (
                             <>
-                                {currentPlan === 'FREE' && !trialUsed ? (
+                                {currentPlan === 'PRO' && subStatus === 'TRIALING' && (
+                                    <div className="w-full mb-3 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-md text-center">
+                                        <p className="text-sm font-medium text-indigo-400">
+                                            ⚠️ Trial Mode Active
+                                        </p>
+                                        <p className="text-xs text-indigo-300/80 mt-1">
+                                            Upgrade now to keep your data & features forever.
+                                        </p>
+                                    </div>
+                                )}
+
+                                {currentPlan === 'FREE' && !trialUsed && (
                                     <Button
-                                        className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 shadow-md text-white font-bold"
-                                        onClick={() => setShowTrialDialog(true)}
+                                        className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 shadow-md text-white font-bold h-10"
+                                        onClick={() => {
+                                            toast.info("Loading offer details...")
+                                            console.log("Opening trial dialog for org:", orgId)
+                                            setShowTrialDialog(true)
+                                        }}
                                     >
                                         <Sparkles className="mr-2 h-4 w-4 fill-white" />
                                         Start 5-Day Free Trial
                                     </Button>
-                                ) : (
+                                )}
+
+                                <div className="w-full">
                                     <Button
                                         className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md"
                                         onClick={handlePayment}
@@ -218,7 +242,7 @@ export default function PricingPage() {
                                         {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Zap className="mr-2 h-4 w-4 fill-current" />}
                                         {loading ? 'Processing...' : 'Upgrade to Pro'}
                                     </Button>
-                                )}
+                                </div>
                             </>
                         )}
                     </CardFooter>

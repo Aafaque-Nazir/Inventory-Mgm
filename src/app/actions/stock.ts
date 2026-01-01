@@ -10,6 +10,8 @@ export type StockMovementState = {
     error?: string
 }
 
+import { getWarehouseCookie } from './warehouse-cookie'
+
 export async function recordStockMovement(
     prevState: StockMovementState,
     formData: FormData
@@ -29,7 +31,32 @@ export async function recordStockMovement(
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return { error: 'Unauthorized' }
 
-        // 1. Get current item state and organization details
+        // 1. Determine Location
+        let location_id = await getWarehouseCookie()
+
+        if (!location_id) {
+            // Fallback to default location if no cookie (e.g. mobile app or first load)
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('organization_id')
+                .eq('id', user.id)
+                .single()
+
+            if (profile?.organization_id) {
+                const { data: defaultLoc } = await supabase
+                    .from('locations')
+                    .select('id')
+                    .eq('organization_id', profile.organization_id)
+                    .eq('is_default', true)
+                    .single()
+                location_id = defaultLoc?.id
+            }
+        }
+
+        if (!location_id) return { error: 'No warehouse selected' }
+
+
+        // 2. Get current item state and organization details
         const { data: item, error: itemError } = await supabase
             .from('items')
             .select('*, organization:organizations(name, plan_type)')
@@ -40,7 +67,7 @@ export async function recordStockMovement(
             return { error: 'Item not found' }
         }
 
-        // 2. Insert movement
+        // 3. Insert movement with location_id
         const unitPrice = type === 'OUT' ? item.selling_price : item.cost_price
 
         const { error: moveError } = await supabase.from('stock_movements').insert({
@@ -48,34 +75,56 @@ export async function recordStockMovement(
             quantity,
             type,
             reason,
-            organization_id: item.organization_id, // Ensure it matches item's org
-            unit_price: unitPrice || 0, // Save price at time of movement
+            organization_id: item.organization_id,
+            location_id: location_id, // Critical for Multi-Warehouse
+            unit_price: unitPrice || 0,
             created_by: user.id
         })
 
         if (moveError) throw moveError
 
-        // 3. Update item stock
-        const newStock = type === 'IN'
-            ? Number(item.current_stock) + quantity
-            : Number(item.current_stock) - quantity
+        // 4. Update item stock (in item_stock TABLE)
+        // We do Upsert: if record exists, add/subtract. if not, create.
 
-        const { error: updateError } = await supabase
-            .from('items')
-            .update({ current_stock: newStock })
-            .eq('id', item_id)
+        // First fetch current stock at this location
+        const { data: currentStockRecord } = await supabase
+            .from('item_stock')
+            .select('quantity')
+            .eq('item_id', item_id)
+            .eq('location_id', location_id)
+            .single()
 
-        if (updateError) throw updateError
+        const currentQty = currentStockRecord?.quantity || 0
+        const newQty = type === 'IN' ? currentQty + quantity : currentQty - quantity
 
-        // 4. Check for Low Stock Alert (Only on OUT movements)
-        // CHECK: Only send for PRO or ENTERPRISE plans (or Super Admin)
+        if (newQty < 0) {
+            // Optional: allow negative stock? Usually no.
+            // return { error: 'Insufficient stock in this warehouse' }
+        }
+
+        const { error: stockError } = await supabase
+            .from('item_stock')
+            .upsert({
+                item_id,
+                location_id,
+                quantity: newQty,
+                updated_at: new Date().toISOString()
+            }, { onConflict: 'item_id, location_id' })
+
+        if (stockError) throw stockError
+
+        // 5. Update Legacy 'items.current_stock' (Global Aggregate)
+        // This keeps the 'items' table roughly in sync for simple views (optional but recommended for legacy compatibility)
+        // We can just add/subtract the delta from the global total
+        const globalNewStock = type === 'IN'
+            ? (item.current_stock || 0) + quantity
+            : (item.current_stock || 0) - quantity
+
+        await supabase.from('items').update({ current_stock: globalNewStock }).eq('id', item_id)
+
+
+        // 6. Check for Low Stock Alert (Only on OUT movements)
         const plan = item.organization?.plan_type || 'FREE'
-
-        // Is the current user a Super Admin? We need to check or assume permission based on this action's context
-        // For efficiency, we can just check if plan is NOT free. 
-        // But to be precise for the "Super Admin" request, let's re-fetch or assume Pro features for now.
-        // Actually, let's just stick to the plan for email alerts for simplicity, BUT since the user asked,
-        // we should probably fetch the user's role.
 
         const { data: profile } = await supabase
             .from('profiles')
@@ -86,19 +135,24 @@ export async function recordStockMovement(
         const isSuperAdmin = profile?.is_super_admin
 
         let alertMessage = ''
-        if (type === 'OUT' && newStock <= item.min_stock) {
+        // Check GLOBAL min_stock against LOCATION stock? Or Global?
+        // Usually alerts are based on specific location levels or total. 
+        // Let's stick to checking the *newQty* at this location vs min_stock (if min_stock is per location - currently it's global).
+        // If min_stock is global, we should probably check global stock. 
+        // User wants "professional mind": Alert if stock is low *where it's needed*. 
+        // For now, let's use the LOCAL quantity vs GLOBAL min_stock as a heuristic, OR the global one.
+        // Let's use Global for consistency with previous behavior for now.
+        if (type === 'OUT' && globalNewStock <= item.min_stock) {
             if (plan !== 'FREE' || isSuperAdmin) {
                 const emailResult = await sendLowStockAlert(
                     user.email || '',
                     item.name,
-                    newStock,
+                    globalNewStock,
                     item.min_stock,
                     item.organization?.name || 'Your Organization'
                 )
                 if (emailResult?.success) {
-                    alertMessage = ' (Low stock alert sent - Check Spam folder if missing)'
-                } else {
-                    alertMessage = ' (Failed to send email alert - check system logs)'
+                    alertMessage = ' (Low stock alert sent)'
                 }
             }
         }
@@ -112,8 +166,9 @@ export async function recordStockMovement(
             type,
             quantity,
             reason,
-            old_stock: item.current_stock,
-            new_stock: newStock
+            location_id,
+            old_stock: currentQty,
+            new_stock: newQty
         })
 
         return { message: `Stock updated successfully${alertMessage}` }

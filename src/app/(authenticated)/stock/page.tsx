@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { cookies } from 'next/headers'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { AddStockMovementDialog } from '@/components/stock/AddStockMovementDialog'
@@ -46,8 +47,14 @@ export default async function StockPage() {
         .order('created_at', { ascending: false })
         .limit(50)
 
+    const warehouseId = (await cookies()).get('warehouse_id')?.value
+
     if (!isSuperAdmin && organizationId) {
         movementsQuery = movementsQuery.eq('organization_id', organizationId)
+
+        if (warehouseId) {
+            movementsQuery = movementsQuery.eq('location_id', warehouseId)
+        }
     }
 
     const { data: movements } = await movementsQuery

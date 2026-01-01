@@ -1,7 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import Link from 'next/link'
-import { BarChart3 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { StockDistributionChart } from '@/components/reports/StockDistributionChart'
 import { MovementTrendChart } from '@/components/reports/MovementTrendChart'
 import { LowStockTable } from '@/components/reports/LowStockTable'
@@ -9,6 +6,7 @@ import { TopItemsTable } from '@/components/reports/TopItemsTable'
 import { SummaryCard } from '@/components/reports/SummaryCard'
 import { format, subDays } from 'date-fns'
 import { ProLock } from '@/components/common/ProLock'
+import { getWarehouseCookie } from '@/app/actions/warehouse-cookie'
 
 export const dynamic = 'force-dynamic'
 
@@ -54,27 +52,70 @@ export default async function ReportsPage() {
         return <div className="p-8">No organization found for reports/analytics.</div>
     }
 
-    // --- Fetch All Items ---
-    let itemsQuery = supabase.from('items').select('*')
-    if (!isSuperAdmin) itemsQuery = itemsQuery.eq('organization_id', organizationId!)
-    const { data: items } = await itemsQuery
+    // --- CONTEXT AWARE DATA FETCHING ---
+    const warehouseId = await getWarehouseCookie() // From Cookie
 
-    // --- Fetch All Suppliers ---
-    let suppliersQuery = supabase.from('suppliers').select('*', { count: 'exact', head: true })
-    if (!isSuperAdmin) suppliersQuery = suppliersQuery.eq('organization_id', organizationId!)
-    const { count: suppliersCount } = await suppliersQuery
+    let items: any[] = []
+    let movements: any[] = []
 
-    // --- KPI Summary Data ---
-    const totalItems = items?.length || 0
-    const totalStock = items?.reduce((sum, i) => sum + Number(i.current_stock || 0), 0) || 0
-    const lowStockItems = items?.filter(i => i.current_stock < i.min_stock) || []
+    if (!isSuperAdmin && organizationId) {
 
-    // --- Restored Data Aggregation Logic ---
-    const outOfStockItems = items?.filter(i => i.current_stock === 0) || []
+        if (warehouseId) {
+            // A. Fetch Only Tracked items in this warehouse (Strict Isolation)
+            const { data: locationStock } = await supabase
+                .from('item_stock')
+                .select('item_id, quantity, item:items(*)')
+                .eq('location_id', warehouseId)
+
+            items = locationStock?.map((record: any) => ({
+                ...record.item,
+                current_stock: record.quantity // Override with LOCAL quantity
+            })) || []
+
+            // B. Fetch Movements for this Warehouse Only
+            const startDate = subDays(new Date(), 7).toISOString()
+            const { data: locMovements } = await supabase
+                .from('stock_movements')
+                .select('created_at, type, quantity, item_id, unit_price')
+                .eq('organization_id', organizationId)
+                .eq('location_id', warehouseId)
+                .gte('created_at', startDate)
+                .order('created_at', { ascending: true })
+            movements = locMovements || []
+
+        } else {
+            // Fallback: Global Data (Legacy / Aggregated)
+            // Fetch All Items
+            let itemsQuery = supabase.from('items').select('*')
+            if (!isSuperAdmin) itemsQuery = itemsQuery.eq('organization_id', organizationId!)
+            const { data: allItems } = await itemsQuery
+            items = allItems || []
+
+            // Fetch All Movements
+            const startDate = subDays(new Date(), 7).toISOString()
+            let moveQuery = supabase
+                .from('stock_movements')
+                .select('created_at, type, quantity, item_id, unit_price')
+                .gte('created_at', startDate)
+                .order('created_at', { ascending: true })
+            if (!isSuperAdmin) moveQuery = moveQuery.eq('organization_id', organizationId!)
+            const { data: allMovements } = await moveQuery
+            movements = allMovements || []
+        }
+    } else {
+        // Super Admin Logic (Simplified)
+        const { data: allItems } = await supabase.from('items').select('*')
+        items = allItems || []
+    }
+
+    // --- KPI Calculations (Context Aware) ---
+    const totalItems = items.length
+    const totalStock = items.reduce((sum, i) => sum + Number(i.current_stock || 0), 0)
+    const lowStockItems = items.filter(i => i.current_stock < i.min_stock)
 
     // --- Stock Distribution Data (by Category) ---
     const categoryMap = new Map<string, number>()
-    items?.forEach(item => {
+    items.forEach(item => {
         const cat = item.category || 'Uncategorized'
         const current = categoryMap.get(cat) || 0
         categoryMap.set(cat, current + Number(item.current_stock || 0))
@@ -84,21 +125,12 @@ export default async function ReportsPage() {
         .sort((a, b) => b.value - a.value)
 
     // --- Movement Trends Data (Last 7 Days) ---
-    const startDate = subDays(new Date(), 7).toISOString()
-    let moveQuery = supabase
-        .from('stock_movements')
-        .select('created_at, type, quantity, item_id, unit_price')
-        .gte('created_at', startDate)
-        .order('created_at', { ascending: true })
-    if (!isSuperAdmin) moveQuery = moveQuery.eq('organization_id', organizationId!)
-    const { data: movements } = await moveQuery
-
     const trendMap = new Map<string, { in: number, out: number }>()
     for (let i = 6; i >= 0; i--) {
         const d = format(subDays(new Date(), i), 'MMM dd')
         trendMap.set(d, { in: 0, out: 0 })
     }
-    movements?.forEach(m => {
+    movements.forEach(m => {
         const d = format(new Date(m.created_at), 'MMM dd')
         if (trendMap.has(d)) {
             const current = trendMap.get(d)!
@@ -111,7 +143,7 @@ export default async function ReportsPage() {
     // --- Top 5 Items by Movement (Last 7 days) ---
     const itemMovementIn = new Map<string, number>()
     const itemMovementOut = new Map<string, number>()
-    movements?.forEach(m => {
+    movements.forEach(m => {
         const map = m.type === 'IN' ? itemMovementIn : itemMovementOut
         const current = map.get(m.item_id) || 0
         map.set(m.item_id, current + Number(m.quantity))
@@ -122,7 +154,7 @@ export default async function ReportsPage() {
             .sort((a, b) => b[1] - a[1])
             .slice(0, 5)
             .map(([id, total]) => {
-                const item = items?.find(i => i.id === id)
+                const item = items.find(i => i.id === id)
                 return { name: item?.name || 'Unknown', total, unit: item?.unit || '' }
             })
     }
@@ -139,8 +171,8 @@ export default async function ReportsPage() {
     // ----------------------------------------
 
     // Financial Metrics
-    const totalValuation = items?.reduce((sum, i) => sum + (Number(i.current_stock || 0) * Number(i.cost_price || 0)), 0) || 0
-    const totalPotentialRevenue = items?.reduce((sum, i) => sum + (Number(i.current_stock || 0) * Number(i.selling_price || 0)), 0) || 0
+    const totalValuation = items.reduce((sum, i) => sum + (Number(i.current_stock || 0) * Number(i.cost_price || 0)), 0)
+    const totalPotentialRevenue = items.reduce((sum, i) => sum + (Number(i.current_stock || 0) * Number(i.selling_price || 0)), 0)
     const estimatedProfit = totalPotentialRevenue - totalValuation
 
     const formatCurrency = (amount: number) => {
@@ -185,7 +217,7 @@ export default async function ReportsPage() {
                             value={formatCurrency(
                                 movements?.filter(m => m.type === 'OUT' && Number(m.unit_price) > 0).reduce((profit, m) => {
                                     const revenue = Number(m.quantity) * Number(m.unit_price || 0)
-                                    const item = items?.find(i => i.id === m.item_id)
+                                    const item = items.find(i => i.id === m.item_id)
                                     const cost = Number(m.quantity) * Number(item?.cost_price || 0)
                                     return profit + (revenue - cost)
                                 }, 0) || 0

@@ -2,9 +2,9 @@ import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Package, Users, AlertTriangle, ArrowRightLeft } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { format, subDays } from 'date-fns'
-import { calculateForecasts } from '@/lib/ai-forecast'
+import { format } from 'date-fns'
 import { AiInsightsCard } from '@/components/dashboard/AiInsightsCard'
+import { getWarehouseCookie } from '@/app/actions/warehouse-cookie'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,38 +28,107 @@ export default async function DashboardPage() {
         isSuperAdmin = profile?.is_super_admin || false
     }
 
-    // Build queries with tenant filter (unless Super Admin)
-    let itemsQuery = supabase.from('items').select('*', { count: 'exact', head: true })
-    let suppliersQuery = supabase.from('suppliers').select('*', { count: 'exact', head: true })
-    let allItemsQuery = supabase.from('items').select('*')
-    let movementsQuery = supabase.from('stock_movements').select('*, item:items(name)').order('created_at', { ascending: false }).limit(5)
+    // Build specific queries
+    // We will build these dyamically based on context to ensure total isolation
 
-    // Apply tenant filter if NOT super admin
+    // 1. Base counts (Tenant filtered)
+    let itemsCount = 0
+    let suppliersCount = 0
+    let lowStockCount = 0
+    let lowStockList: any[] = []
+    let recentMovements: any[] = []
+
     if (!isSuperAdmin && organizationId) {
-        itemsQuery = itemsQuery.eq('organization_id', organizationId)
-        suppliersQuery = suppliersQuery.eq('organization_id', organizationId)
-        allItemsQuery = allItemsQuery.eq('organization_id', organizationId)
-        movementsQuery = movementsQuery.eq('organization_id', organizationId)
+        // --- BASE QUERIES ---
+        const warehouseId = await getWarehouseCookie() // From Cookie
+
+        // Suppliers are global per organization (usually independent of warehouse)
+        const { count: sCount } = await supabase
+            .from('suppliers')
+            .select('*', { count: 'exact', head: true })
+            .eq('organization_id', organizationId)
+        suppliersCount = sCount || 0
+
+        // --- WAREHOUSE SPECIFIC LOGIC ---
+        if (warehouseId) {
+            // A. Recent Movements (Filtered by Location)
+            const { data: movements } = await supabase
+                .from('stock_movements')
+                .select('*, item:items(name)')
+                .eq('organization_id', organizationId)
+                .eq('location_id', warehouseId)
+                .order('created_at', { ascending: false })
+                .limit(5)
+            recentMovements = movements || []
+
+            // B. Items & Low Stock (STRICT Isolation)
+            // Fetch ONLY items that exist in 'item_stock' for this location
+            const { data: locationStock } = await supabase
+                .from('item_stock')
+                .select('item_id, quantity, item:items(*)')
+                .eq('location_id', warehouseId)
+
+            // Map to a clean list of items with local stock
+            const trackedItems = locationStock?.map((record: any) => ({
+                ...record.item,        // Spread the item details (name, min_stock, etc.)
+                current_stock: record.quantity // Override with LOCAL quantity
+            })) || []
+
+            // Now calculate metrics based on this LOCAL tracking list
+            itemsCount = trackedItems.length
+
+            const lowStockItems = trackedItems.filter((i: any) => i.current_stock < i.min_stock)
+            lowStockCount = lowStockItems.length
+            lowStockList = lowStockItems.slice(0, 5)
+
+        } else {
+            // --- GLOBAL FALLBACK (No Warehouse Selected) ---
+            // Show global views (or aggregated)
+
+            // Items Count
+            const { count: iCount } = await supabase
+                .from('items')
+                .select('*', { count: 'exact', head: true })
+                .eq('organization_id', organizationId)
+            itemsCount = iCount || 0
+
+            // Movements (All)
+            const { data: movements } = await supabase
+                .from('stock_movements')
+                .select('*, item:items(name)')
+                .eq('organization_id', organizationId)
+                .order('created_at', { ascending: false })
+                .limit(5)
+            recentMovements = movements || []
+
+            // Low Stock (Based on Global `current_stock` column - Legacy/Aggregate)
+            const { data: allItems } = await supabase
+                .from('items')
+                .select('*')
+                .eq('organization_id', organizationId)
+
+            if (allItems) {
+                const lowItems = allItems.filter(i => i.current_stock < i.min_stock)
+                lowStockCount = lowItems.length
+                lowStockList = lowItems.slice(0, 5)
+            }
+        }
     } else if (!isSuperAdmin && !organizationId) {
-        // User has no organization - show nothing
         return (
             <div className="space-y-6">
                 <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-                <p className="text-muted-foreground">Your account is not associated with any organization. Please contact your administrator.</p>
+                <p className="text-muted-foreground">Your account is not associated with any organization.</p>
             </div>
         )
+    } else {
+        // Super Admin View (Simplified)
+        const { count: iCount } = await supabase.from('items').select('*', { count: 'exact', head: true })
+        itemsCount = iCount || 0
+        const { count: sCount } = await supabase.from('suppliers').select('*', { count: 'exact', head: true })
+        suppliersCount = sCount || 0
     }
 
-    const { count: itemsCount } = await itemsQuery
-    const { count: suppliersCount } = await suppliersQuery
-    const { data: allItems } = await allItemsQuery
-    const { data: recentMovements } = await movementsQuery
-
-    const lowStockCount = allItems?.filter(i => i.current_stock < i.min_stock).length || 0
-    const lowStockList = allItems?.filter(i => i.current_stock < i.min_stock).slice(0, 5) || []
-
-    // --- AI Forecast Data Fetching (Legacy Code Removed) ---
-    // Fetching Real AI Insights
+    // --- AI Forecast Data Fetching ---
     const { getAiInsights } = await import('@/app/actions/ai')
     const insights = await getAiInsights()
 
@@ -77,7 +146,7 @@ export default async function DashboardPage() {
                         <Package className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{itemsCount || 0}</div>
+                        <div className="text-2xl font-bold">{itemsCount}</div>
                     </CardContent>
                 </Card>
                 <Card>
@@ -86,7 +155,7 @@ export default async function DashboardPage() {
                         <Users className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{suppliersCount || 0}</div>
+                        <div className="text-2xl font-bold">{suppliersCount}</div>
                     </CardContent>
                 </Card>
                 <Card>
@@ -126,7 +195,7 @@ export default async function DashboardPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {recentMovements?.map((movement) => (
+                                {recentMovements?.map((movement: any) => (
                                     <TableRow key={movement.id}>
                                         <TableCell>{movement.item?.name}</TableCell>
                                         <TableCell>
@@ -161,7 +230,7 @@ export default async function DashboardPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {lowStockList.map((item) => (
+                                {lowStockList.map((item: any) => (
                                     <TableRow key={item.id}>
                                         <TableCell className="font-medium">{item.name}</TableCell>
                                         <TableCell className="text-destructive">{item.current_stock}</TableCell>

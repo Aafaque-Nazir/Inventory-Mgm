@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { cookies } from 'next/headers'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { CreatePurchaseOrderDialog } from '@/components/purchase-orders/CreatePurchaseOrderDialog'
@@ -34,8 +35,14 @@ export default async function PurchaseOrdersPage() {
         .select('*, supplier:suppliers(name), profile:profiles!created_by(full_name)')
         .order('created_at', { ascending: false })
 
+    const warehouseId = (await cookies()).get('warehouse_id')?.value
+
     if (!isSuperAdmin && organizationId) {
         ordersQuery = ordersQuery.eq('organization_id', organizationId)
+
+        if (warehouseId) {
+            ordersQuery = ordersQuery.eq('location_id', warehouseId)
+        }
     }
 
     console.log('Fetching purchase orders...')
@@ -58,7 +65,7 @@ export default async function PurchaseOrdersPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold tracking-tight">Purchase Orders</h1>
-                <CreatePurchaseOrderDialog />
+                <CreatePurchaseOrderDialog warehouseId={warehouseId} />
             </div>
 
             <Card>

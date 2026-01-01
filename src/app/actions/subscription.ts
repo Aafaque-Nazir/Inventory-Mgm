@@ -1,11 +1,12 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
+import { createClient as createServerClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { addDays } from 'date-fns'
 
 export async function startFreeTrial(organizationId: string) {
-    const supabase = await createClient()
+    const supabase = await createServerClient()
 
     // 1. Verify User
     const { data: { user } } = await supabase.auth.getUser()
@@ -32,10 +33,20 @@ export async function startFreeTrial(organizationId: string) {
         return { error: 'You are already on a premium plan.' }
     }
 
-    // 3. Start Trial (5 Days)
+    // 3. Start Trial (5 Days) - Use Admin Client to bypass RLS
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    if (!serviceKey) {
+        return { error: 'Server misconfiguration: Missing Service Key' }
+    }
+
+    const adminClient = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        serviceKey
+    )
+
     const endDate = addDays(new Date(), 5).toISOString()
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await adminClient
         .from('organizations')
         .update({
             plan_type: 'PRO',
@@ -47,7 +58,7 @@ export async function startFreeTrial(organizationId: string) {
 
     if (updateError) {
         console.error('Trial Start Error:', updateError)
-        return { error: 'Failed to start trial. Please contact support.' }
+        return { error: `DB Error: ${updateError.message}` }
     }
 
     revalidatePath('/')

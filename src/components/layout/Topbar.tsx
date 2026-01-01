@@ -39,6 +39,7 @@ import { Badge } from '@/components/ui/badge'
 import { useEffect, useState } from 'react'
 import { Profile } from '@/types'
 import { cn } from '@/lib/utils'
+import { WarehouseSwitcher } from '@/components/warehouses/WarehouseSwitcher'
 
 export function Topbar() {
     const router = useRouter()
@@ -106,6 +107,72 @@ export function Topbar() {
                         </div>
                         <nav className="flex-1 space-y-1 px-3 py-4">
                             {navigation.map((item) => {
+                                if (item.name === 'Settings') {
+                                    return (
+                                        <div key="settings-mobile-group" className="space-y-1">
+                                            <div className="flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium text-muted-foreground">
+                                                <div className="flex items-center">
+                                                    <Settings className="mr-3 h-5 w-5 flex-shrink-0" />
+                                                    Settings
+                                                </div>
+                                            </div>
+                                            <div className="ml-4 space-y-1 border-l pl-2">
+                                                <Link
+                                                    href="/settings/profile"
+                                                    onClick={() => setOpen(false)}
+                                                    className={cn(
+                                                        'block rounded-md px-3 py-2 text-sm transition-colors',
+                                                        pathname.startsWith('/settings/profile') ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:text-foreground'
+                                                    )}
+                                                >
+                                                    Profile
+                                                </Link>
+                                                <Link
+                                                    href="/settings/organization"
+                                                    onClick={() => setOpen(false)}
+                                                    className={cn(
+                                                        'block rounded-md px-3 py-2 text-sm transition-colors',
+                                                        pathname.startsWith('/settings/organization') ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:text-foreground'
+                                                    )}
+                                                >
+                                                    Organization
+                                                </Link>
+                                                <Link
+                                                    href="/warehouses"
+                                                    onClick={() => setOpen(false)}
+                                                    className={cn(
+                                                        'block rounded-md px-3 py-2 text-sm transition-colors flex items-center justify-between',
+                                                        pathname.startsWith('/warehouses') ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:text-foreground'
+                                                    )}
+                                                >
+                                                    <span>Warehouses</span>
+                                                    <span className="text-[10px] font-bold text-indigo-500 bg-indigo-500/10 px-1 rounded ml-2">PRO</span>
+                                                </Link>
+                                                <Link
+                                                    href="/settings/team"
+                                                    onClick={() => setOpen(false)}
+                                                    className={cn(
+                                                        'block rounded-md px-3 py-2 text-sm transition-colors',
+                                                        pathname.startsWith('/settings/team') ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:text-foreground'
+                                                    )}
+                                                >
+                                                    Team
+                                                </Link>
+                                                <Link
+                                                    href="/settings/billing"
+                                                    onClick={() => setOpen(false)}
+                                                    className={cn(
+                                                        'block rounded-md px-3 py-2 text-sm transition-colors',
+                                                        pathname.startsWith('/settings/billing') ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:text-foreground'
+                                                    )}
+                                                >
+                                                    Billing
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    )
+                                }
+
                                 const isActive = pathname.startsWith(item.href)
                                 const isLocked = item.name === 'Reports' && (!profile?.organization?.plan_type || profile.organization.plan_type === 'FREE') && !profile?.is_super_admin
 
@@ -154,7 +221,7 @@ export function Topbar() {
                     </SheetContent>
                 </Sheet>
                 <div className="flex items-center gap-3">
-                    <h2 className="text-lg font-semibold">Dashboard</h2>
+                    <h2 className="text-lg font-semibold hidden md:block">Dashboard</h2>
                     {profile?.is_super_admin ? (
                         <Badge
                             className="bg-purple-600 hover:bg-purple-700 text-[10px] px-2 h-5 font-semibold tracking-wide uppercase border-purple-500/20"
@@ -174,6 +241,9 @@ export function Topbar() {
                             {profile.organization.plan_type} PLAN
                         </Badge>
                     )}
+                    <div className="ml-2">
+                        <WarehouseSwitcher />
+                    </div>
                 </div>
             </div>
             <div className="flex items-center gap-4">

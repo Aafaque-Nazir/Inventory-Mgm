@@ -42,7 +42,7 @@ const formSchema = z.object({
     items: z.array(lineItemSchema).min(1, 'At least one item is required'),
 })
 
-export function CreatePurchaseOrderDialog() {
+export function CreatePurchaseOrderDialog({ warehouseId }: { warehouseId?: string }) {
     const [open, setOpen] = useState(false)
     const [items, setItems] = useState<Item[]>([])
     const [suppliers, setSuppliers] = useState<Supplier[]>([])
@@ -102,6 +102,7 @@ export function CreatePurchaseOrderDialog() {
                     total_amount: total,
                     created_by: user?.id,
                     status: 'DRAFT',
+                    location_id: warehouseId // Add location_id
                 })
                 .select()
                 .single()
