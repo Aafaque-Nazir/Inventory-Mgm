@@ -5,11 +5,17 @@ import { Button } from '@/components/ui/button'
 import { ScanBarcode } from 'lucide-react'
 import { BarcodeScanner } from '@/components/common/BarcodeScanner'
 import { CreateItemDialog } from './CreateItemDialog'
+import { QuickStockDialog } from '@/components/items/QuickStockDialog'
+import { getItemBySku } from '@/app/actions/items'
 import { toast } from 'sonner'
+import type { Item } from '@/types'
 
 export function ScanItemButton() {
     const [isScanning, setIsScanning] = useState(false)
     const [showCreateDialog, setShowCreateDialog] = useState(false)
+    const [showStockDialog, setShowStockDialog] = useState(false)
+    const [existingItem, setExistingItem] = useState<Item | null>(null)
+
     const [scannedData, setScannedData] = useState<{
         sku: string,
         name: string,
@@ -20,9 +26,23 @@ export function ScanItemButton() {
 
     const handleScanSuccess = async (code: string) => {
         setIsScanning(false)
-        setScannedData({ sku: code, name: '', category: '', unit: '', size: '' })
+        console.log("Scanned code:", code)
 
+        // 1. Check if item already exists
+        toast.info('Checking inventory...')
+        const existingResult = await getItemBySku(code)
+
+        if (existingResult.item) {
+            toast.success(`Item found: ${existingResult.item.name}`)
+            setExistingItem(existingResult.item)
+            setShowStockDialog(true)
+            return
+        }
+
+        // 2. If not found, fetch details for creation
+        setScannedData({ sku: code, name: '', category: '', unit: '', size: '' })
         toast.info('Fetching product details...')
+
         try {
             const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${code}.json`)
             const data = await response.json()
@@ -33,26 +53,6 @@ export function ScanItemButton() {
                 let category = ''
                 let unit = ''
                 let size = ''
-
-                // Try to guess category
-                const tags = p.categories_tags || []
-                if (Array.isArray(tags)) {
-                    // Simple logic: check if any tag string contains one of our known categories
-                    const knownCategories = [
-                        "Electronics", "Mobile Phones", "Laptops", "Fashion", "Clothing", "Shoes",
-                        "Home", "Furniture", "Kitchen", "Health", "Beauty", "Food", "Groceries",
-                        "Toys", "Sports", "Automotive", "Office"
-                    ]
-
-                    for (const tag of tags) {
-                        const t = tag.toLowerCase().replace('en:', '').replace(/-/g, ' ')
-                        const match = knownCategories.find(c => t.includes(c.toLowerCase()))
-                        if (match) {
-                            // Map loose match to specific category if possible
-                            // For now we don't auto-set to avoid errors, but logic is here for future expansion
-                        }
-                    }
-                }
 
                 // Try to extract quantity/unit
                 if (p.quantity) {
@@ -92,8 +92,6 @@ export function ScanItemButton() {
         // If code looks like a name (has spaces, letters), use it as name too
         const isText = isNaN(Number(code)) && code.length > 3
         const nameGuess = isText ? code : ''
-        // If text, we can use it as name, but for SKU maybe we keep it blank or use generic?
-        // Let's use it for SKU too for now as it must be unique.
 
         setScannedData({
             sku: code,
@@ -131,6 +129,14 @@ export function ScanItemButton() {
                 defaultSize={scannedData.size}
                 hideTrigger={true}
             />
+
+            {existingItem && (
+                <QuickStockDialog
+                    item={existingItem}
+                    open={showStockDialog}
+                    onOpenChange={setShowStockDialog}
+                />
+            )}
         </>
     )
 }
