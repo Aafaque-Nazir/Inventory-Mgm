@@ -32,13 +32,23 @@ interface CreateItemDialogProps {
     onOpenChange?: (open: boolean) => void
     defaultSku?: string
     defaultName?: string
+    defaultCategory?: string
+    defaultUnit?: string
+    defaultSize?: string
+    defaultColor?: string
+    hideTrigger?: boolean
 }
 
 export function CreateItemDialog({
     open: controlledOpen,
     onOpenChange: controlledOnOpenChange,
     defaultSku = '',
-    defaultName = ''
+    defaultName = '',
+    defaultCategory = '',
+    defaultUnit = 'pcs',
+    defaultSize = '',
+    defaultColor = '',
+    hideTrigger = false
 }: CreateItemDialogProps = {}) {
     const [internalOpen, setInternalOpen] = useState(false)
     const isControlled = controlledOpen !== undefined
@@ -55,6 +65,11 @@ export function CreateItemDialog({
     const [isScanning, setIsScanning] = useState(false)
     const [sku, setSku] = useState(defaultSku)
     const [name, setName] = useState(defaultName)
+    const [category, setCategory] = useState(defaultCategory)
+    const [unit, setUnit] = useState(defaultUnit)
+    const [size, setSize] = useState(defaultSize)
+    const [color, setColor] = useState(defaultColor)
+
     const [isPending, startTransition] = useTransition()
     const router = useRouter()
 
@@ -64,9 +79,12 @@ export function CreateItemDialog({
         setPrevOpen(open)
         if (open) {
             // Only reset from defaults if we are opening
-            // If defaults are empty strings, it resets. If they have values (from scan), it fills.
             setSku(defaultSku)
             setName(defaultName)
+            if (defaultCategory) setCategory(defaultCategory)
+            if (defaultUnit) setUnit(defaultUnit)
+            if (defaultSize) setSize(defaultSize)
+            if (defaultColor) setColor(defaultColor)
         }
     }
 
@@ -118,11 +136,13 @@ export function CreateItemDialog({
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                <Button>
-                    <Plus className="mr-2 h-4 w-4" /> Add Item
-                </Button>
-            </DialogTrigger>
+            {!hideTrigger && (
+                <DialogTrigger asChild>
+                    <Button>
+                        <Plus className="mr-2 h-4 w-4" /> Add Item
+                    </Button>
+                </DialogTrigger>
+            )}
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Add New Item</DialogTitle>
@@ -161,7 +181,7 @@ export function CreateItemDialog({
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2 flex flex-col">
                             <Label>Category</Label>
-                            <Select name="category">
+                            <Select name="category" value={category} onValueChange={setCategory}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select category" />
                                 </SelectTrigger>
@@ -177,7 +197,7 @@ export function CreateItemDialog({
 
                         <div className="space-y-2 flex flex-col">
                             <Label>Unit</Label>
-                            <Select name="unit" defaultValue="pcs">
+                            <Select name="unit" value={unit} onValueChange={setUnit}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select unit" />
                                 </SelectTrigger>
@@ -237,11 +257,11 @@ export function CreateItemDialog({
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="size">Size</Label>
-                            <Input id="size" name="size" placeholder="e.g. XL, 42, 10kg" />
+                            <Input id="size" name="size" placeholder="e.g. XL, 42, 10kg" value={size} onChange={(e) => setSize(e.target.value)} />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="color">Color</Label>
-                            <Input id="color" name="color" placeholder="e.g. Red, Black" />
+                            <Input id="color" name="color" placeholder="e.g. Red, Black" value={color} onChange={(e) => setColor(e.target.value)} />
                         </div>
                     </div>
 
