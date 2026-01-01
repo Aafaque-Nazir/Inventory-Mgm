@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Plus, Loader2 } from 'lucide-react'
+import { Plus, Loader2, ScanBarcode } from 'lucide-react'
 import { createItem } from '@/app/actions/items'
 import { ITEM_CATEGORIES, ITEM_UNITS } from '@/lib/constants'
 import {
@@ -25,9 +25,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { BarcodeScanner } from '@/components/common/BarcodeScanner'
 
 export function CreateItemDialog() {
     const [open, setOpen] = useState(false)
+    const [isScanning, setIsScanning] = useState(false)
+    const [sku, setSku] = useState('')
     const [isPending, startTransition] = useTransition()
     const router = useRouter()
 
@@ -67,7 +70,19 @@ export function CreateItemDialog() {
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="sku">SKU / Barcode</Label>
-                        <Input id="sku" name="sku" placeholder="APL-001" required />
+                        <div className="flex gap-2">
+                            <Input
+                                id="sku"
+                                name="sku"
+                                placeholder="APL-001"
+                                required
+                                value={sku}
+                                onChange={(e) => setSku(e.target.value)}
+                            />
+                            <Button type="button" variant="outline" size="icon" onClick={() => setIsScanning(true)} title="Scan Barcode">
+                                <ScanBarcode className="h-4 w-4" />
+                            </Button>
+                        </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2 flex flex-col">
@@ -164,6 +179,11 @@ export function CreateItemDialog() {
                     </DialogFooter>
                 </form>
             </DialogContent>
+            <BarcodeScanner
+                open={isScanning}
+                onOpenChange={setIsScanning}
+                onScanSuccess={(code) => setSku(code)}
+            />
         </Dialog >
     )
 }
