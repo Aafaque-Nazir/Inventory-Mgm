@@ -51,10 +51,10 @@ export default async function SuppliersPage() {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Name</TableHead>
-                                    <TableHead>Contact Person</TableHead>
+                                    <TableHead className="hidden md:table-cell">Contact Person</TableHead>
                                     <TableHead>Phone</TableHead>
-                                    <TableHead>Email</TableHead>
-                                    <TableHead>Address</TableHead>
+                                    <TableHead className="hidden md:table-cell">Email</TableHead>
+                                    <TableHead className="hidden md:table-cell">Address</TableHead>
                                     <TableHead className="w-[100px] text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -62,7 +62,7 @@ export default async function SuppliersPage() {
                                 {suppliers?.map((supplier) => (
                                     <TableRow key={supplier.id}>
                                         <TableCell className="font-medium">{supplier.name}</TableCell>
-                                        <TableCell>
+                                        <TableCell className="hidden md:table-cell">
                                             {supplier.contact_person ? (
                                                 <div className="flex items-center gap-2">
                                                     <User className="h-4 w-4 text-muted-foreground" />
@@ -82,7 +82,7 @@ export default async function SuppliersPage() {
                                                 <span className="text-muted-foreground">-</span>
                                             )}
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell className="hidden md:table-cell">
                                             {supplier.email ? (
                                                 <div className="flex items-center gap-2">
                                                     <Mail className="h-4 w-4 text-muted-foreground" />
@@ -92,7 +92,7 @@ export default async function SuppliersPage() {
                                                 <span className="text-muted-foreground">-</span>
                                             )}
                                         </TableCell>
-                                        <TableCell className="text-muted-foreground">
+                                        <TableCell className="hidden text-muted-foreground md:table-cell">
                                             {supplier.address || '-'}
                                         </TableCell>
                                         <TableCell className="text-right">

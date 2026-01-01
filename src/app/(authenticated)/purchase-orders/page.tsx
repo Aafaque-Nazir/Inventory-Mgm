@@ -74,8 +74,8 @@ export default async function PurchaseOrdersPage() {
                                     <TableHead>Supplier</TableHead>
                                     <TableHead>Status</TableHead>
                                     <TableHead className="text-right">Total Amount</TableHead>
-                                    <TableHead>Created By</TableHead>
-                                    <TableHead>Date</TableHead>
+                                    <TableHead className="hidden md:table-cell">Created By</TableHead>
+                                    <TableHead className="hidden md:table-cell">Date</TableHead>
                                     <TableHead className="w-[100px] text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -96,8 +96,8 @@ export default async function PurchaseOrdersPage() {
                                         <TableCell className="text-right font-mono">
                                             ${order.total_amount.toFixed(2)}
                                         </TableCell>
-                                        <TableCell>{order.profile?.full_name || 'Unknown'}</TableCell>
-                                        <TableCell className="text-muted-foreground">
+                                        <TableCell className="hidden md:table-cell">{order.profile?.full_name || 'Unknown'}</TableCell>
+                                        <TableCell className="hidden text-muted-foreground md:table-cell">
                                             {format(new Date(order.created_at), 'MMM d, yyyy')}
                                         </TableCell>
                                         <TableCell className="text-right">

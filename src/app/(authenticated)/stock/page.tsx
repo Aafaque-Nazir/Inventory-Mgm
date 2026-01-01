@@ -78,8 +78,8 @@ export default async function StockPage() {
                                     <TableHead>Item</TableHead>
                                     <TableHead>Type</TableHead>
                                     <TableHead className="text-right">Quantity</TableHead>
-                                    <TableHead>Reason</TableHead>
-                                    <TableHead>Created By</TableHead>
+                                    <TableHead className="hidden md:table-cell">Reason</TableHead>
+                                    <TableHead className="hidden md:table-cell">Created By</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -107,10 +107,10 @@ export default async function StockPage() {
                                         <TableCell className="text-right font-mono">
                                             {movement.quantity}
                                         </TableCell>
-                                        <TableCell className="text-muted-foreground">
+                                        <TableCell className="hidden text-muted-foreground md:table-cell">
                                             {movement.reason || '-'}
                                         </TableCell>
-                                        <TableCell>{movement.profile?.full_name || 'Unknown'}</TableCell>
+                                        <TableCell className="hidden md:table-cell">{movement.profile?.full_name || 'Unknown'}</TableCell>
                                     </TableRow>
                                 ))}
                                 {(!movements || movements.length === 0) && (

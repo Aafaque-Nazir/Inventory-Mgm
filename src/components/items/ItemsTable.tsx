@@ -73,12 +73,12 @@ export function ItemsTable({ items }: ItemsTableProps) {
 
     return (
         <div className="space-y-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full md:w-auto">
                 <Input
                     placeholder="Search items..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="max-w-sm"
+                    className="flex-1 md:max-w-sm"
                 />
                 <Button variant="outline" size="icon" onClick={() => setIsScanning(true)} title="Scan Barcode">
                     <ScanBarcode className="h-4 w-4" />
@@ -89,12 +89,12 @@ export function ItemsTable({ items }: ItemsTableProps) {
                     <TableHeader>
                         <TableRow>
                             <TableHead>Name</TableHead>
-                            <TableHead>SKU</TableHead>
-                            <TableHead>Category</TableHead>
-                            <TableHead>Size</TableHead>
-                            <TableHead>Color</TableHead>
+                            <TableHead className="hidden md:table-cell">SKU</TableHead>
+                            <TableHead className="hidden md:table-cell">Category</TableHead>
+                            <TableHead className="hidden md:table-cell">Size</TableHead>
+                            <TableHead className="hidden md:table-cell">Color</TableHead>
                             <TableHead>Stock</TableHead>
-                            <TableHead>Unit</TableHead>
+                            <TableHead className="hidden md:table-cell">Unit</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead className="w-[50px]"></TableHead>
                         </TableRow>
@@ -102,18 +102,23 @@ export function ItemsTable({ items }: ItemsTableProps) {
                     <TableBody>
                         {filteredItems.map((item) => (
                             <TableRow key={item.id}>
-                                <TableCell className="font-medium">{item.name}</TableCell>
-                                <TableCell>{item.sku}</TableCell>
-                                <TableCell>{item.category || '-'}</TableCell>
-                                <TableCell>{item.size || '-'}</TableCell>
-                                <TableCell>{item.color || '-'}</TableCell>
+                                <TableCell className="font-medium">
+                                    <div className="flex flex-col">
+                                        <span>{item.name}</span>
+                                        <span className="text-xs text-muted-foreground md:hidden">{item.sku}</span>
+                                    </div>
+                                </TableCell>
+                                <TableCell className="hidden md:table-cell">{item.sku}</TableCell>
+                                <TableCell className="hidden md:table-cell">{item.category || '-'}</TableCell>
+                                <TableCell className="hidden md:table-cell">{item.size || '-'}</TableCell>
+                                <TableCell className="hidden md:table-cell">{item.color || '-'}</TableCell>
                                 <TableCell className="font-mono">{item.current_stock}</TableCell>
-                                <TableCell>{item.unit}</TableCell>
+                                <TableCell className="hidden md:table-cell">{item.unit}</TableCell>
                                 <TableCell>
                                     {item.current_stock < item.min_stock ? (
-                                        <Badge variant="destructive">Low</Badge>
+                                        <Badge variant="destructive" className="h-5 px-1.5 text-[10px] md:h-6 md:px-2.5 md:text-xs">Low</Badge>
                                     ) : (
-                                        <Badge variant="secondary">OK</Badge>
+                                        <Badge variant="secondary" className="h-5 px-1.5 text-[10px] md:h-6 md:px-2.5 md:text-xs">OK</Badge>
                                     )}
                                 </TableCell>
                                 <TableCell>
