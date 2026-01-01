@@ -69,24 +69,40 @@ export function ScanItemButton() {
                     setScannedData({
                         sku: code,
                         name: productName,
-                        category: '', // Leave empty for user to select
+                        category: '',
                         unit,
                         size
                     })
                     toast.success('Product found: ' + productName)
                 } else {
-                    toast.info('Product found but no name available')
-                    setScannedData(prev => ({ ...prev, sku: code }))
+                    handleNewItem(code, "Details not found online. Ready to create!")
                 }
             } else {
-                toast.info('Product not found in database')
+                handleNewItem(code, "New item detected! Enter details.")
             }
         } catch (error) {
             console.error('Error fetching product:', error)
-            toast.error('Failed to fetch details, setting SKU only')
+            handleNewItem(code, "Offline or unknown item. Ready to add!")
         }
 
         setShowCreateDialog(true)
+    }
+
+    const handleNewItem = (code: string, message: string) => {
+        // If code looks like a name (has spaces, letters), use it as name too
+        const isText = isNaN(Number(code)) && code.length > 3
+        const nameGuess = isText ? code : ''
+        // If text, we can use it as name, but for SKU maybe we keep it blank or use generic?
+        // Let's use it for SKU too for now as it must be unique.
+
+        setScannedData({
+            sku: code,
+            name: nameGuess,
+            category: '',
+            unit: '',
+            size: ''
+        })
+        toast.info(message)
     }
 
     return (
