@@ -291,12 +291,23 @@ function FormCombobox({ items, value, onChange, placeholder, allowCustom = false
     allowCustom?: boolean
 }) {
     const [open, setOpen] = useState(false)
-    const [searchTerm, setSearchTerm] = useState("")
+    const [search, setSearch] = useState("")
 
-    // If value is custom (not in items), add it to the display list
-    const displayItems = value && !items.includes(value)
-        ? [value, ...items]
+    // Filter items based on search
+    const filteredItems = search
+        ? items.filter(item => item.toLowerCase().includes(search.toLowerCase()))
         : items
+
+    // If value is custom (not in items), add it to top
+    const displayItems = value && !items.includes(value)
+        ? [value, ...filteredItems]
+        : filteredItems
+
+    const handleSelect = (item: string) => {
+        onChange(item)
+        setOpen(false)
+        setSearch("")
+    }
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -315,58 +326,60 @@ function FormCombobox({ items, value, onChange, placeholder, allowCustom = false
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
-                <Command shouldFilter={true}>
-                    <CommandInput
-                        placeholder={`Search ${placeholder.toLowerCase()}...`}
-                        value={searchTerm}
-                        onValueChange={setSearchTerm}
-                    />
-                    <CommandList>
-                        <CommandEmpty>
-                            {allowCustom && searchTerm ? (
-                                <div className="p-2">
-                                    <p className="text-xs text-muted-foreground mb-2">No results found.</p>
-                                    <Button
-                                        type="button"
-                                        variant="secondary"
-                                        size="sm"
-                                        className="w-full h-auto py-1.5"
-                                        onClick={() => {
-                                            onChange(searchTerm)
-                                            setOpen(false)
-                                            setSearchTerm("")
-                                        }}
-                                    >
-                                        + Add "{searchTerm}"
-                                    </Button>
-                                </div>
-                            ) : (
-                                "No results found."
-                            )}
-                        </CommandEmpty>
-                        <CommandGroup className="max-h-[200px] overflow-auto">
-                            {displayItems.map((item) => (
-                                <CommandItem
-                                    key={item}
-                                    value={item}
-                                    onSelect={() => {
-                                        onChange(item)
-                                        setOpen(false)
-                                        setSearchTerm("")
-                                    }}
+                <div className="flex flex-col">
+                    {/* Search Input */}
+                    <div className="flex items-center border-b px-3">
+                        <input
+                            className="flex h-10 w-full bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground"
+                            placeholder={`Search ${placeholder.toLowerCase()}...`}
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                    </div>
+
+                    {/* Items List */}
+                    <div className="max-h-[200px] overflow-auto p-1">
+                        {displayItems.length === 0 && !allowCustom && (
+                            <div className="py-6 text-center text-sm text-muted-foreground">
+                                No results found.
+                            </div>
+                        )}
+
+                        {displayItems.length === 0 && allowCustom && search && (
+                            <div className="p-2">
+                                <p className="text-xs text-muted-foreground mb-2">No results found.</p>
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    size="sm"
+                                    className="w-full"
+                                    onClick={() => handleSelect(search)}
                                 >
-                                    <Check
-                                        className={cn(
-                                            "mr-2 h-4 w-4",
-                                            value === item ? "opacity-100" : "opacity-0"
-                                        )}
-                                    />
-                                    {item}
-                                </CommandItem>
-                            ))}
-                        </CommandGroup>
-                    </CommandList>
-                </Command>
+                                    + Add "{search}"
+                                </Button>
+                            </div>
+                        )}
+
+                        {displayItems.map((item) => (
+                            <div
+                                key={item}
+                                className={cn(
+                                    "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground",
+                                    value === item && "bg-accent"
+                                )}
+                                onClick={() => handleSelect(item)}
+                            >
+                                <Check
+                                    className={cn(
+                                        "mr-2 h-4 w-4",
+                                        value === item ? "opacity-100" : "opacity-0"
+                                    )}
+                                />
+                                {item}
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </PopoverContent>
         </Popover>
     )
