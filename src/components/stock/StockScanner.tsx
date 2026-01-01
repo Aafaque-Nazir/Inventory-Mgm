@@ -39,11 +39,12 @@ export function StockScanner() {
         <>
             <Button
                 variant="outline"
-                className="gap-2 border-dashed"
+                size="sm"
+                className="gap-1 sm:gap-2 border-dashed sm:size-default"
                 onClick={() => setIsScanning(true)}
             >
                 <ScanBarcode className="h-4 w-4" />
-                Scan to Update
+                <span className="hidden xs:inline">Scan to</span> Update
             </Button>
 
             <BarcodeScanner

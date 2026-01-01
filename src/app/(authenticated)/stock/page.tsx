@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { TrendingDown, TrendingUp, ArrowDown, ArrowUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { StockScanner } from '@/components/stock/StockScanner'
+import { ScanItemButton } from '@/components/items/ScanItemButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -41,17 +42,19 @@ export default async function StockPage() {
     const { data: movements } = await movementsQuery
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold tracking-tight">Stock Movements</h1>
-                <div className="flex gap-2">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Stock Movements</h1>
+                <div className="flex flex-wrap gap-2">
+                    <ScanItemButton />
                     <StockScanner />
                     <AddStockMovementDialog
                         defaultType="OUT"
                         defaultReason="Sale"
                         title="Record Sale"
                         trigger={
-                            <Button variant="destructive">
-                                <TrendingDown className="mr-2 h-4 w-4" /> Record Sale
+                            <Button variant="destructive" size="sm" className="sm:size-default">
+                                <TrendingDown className="mr-1 sm:mr-2 h-4 w-4" />
+                                <span className="hidden xs:inline">Record</span> Sale
                             </Button>
                         }
                     />
@@ -59,8 +62,9 @@ export default async function StockPage() {
                         defaultType="IN"
                         title="Add Stock"
                         trigger={
-                            <Button>
-                                <TrendingUp className="mr-2 h-4 w-4" /> Add Stock
+                            <Button size="sm" className="sm:size-default">
+                                <TrendingUp className="mr-1 sm:mr-2 h-4 w-4" />
+                                <span className="hidden xs:inline">Add</span> Stock
                             </Button>
                         }
                     />
