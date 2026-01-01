@@ -123,6 +123,39 @@ export function CreateItemDialog() {
                         </div>
                     </div>
 
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="hsn_code">HSN Code</Label>
+                            <Input id="hsn_code" name="hsn_code" placeholder="e.g. 123456" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="gst_rate">GST Rate (%)</Label>
+                            <Select name="gst_rate" defaultValue="0">
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select GST" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="0">0% (Exempt)</SelectItem>
+                                    <SelectItem value="5">5%</SelectItem>
+                                    <SelectItem value="12">12%</SelectItem>
+                                    <SelectItem value="18">18%</SelectItem>
+                                    <SelectItem value="28">28%</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="size">Size</Label>
+                            <Input id="size" name="size" placeholder="e.g. XL, 42, 10kg" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="color">Color</Label>
+                            <Input id="color" name="color" placeholder="e.g. Red, Black" />
+                        </div>
+                    </div>
+
                     <DialogFooter>
                         <Button type="submit" disabled={isPending}>
                             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

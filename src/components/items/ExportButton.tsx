@@ -27,7 +27,7 @@ export function ExportButton({ items, isPro }: ExportButtonProps) {
 
         // Convert key-value pairs to CSV
         // 1. Get headers
-        const headers = ['Name', 'SKU', 'Category', 'Unit', 'Current Stock', 'Min Stock', 'Price']
+        const headers = ['Name', 'SKU', 'Category', 'Unit', 'Current Stock', 'Min Stock', 'Cost Price', 'Selling Price', 'Size', 'Color']
         const csvContent = [
             headers.join(','),
             ...items.map(item => [
@@ -37,7 +37,10 @@ export function ExportButton({ items, isPro }: ExportButtonProps) {
                 `"${item.unit}"`,
                 item.current_stock,
                 item.min_stock,
-                item.price || 0
+                item.cost_price || 0,
+                item.selling_price || 0,
+                `"${item.size || ''}"`,
+                `"${item.color || ''}"`
             ].join(','))
         ].join('\n')
 

@@ -16,7 +16,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { MoreHorizontal, Edit, Trash2, TrendingUp, TrendingDown, Eye } from 'lucide-react'
+import { MoreHorizontal, Edit, Trash2, TrendingUp, TrendingDown, Eye, ScanBarcode } from 'lucide-react'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -38,6 +38,7 @@ import {
 import Link from 'next/link'
 import { EditItemDialog } from './EditItemDialog'
 import { QuickStockDialog } from './QuickStockDialog'
+import { BarcodeScanner } from '@/components/common/BarcodeScanner'
 
 interface ItemsTableProps {
     items: Item[]
@@ -48,6 +49,7 @@ export function ItemsTable({ items }: ItemsTableProps) {
     const [deleteId, setDeleteId] = useState<string | null>(null)
     const [editItem, setEditItem] = useState<Item | null>(null)
     const [quickStockItem, setQuickStockItem] = useState<Item | null>(null)
+    const [isScanning, setIsScanning] = useState(false)
     const router = useRouter()
     const supabase = createClient()
 
@@ -78,6 +80,9 @@ export function ItemsTable({ items }: ItemsTableProps) {
                     onChange={(e) => setSearch(e.target.value)}
                     className="max-w-sm"
                 />
+                <Button variant="outline" size="icon" onClick={() => setIsScanning(true)} title="Scan Barcode">
+                    <ScanBarcode className="h-4 w-4" />
+                </Button>
             </div>
             <div className="rounded-md border">
                 <Table>
@@ -86,6 +91,8 @@ export function ItemsTable({ items }: ItemsTableProps) {
                             <TableHead>Name</TableHead>
                             <TableHead>SKU</TableHead>
                             <TableHead>Category</TableHead>
+                            <TableHead>Size</TableHead>
+                            <TableHead>Color</TableHead>
                             <TableHead>Stock</TableHead>
                             <TableHead>Unit</TableHead>
                             <TableHead>Status</TableHead>
@@ -98,6 +105,8 @@ export function ItemsTable({ items }: ItemsTableProps) {
                                 <TableCell className="font-medium">{item.name}</TableCell>
                                 <TableCell>{item.sku}</TableCell>
                                 <TableCell>{item.category || '-'}</TableCell>
+                                <TableCell>{item.size || '-'}</TableCell>
+                                <TableCell>{item.color || '-'}</TableCell>
                                 <TableCell className="font-mono">{item.current_stock}</TableCell>
                                 <TableCell>{item.unit}</TableCell>
                                 <TableCell>
@@ -182,6 +191,12 @@ export function ItemsTable({ items }: ItemsTableProps) {
                     onOpenChange={(open) => !open && setQuickStockItem(null)}
                 />
             )}
+
+            <BarcodeScanner
+                open={isScanning}
+                onOpenChange={setIsScanning}
+                onScanSuccess={(code) => setSearch(code)}
+            />
         </div>
     )
 }

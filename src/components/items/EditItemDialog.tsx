@@ -34,6 +34,10 @@ const formSchema = z.object({
     min_stock: z.coerce.number().min(0),
     cost_price: z.coerce.number().min(0),
     selling_price: z.coerce.number().min(0),
+    size: z.string().optional(),
+    color: z.string().optional(),
+    hsn_code: z.string().optional(),
+    gst_rate: z.coerce.number().min(0).max(100).optional(),
 })
 
 interface EditItemDialogProps {
@@ -56,6 +60,10 @@ export function EditItemDialog({ item, open, onOpenChange }: EditItemDialogProps
             min_stock: item.min_stock,
             cost_price: item.cost_price || 0,
             selling_price: item.selling_price || 0,
+            size: item.size || '',
+            color: item.color || '',
+            hsn_code: item.hsn_code || '',
+            gst_rate: item.gst_rate || 0,
         },
     })
 
@@ -164,6 +172,62 @@ export function EditItemDialog({ item, open, onOpenChange }: EditItemDialogProps
                                         <FormLabel>Selling Price (₹)</FormLabel>
                                         <FormControl>
                                             <Input type="number" step="0.01" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="size"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Size</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} placeholder="e.g. XL" />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="color"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Color</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} placeholder="e.g. Red" />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="hsn_code"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>HSN Code</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} placeholder="e.g. 123456" />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="gst_rate"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>GST Rate (%)</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" {...field} placeholder="e.g. 18" />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

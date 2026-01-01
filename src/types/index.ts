@@ -23,6 +23,10 @@ export interface Item {
     current_stock: number
     cost_price: number // New field
     selling_price: number // New field
+    size?: string | null
+    color?: string | null
+    hsn_code?: string | null
+    gst_rate?: number
     created_at: string
     updated_at: string
 }

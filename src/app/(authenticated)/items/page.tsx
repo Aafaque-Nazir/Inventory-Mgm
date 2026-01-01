@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { ItemsTable } from '@/components/items/ItemsTable'
 import { CreateItemDialog } from '@/components/items/CreateItemDialog'
 import { ExportButton } from '@/components/items/ExportButton'
+import { CsvImporter } from '@/components/items/CsvImporter'
 
 export const dynamic = 'force-dynamic'
 
@@ -61,6 +62,7 @@ export default async function ItemsPage() {
                     <p className="text-muted-foreground">Manage your stock and items.</p>
                 </div>
                 <div className="flex gap-2">
+                    <CsvImporter />
                     <ExportButton items={items || []} isPro={isPro || isSuperAdmin} />
                     <CreateItemDialog />
                 </div>
