@@ -10,27 +10,80 @@ import { toast } from 'sonner'
 export function ScanItemButton() {
     const [isScanning, setIsScanning] = useState(false)
     const [showCreateDialog, setShowCreateDialog] = useState(false)
-    const [scannedData, setScannedData] = useState<{ sku: string, name: string }>({ sku: '', name: '' })
+    const [scannedData, setScannedData] = useState<{
+        sku: string,
+        name: string,
+        category: string,
+        unit: string,
+        size: string
+    }>({ sku: '', name: '', category: '', unit: '', size: '' })
 
     const handleScanSuccess = async (code: string) => {
         setIsScanning(false)
-        setScannedData({ sku: code, name: '' })
+        setScannedData({ sku: code, name: '', category: '', unit: '', size: '' })
 
-        // Optional: Fetch details here too if we want to pre-fill before opening
         toast.info('Fetching product details...')
         try {
             const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${code}.json`)
             const data = await response.json()
 
             if (data.status === 1 && data.product) {
-                const productName = data.product.product_name || data.product.product_name_en
-                if (productName) {
-                    setScannedData({ sku: code, name: productName })
-                    toast.success('Product found: ' + productName)
+                const p = data.product
+                const productName = p.product_name || p.product_name_en || p.brands || ''
+                let category = ''
+                let unit = ''
+                let size = ''
+
+                // Try to guess category
+                const tags = p.categories_tags || []
+                if (Array.isArray(tags)) {
+                    // Simple logic: check if any tag string contains one of our known categories
+                    const knownCategories = [
+                        "Electronics", "Mobile Phones", "Laptops", "Fashion", "Clothing", "Shoes",
+                        "Home", "Furniture", "Kitchen", "Health", "Beauty", "Food", "Groceries",
+                        "Toys", "Sports", "Automotive", "Office"
+                    ]
+
+                    for (const tag of tags) {
+                        const t = tag.toLowerCase().replace('en:', '').replace(/-/g, ' ')
+                        const match = knownCategories.find(c => t.includes(c.toLowerCase()))
+                        if (match) {
+                            // Map loose match to specific category if possible
+                            // For now we don't auto-set to avoid errors, but logic is here for future expansion
+                        }
+                    }
                 }
+
+                // Try to extract quantity/unit
+                if (p.quantity) {
+                    const q = p.quantity.toLowerCase()
+                    if (q.includes('ml')) { unit = 'ml'; size = p.quantity }
+                    else if (q.includes('l') || q.includes('liter')) { unit = 'ltr (liter)'; size = p.quantity }
+                    else if (q.includes('kg')) { unit = 'kg'; size = p.quantity }
+                    else if (q.includes('mg')) { unit = 'mg'; size = p.quantity }
+                    else if (q.includes('g') && !q.includes('kg')) { unit = 'g'; size = p.quantity }
+                    else { size = p.quantity }
+                }
+
+                if (productName) {
+                    setScannedData({
+                        sku: code,
+                        name: productName,
+                        category: '', // Leave empty for user to select
+                        unit,
+                        size
+                    })
+                    toast.success('Product found: ' + productName)
+                } else {
+                    toast.info('Product found but no name available')
+                    setScannedData(prev => ({ ...prev, sku: code }))
+                }
+            } else {
+                toast.info('Product not found in database')
             }
         } catch (error) {
             console.error('Error fetching product:', error)
+            toast.error('Failed to fetch details, setting SKU only')
         }
 
         setShowCreateDialog(true)
@@ -57,6 +110,10 @@ export function ScanItemButton() {
                 onOpenChange={setShowCreateDialog}
                 defaultSku={scannedData.sku}
                 defaultName={scannedData.name}
+                defaultCategory={scannedData.category}
+                defaultUnit={scannedData.unit}
+                defaultSize={scannedData.size}
+                hideTrigger={true}
             />
         </>
     )
