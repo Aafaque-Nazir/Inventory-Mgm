@@ -15,17 +15,25 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Plus, Loader2, ScanBarcode } from 'lucide-react'
+import { Plus, Loader2, ScanBarcode, ChevronsUpDown, Check } from 'lucide-react'
 import { createItem } from '@/app/actions/items'
 import { ITEM_CATEGORIES, ITEM_UNITS } from '@/lib/constants'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 import { BarcodeScanner } from '@/components/common/BarcodeScanner'
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/ui/command"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface CreateItemDialogProps {
     open?: boolean
@@ -96,6 +104,10 @@ export function CreateItemDialog({
         if (sku && !formData.get('sku')) formData.set('sku', sku)
         if (name && !formData.get('name')) formData.set('name', name)
 
+        // Ensure combobox values are set
+        if (category) formData.set('category', category)
+        if (unit) formData.set('unit', unit)
+
         startTransition(async () => {
             const result = await createItem({}, formData)
             if (result?.error) {
@@ -143,7 +155,7 @@ export function CreateItemDialog({
                     </Button>
                 </DialogTrigger>
             )}
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] overflow-y-auto max-h-[90vh]">
                 <DialogHeader>
                     <DialogTitle>Add New Item</DialogTitle>
                     <DialogDescription>
@@ -181,34 +193,23 @@ export function CreateItemDialog({
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2 flex flex-col">
                             <Label>Category</Label>
-                            <Select name="category" value={category} onValueChange={setCategory}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select category" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {ITEM_CATEGORIES.map((cat) => (
-                                        <SelectItem key={cat} value={cat}>
-                                            {cat}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            <FormCombobox
+                                items={ITEM_CATEGORIES}
+                                value={category}
+                                onChange={setCategory}
+                                placeholder="Select category"
+                                allowCustom={true}
+                            />
                         </div>
 
                         <div className="space-y-2 flex flex-col">
                             <Label>Unit</Label>
-                            <Select name="unit" value={unit} onValueChange={setUnit}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select unit" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {ITEM_UNITS.map((u) => (
-                                        <SelectItem key={u} value={u}>
-                                            {u}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            <FormCombobox
+                                items={ITEM_UNITS}
+                                value={unit}
+                                onChange={setUnit}
+                                placeholder="Select unit"
+                            />
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -279,5 +280,83 @@ export function CreateItemDialog({
                 onScanSuccess={(code) => fetchProductDetails(code)}
             />
         </Dialog >
+    )
+}
+
+function FormCombobox({ items, value, onChange, placeholder, allowCustom = false }: {
+    items: string[]
+    value: string
+    onChange: (val: string) => void
+    placeholder: string
+    allowCustom?: boolean
+}) {
+    const [open, setOpen] = useState(false)
+    const [searchTerm, setSearchTerm] = useState("")
+
+    return (
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+                <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="w-full justify-between font-normal"
+                >
+                    {value
+                        ? value
+                        : <span className="text-muted-foreground">{placeholder}</span>}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                <Command>
+                    <CommandInput placeholder={`Search ${placeholder.toLowerCase()}...`} onValueChange={setSearchTerm} />
+                    <CommandList>
+                        <CommandEmpty>
+                            {allowCustom && searchTerm ? (
+                                <div className="p-2">
+                                    <p className="text-xs text-muted-foreground mb-2">No results found.</p>
+                                    <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        className="w-full h-auto py-1.5"
+                                        onClick={() => {
+                                            onChange(searchTerm)
+                                            setOpen(false)
+                                            setSearchTerm("")
+                                        }}
+                                    >
+                                        + Add "{searchTerm}"
+                                    </Button>
+                                </div>
+                            ) : (
+                                "No results found."
+                            )}
+                        </CommandEmpty>
+                        <CommandGroup className="max-h-[200px] overflow-auto">
+                            {items.map((item) => (
+                                <CommandItem
+                                    key={item}
+                                    value={item}
+                                    onSelect={(currentValue) => {
+                                        // Use the exact casing from the item list, not the lowercased value from cmdk
+                                        onChange(item)
+                                        setOpen(false)
+                                    }}
+                                >
+                                    <Check
+                                        className={cn(
+                                            "mr-2 h-4 w-4",
+                                            value === item ? "opacity-100" : "opacity-0"
+                                        )}
+                                    />
+                                    {item}
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </Popover>
     )
 }
