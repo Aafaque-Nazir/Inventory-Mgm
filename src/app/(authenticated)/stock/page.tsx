@@ -6,6 +6,7 @@ import { format } from 'date-fns'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { TrendingDown, TrendingUp, ArrowDown, ArrowUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { StockScanner } from '@/components/stock/StockScanner'
 
 export const dynamic = 'force-dynamic'
 
@@ -43,6 +44,7 @@ export default async function StockPage() {
             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold tracking-tight">Stock Movements</h1>
                 <div className="flex gap-2">
+                    <StockScanner />
                     <AddStockMovementDialog
                         defaultType="OUT"
                         defaultReason="Sale"

@@ -217,3 +217,38 @@ export async function bulkCreateItems(items: any[]) {
         return { error: error.message || 'Failed to import items' }
     }
 }
+
+export async function getItemBySku(sku: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: 'Unauthorized' }
+
+    try {
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('organization_id')
+            .eq('id', user.id)
+            .single()
+
+        if (!profile?.organization_id) return { error: 'Organization not found' }
+
+        const { data: item, error } = await supabase
+            .from('items')
+            .select('*')
+            .eq('organization_id', profile.organization_id)
+            .eq('sku', sku)
+            .single()
+
+        if (error) {
+            if (error.code === 'PGRST116') {
+                return { error: 'Item not found' }
+            }
+            throw error
+        }
+
+        return { item }
+    } catch (error: any) {
+        console.error('Get Item By SKU Error:', error)
+        return { error: error.message || 'Failed to fetch item' }
+    }
+}
