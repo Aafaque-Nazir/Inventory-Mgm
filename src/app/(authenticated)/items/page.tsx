@@ -3,6 +3,7 @@ import { ItemsTable } from '@/components/items/ItemsTable'
 import { CreateItemDialog } from '@/components/items/CreateItemDialog'
 import { ExportButton } from '@/components/items/ExportButton'
 import { CsvImporter } from '@/components/items/CsvImporter'
+import { ScanItemButton } from '@/components/items/ScanItemButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -62,6 +63,7 @@ export default async function ItemsPage() {
                     <p className="text-muted-foreground">Manage your stock and items.</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
+                    <ScanItemButton />
                     <CsvImporter />
                     <ExportButton items={items || []} isPro={isPro || isSuperAdmin} />
                     <CreateItemDialog />

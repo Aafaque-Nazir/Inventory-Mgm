@@ -38,7 +38,6 @@ import {
 import Link from 'next/link'
 import { EditItemDialog } from './EditItemDialog'
 import { QuickStockDialog } from './QuickStockDialog'
-import { BarcodeScanner } from '@/components/common/BarcodeScanner'
 
 interface ItemsTableProps {
     items: Item[]
@@ -49,7 +48,6 @@ export function ItemsTable({ items }: ItemsTableProps) {
     const [deleteId, setDeleteId] = useState<string | null>(null)
     const [editItem, setEditItem] = useState<Item | null>(null)
     const [quickStockItem, setQuickStockItem] = useState<Item | null>(null)
-    const [isScanning, setIsScanning] = useState(false)
     const router = useRouter()
     const supabase = createClient()
 
@@ -80,9 +78,6 @@ export function ItemsTable({ items }: ItemsTableProps) {
                     onChange={(e) => setSearch(e.target.value)}
                     className="flex-1 md:max-w-sm"
                 />
-                <Button variant="outline" size="icon" onClick={() => setIsScanning(true)} title="Scan Barcode">
-                    <ScanBarcode className="h-4 w-4" />
-                </Button>
             </div>
             <div className="rounded-md border">
                 <Table>
@@ -197,11 +192,6 @@ export function ItemsTable({ items }: ItemsTableProps) {
                 />
             )}
 
-            <BarcodeScanner
-                open={isScanning}
-                onOpenChange={setIsScanning}
-                onScanSuccess={(code) => setSearch(code)}
-            />
         </div>
     )
 }

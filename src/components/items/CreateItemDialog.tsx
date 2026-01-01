@@ -27,13 +27,48 @@ import {
 } from "@/components/ui/select"
 import { BarcodeScanner } from '@/components/common/BarcodeScanner'
 
-export function CreateItemDialog() {
-    const [open, setOpen] = useState(false)
+interface CreateItemDialogProps {
+    open?: boolean
+    onOpenChange?: (open: boolean) => void
+    defaultSku?: string
+    defaultName?: string
+}
+
+export function CreateItemDialog({
+    open: controlledOpen,
+    onOpenChange: controlledOnOpenChange,
+    defaultSku = '',
+    defaultName = ''
+}: CreateItemDialogProps = {}) {
+    const [internalOpen, setInternalOpen] = useState(false)
+    const isControlled = controlledOpen !== undefined
+
+    const open = isControlled ? controlledOpen : internalOpen
+    const setOpen = (newOpen: boolean) => {
+        if (isControlled) {
+            controlledOnOpenChange?.(newOpen)
+        } else {
+            setInternalOpen(newOpen)
+        }
+    }
+
     const [isScanning, setIsScanning] = useState(false)
-    const [sku, setSku] = useState('')
-    const [name, setName] = useState('')
+    const [sku, setSku] = useState(defaultSku)
+    const [name, setName] = useState(defaultName)
     const [isPending, startTransition] = useTransition()
     const router = useRouter()
+
+    // Sync state with props when dialog opens/closes
+    const [prevOpen, setPrevOpen] = useState(open)
+    if (open !== prevOpen) {
+        setPrevOpen(open)
+        if (open) {
+            // Only reset from defaults if we are opening
+            // If defaults are empty strings, it resets. If they have values (from scan), it fills.
+            setSku(defaultSku)
+            setName(defaultName)
+        }
+    }
 
     async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()

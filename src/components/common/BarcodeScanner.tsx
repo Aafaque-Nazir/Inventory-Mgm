@@ -73,9 +73,6 @@ export function BarcodeScanner({ open, onOpenChange, onScanSuccess }: BarcodeSca
                     scanner.render(
                         (decodedText) => {
                             // Success
-                            const audio = new Audio('/beep.mp3') // We will use a base64 string if file not present, or just a simple reliable beep
-                            // Actually, let's use a simple reliable AudioContext beep or a public URL if available.
-                            // For simplicity, I'll use a short inline function for a synthesized beep to avoid file dependency.
                             playBeep()
 
                             onScanSuccess(decodedText)
