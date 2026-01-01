@@ -18,15 +18,26 @@ export default async function StockPage() {
     const { data: { user } } = await supabase.auth.getUser()
     let organizationId: string | null = null
     let isSuperAdmin = false
+    let isPro = false
 
     if (user) {
         const { data: profile } = await supabase
             .from('profiles')
-            .select('organization_id, is_super_admin')
+            .select('organization_id, is_super_admin, organizations(plan_type, subscription_end_date)')
             .eq('id', user.id)
             .single()
         organizationId = profile?.organization_id || null
         isSuperAdmin = profile?.is_super_admin || false
+
+        // Check Pro Status
+        // @ts-ignore
+        if (profile?.organizations?.plan_type === 'PRO') {
+            // @ts-ignore
+            const endDate = profile.organizations.subscription_end_date
+            if (endDate && new Date(endDate) > new Date()) {
+                isPro = true
+            }
+        }
     }
 
     let movementsQuery = supabase
@@ -45,8 +56,8 @@ export default async function StockPage() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Stock Movements</h1>
                 <div className="flex flex-wrap gap-2">
-                    <ScanItemButton />
-                    <StockScanner />
+                    <ScanItemButton isPro={isPro || isSuperAdmin} />
+                    <StockScanner isPro={isPro || isSuperAdmin} />
                     <AddStockMovementDialog
                         defaultType="OUT"
                         defaultReason="Sale"

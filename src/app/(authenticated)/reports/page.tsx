@@ -8,6 +8,7 @@ import { LowStockTable } from '@/components/reports/LowStockTable'
 import { TopItemsTable } from '@/components/reports/TopItemsTable'
 import { SummaryCard } from '@/components/reports/SummaryCard'
 import { format, subDays } from 'date-fns'
+import { ProLock } from '@/components/common/ProLock'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,37 +35,23 @@ export default async function ReportsPage() {
             // @ts-ignore
             planType = profile.organizations.plan_type
 
-            // Check Expiry
             // @ts-ignore
-            if (profile.organizations?.subscription_end_date) {
+            const org = profile.organizations
+            // @ts-ignore
+            if (planType === 'PRO' && org?.subscription_end_date) {
                 // @ts-ignore
-                const expiry = new Date(profile.organizations.subscription_end_date)
+                const expiry = new Date(org.subscription_end_date)
                 if (expiry < new Date()) {
-                    planType = 'FREE' // Treat as free if expired
+                    planType = 'FREE'
                 }
             }
         }
     }
 
+    const isPro = planType === 'PRO' || isSuperAdmin
+
     if (!organizationId && !isSuperAdmin) {
         return <div className="p-8">No organization found for reports/analytics.</div>
-    }
-
-    if (planType === 'FREE' && !isSuperAdmin) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
-                <div className="p-4 bg-muted rounded-full">
-                    <BarChart3 className="h-12 w-12 text-muted-foreground" />
-                </div>
-                <h2 className="text-2xl font-bold tracking-tight">Advanced Analytics is a Pro Feature</h2>
-                <p className="text-muted-foreground max-w-md">
-                    Upgrade your plan to unlock detailed reports, stock movement trends, and predictive analytics.
-                </p>
-                <Button asChild>
-                    <Link href="/pricing">Upgrade to Pro</Link>
-                </Button>
-            </div>
-        )
     }
 
     // --- Fetch All Items ---
@@ -168,42 +155,48 @@ export default async function ReportsPage() {
         <div className="space-y-6">
             <h1 className="text-3xl font-bold tracking-tight">Analytics & Reports</h1>
 
-            {/* KPI Summary Cards */}
+            {/* KPI Summary Cards - Always Visible */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <SummaryCard title="Total Items" value={totalItems} icon="package" />
                 <SummaryCard title="Inventory Value" value={formatCurrency(totalValuation)} icon="trendingUp" />
-                <SummaryCard title="Est. Profit" value={formatCurrency(estimatedProfit)} icon="trendingUp" trend={estimatedProfit > 0 ? 'up' : 'neutral'} />
+                <ProLock isPro={isPro} title="Profit Est." className="h-full">
+                    <SummaryCard title="Est. Profit" value={formatCurrency(estimatedProfit)} icon="trendingUp" trend={estimatedProfit > 0 ? 'up' : 'neutral'} />
+                </ProLock>
                 <SummaryCard title="Low Stock Alerts" value={lowStockItems.length} icon="alertTriangle" trend={lowStockItems.length > 0 ? 'down' : 'neutral'} />
             </div>
 
-            {/* Financial Performance Section */}
-            <h2 className="text-xl font-bold tracking-tight pt-4">Financial Performance (Realized)</h2>
-            <div className="grid gap-4 md:grid-cols-3">
-                <SummaryCard
-                    title="Total Sales (Revenue)"
-                    value={formatCurrency(movements?.filter(m => m.type === 'OUT').reduce((sum, m) => sum + (Number(m.quantity) * Number(m.unit_price || 0)), 0) || 0)}
-                    icon="trendingUp"
-                />
-                <SummaryCard
-                    title="Stock Purchases (Cost)"
-                    value={formatCurrency(movements?.filter(m => m.type === 'IN').reduce((sum, m) => sum + (Number(m.quantity) * Number(m.unit_price || 0)), 0) || 0)}
-                    icon="package"
-                />
-                <SummaryCard
-                    title="Net Profit (Est.)"
-                    value={formatCurrency(
-                        movements?.filter(m => m.type === 'OUT' && Number(m.unit_price) > 0).reduce((profit, m) => {
-                            const revenue = Number(m.quantity) * Number(m.unit_price || 0)
-                            const item = items?.find(i => i.id === m.item_id)
-                            const cost = Number(m.quantity) * Number(item?.cost_price || 0)
-                            return profit + (revenue - cost)
-                        }, 0) || 0
-                    )}
-                    icon="trendingUp"
-                />
-            </div>
+            {/* Financial Performance Section - PRO ONLY */}
+            <ProLock isPro={isPro} title="Financial Analytics" description="Unlock detailed revenue and profit analysis.">
+                <div className="space-y-4">
+                    <h2 className="text-xl font-bold tracking-tight pt-4">Financial Performance (Realized)</h2>
+                    <div className="grid gap-4 md:grid-cols-3">
+                        <SummaryCard
+                            title="Total Sales (Revenue)"
+                            value={formatCurrency(movements?.filter(m => m.type === 'OUT').reduce((sum, m) => sum + (Number(m.quantity) * Number(m.unit_price || 0)), 0) || 0)}
+                            icon="trendingUp"
+                        />
+                        <SummaryCard
+                            title="Stock Purchases (Cost)"
+                            value={formatCurrency(movements?.filter(m => m.type === 'IN').reduce((sum, m) => sum + (Number(m.quantity) * Number(m.unit_price || 0)), 0) || 0)}
+                            icon="package"
+                        />
+                        <SummaryCard
+                            title="Net Profit (Est.)"
+                            value={formatCurrency(
+                                movements?.filter(m => m.type === 'OUT' && Number(m.unit_price) > 0).reduce((profit, m) => {
+                                    const revenue = Number(m.quantity) * Number(m.unit_price || 0)
+                                    const item = items?.find(i => i.id === m.item_id)
+                                    const cost = Number(m.quantity) * Number(item?.cost_price || 0)
+                                    return profit + (revenue - cost)
+                                }, 0) || 0
+                            )}
+                            icon="trendingUp"
+                        />
+                    </div>
+                </div>
+            </ProLock>
 
-            {/* Charts Row */}
+            {/* Charts Row - FREE */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <StockDistributionChart data={distributionData} />
                 <MovementTrendChart data={trendData} />
@@ -211,9 +204,14 @@ export default async function ReportsPage() {
 
             {/* Tables Row */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <TopItemsTable title="Top 5 Stock In (7 Days)" items={topInItems} type="in" />
-                <TopItemsTable title="Top 5 Stock Out (7 Days)" items={topOutItems} type="out" />
+                {/* Free: Low Stock */}
                 <LowStockTable items={lowStockData} />
+
+                {/* Free: Top Items */}
+                <div className="md:col-span-2 grid gap-4 grid-cols-1 md:grid-cols-2">
+                    <TopItemsTable title="Top 5 Stock In (7 Days)" items={topInItems} type="in" />
+                    <TopItemsTable title="Top 5 Stock Out (7 Days)" items={topOutItems} type="out" />
+                </div>
             </div>
         </div>
     )

@@ -9,7 +9,11 @@ import { getItemBySku } from '@/app/actions/items'
 import { toast } from 'sonner'
 import { Item } from '@/types'
 
-export function StockScanner() {
+interface StockScannerProps {
+    isPro?: boolean
+}
+
+export function StockScanner({ isPro = false }: StockScannerProps) {
     const [isScanning, setIsScanning] = useState(false)
     const [selectedItem, setSelectedItem] = useState<Item | null>(null)
     const [showStockDialog, setShowStockDialog] = useState(false)
@@ -41,7 +45,18 @@ export function StockScanner() {
                 variant="outline"
                 size="sm"
                 className="gap-1 sm:gap-2 border-dashed sm:size-default"
-                onClick={() => setIsScanning(true)}
+                onClick={() => {
+                    if (!isPro) {
+                        toast.error("Stock scanner is a Pro feature", {
+                            action: {
+                                label: "Upgrade",
+                                onClick: () => window.location.href = "/pricing"
+                            }
+                        })
+                        return
+                    }
+                    setIsScanning(true)
+                }}
             >
                 <ScanBarcode className="h-4 w-4" />
                 <span className="hidden xs:inline">Scan to</span> Update

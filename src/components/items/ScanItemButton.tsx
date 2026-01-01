@@ -10,7 +10,13 @@ import { getItemBySku } from '@/app/actions/items'
 import { toast } from 'sonner'
 import type { Item } from '@/types'
 
-export function ScanItemButton() {
+import Link from 'next/link'
+
+interface ScanItemButtonProps {
+    isPro?: boolean
+}
+
+export function ScanItemButton({ isPro = false }: ScanItemButtonProps) {
     const [isScanning, setIsScanning] = useState(false)
     const [showCreateDialog, setShowCreateDialog] = useState(false)
     const [showStockDialog, setShowStockDialog] = useState(false)
@@ -106,11 +112,23 @@ export function ScanItemButton() {
     return (
         <>
             <Button
-                onClick={() => setIsScanning(true)}
+                onClick={() => {
+                    if (!isPro) {
+                        toast.error("Barcode scanning is a Pro feature", {
+                            action: {
+                                label: "Upgrade",
+                                onClick: () => window.location.href = "/pricing"
+                            }
+                        })
+                        return
+                    }
+                    setIsScanning(true)
+                }}
                 className="gap-2 bg-blue-600 hover:bg-blue-700 text-white"
             >
                 <ScanBarcode className="h-4 w-4" />
-                Scan to Add
+                <span className="hidden xs:inline">Scan to Add</span>
+                <span className="xs:hidden">Scan</span>
             </Button>
 
             <BarcodeScanner

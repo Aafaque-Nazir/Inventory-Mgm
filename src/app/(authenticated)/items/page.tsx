@@ -64,8 +64,8 @@ export default async function ItemsPage() {
                     <p className="text-muted-foreground">Manage your stock and items.</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                    <ScanItemButton />
-                    <StockScanner />
+                    <ScanItemButton isPro={isPro || isSuperAdmin} />
+                    <StockScanner isPro={isPro || isSuperAdmin} />
                     <CsvImporter />
                     <ExportButton items={items || []} isPro={isPro || isSuperAdmin} />
                     <CreateItemDialog />
