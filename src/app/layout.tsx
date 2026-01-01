@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { AnnouncementBanner } from "@/components/layout/AnnouncementBanner";
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -70,6 +71,7 @@ export default function RootLayout({
         <AnnouncementBanner />
         {children}
         <Toaster />
+        <Analytics />
         <SpeedInsights />
       </body>
     </html>
