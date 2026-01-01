@@ -31,12 +31,17 @@ export function CreateItemDialog() {
     const [open, setOpen] = useState(false)
     const [isScanning, setIsScanning] = useState(false)
     const [sku, setSku] = useState('')
+    const [name, setName] = useState('')
     const [isPending, startTransition] = useTransition()
     const router = useRouter()
 
     async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
         const formData = new FormData(event.currentTarget)
+
+        // Ensure state values are present if user didn't type them
+        if (sku && !formData.get('sku')) formData.set('sku', sku)
+        if (name && !formData.get('name')) formData.set('name', name)
 
         startTransition(async () => {
             const result = await createItem({}, formData)
@@ -45,8 +50,35 @@ export function CreateItemDialog() {
             } else {
                 toast.success('Item created successfully')
                 setOpen(false)
+                // Reset form
+                setSku('')
+                setName('')
             }
         })
+    }
+
+    async function fetchProductDetails(barcode: string) {
+        setSku(barcode)
+        toast.info('Fetching product details...')
+        try {
+            const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`)
+            const data = await response.json()
+
+            if (data.status === 1 && data.product) {
+                const productName = data.product.product_name || data.product.product_name_en
+                if (productName) {
+                    setName(productName)
+                    toast.success('Product found: ' + productName)
+                } else {
+                    toast.info('Product found but no name available')
+                }
+            } else {
+                toast.info('Product not found in database')
+            }
+        } catch (error) {
+            console.error('Error fetching product:', error)
+            toast.error('Failed to fetch product details')
+        }
     }
 
     return (
@@ -66,7 +98,14 @@ export function CreateItemDialog() {
                 <form onSubmit={onSubmit} className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="name">Name</Label>
-                        <Input id="name" name="name" placeholder="Apple" required />
+                        <Input
+                            id="name"
+                            name="name"
+                            placeholder="Apple"
+                            required
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                        />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="sku">SKU / Barcode</Label>
@@ -182,7 +221,7 @@ export function CreateItemDialog() {
             <BarcodeScanner
                 open={isScanning}
                 onOpenChange={setIsScanning}
-                onScanSuccess={(code) => setSku(code)}
+                onScanSuccess={(code) => fetchProductDetails(code)}
             />
         </Dialog >
     )
