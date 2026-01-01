@@ -81,3 +81,15 @@ export interface StockMovement {
     item?: Item // Joined
     profile?: Profile // Joined (created_by)
 }
+
+export interface AuditLog {
+    id: string
+    organization_id: string
+    actor_id: string | null
+    action: string
+    entity_type: string
+    entity_id: string | null
+    details: any
+    created_at: string
+    profile?: Profile // Joined
+}

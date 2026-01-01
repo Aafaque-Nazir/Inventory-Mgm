@@ -149,12 +149,12 @@ export default function PricingPage() {
                     <CardContent className="flex-1">
                         <div className="text-3xl font-bold">₹0<span className="text-sm font-normal text-muted-foreground">/mo</span></div>
                         <ul className="mt-6 space-y-2 text-sm">
-                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-green-500" /> 1 User Limit</li>
-                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-green-500" /> up to 50 Items</li>
+                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-green-500" /> Single User</li>
                             <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-green-500" /> Basic Inventory Tracking</li>
-                            <li className="flex items-center text-muted-foreground"><X className="mr-2 h-4 w-4" /> No Email Alerts</li>
-                            <li className="flex items-center text-muted-foreground"><X className="mr-2 h-4 w-4" /> No Reports</li>
-                            <li className="flex items-center text-muted-foreground"><X className="mr-2 h-4 w-4" /> No Team Access</li>
+                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-green-500" /> Basic Reports (KPIs & trends)</li>
+                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-green-500" /> Low Stock Table</li>
+                            <li className="flex items-center text-muted-foreground"><X className="mr-2 h-4 w-4" /> No Financial Analytics</li>
+                            <li className="flex items-center text-muted-foreground"><X className="mr-2 h-4 w-4" /> No Barcode Scanning</li>
                         </ul>
                     </CardContent>
                     <CardFooter>
@@ -179,12 +179,11 @@ export default function PricingPage() {
                         <div className="text-3xl font-bold">₹1499<span className="text-sm font-normal text-muted-foreground">/mo</span></div>
                         <ul className="mt-6 space-y-2 text-sm font-medium">
                             <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> 5 Team Members</li>
-                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> Unlimited Items</li>
+                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> <strong>Advanced Financial Analytics</strong> 💰</li>
+                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> <strong>Barcode Scanning App</strong> 📱</li>
                             <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> Low Stock Email Alerts</li>
-                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> <strong>Profit & Margin Analytics</strong> 💰</li>
-                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> <strong>AI Stock Predictions</strong> 🤖</li>
-                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> <strong>Bulk CSV Export</strong> 📤</li>
-                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> Priority Email Support</li>
+                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> AI Stock Predictions 🤖</li>
+                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> Bulk CSV Import/Export 📤</li>
                         </ul>
                     </CardContent>
                     <CardFooter>
@@ -214,15 +213,18 @@ export default function PricingPage() {
                     <CardContent className="flex-1">
                         <div className="text-3xl font-bold">Custom</div>
                         <ul className="mt-6 space-y-2 text-sm">
-                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-green-500" /> Unlimited Users</li>
-                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-green-500" /> Unlimited Everything</li>
+                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-green-500" /> Unlimited Users & Roles</li>
+                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-green-500" /> <strong>Custom Feature Development</strong></li>
                             <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-green-500" /> Dedicated Account Manager</li>
-                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-green-500" /> Custom Integrations (ERP)</li>
-                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-green-500" /> SLA & Security Audit</li>
+                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-green-500" /> Custom Integrations (ERP/SAP)</li>
+                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-green-500" /> on-premise Deployment Options</li>
+                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-green-500" /> 24/7 Priority Phone Support</li>
                         </ul>
                     </CardContent>
                     <CardFooter>
-                        <Button variant="secondary" className="w-full">Contact Sales</Button>
+                        <Button variant="secondary" className="w-full" asChild>
+                            <a href="mailto:sales@inventory.com?subject=Enterprise%20Plan%20Inquiry">Contact Sales</a>
+                        </Button>
                     </CardFooter>
                 </Card>
             </div>
@@ -232,7 +234,7 @@ export default function PricingPage() {
                 <p className="text-muted-foreground text-sm">
                     Trusted by 500+ businesses worldwide.
                     <br />
-                    Secure payments via Razorpay. Cancel anytime.
+                    Secure payments via Cashfree Payments. Cancel anytime.
                 </p>
             </div>
         </div>

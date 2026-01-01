@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { logAction } from './audit'
 
 const itemSchema = z.object({
     name: z.string().min(2),
@@ -115,9 +116,10 @@ export async function createItem(prevState: any, formData: FormData) {
             })
         }
 
-        revalidatePath('/items')
-        revalidatePath('/stock')
         revalidatePath('/dashboard')
+
+        // Audit Log
+        await logAction('ITEM_CREATE', 'ITEM', newItem.id, { name: newItem.name, sku: newItem.sku })
 
         return { message: 'Item created successfully' }
 
@@ -210,6 +212,10 @@ export async function bulkCreateItems(items: any[]) {
 
         revalidatePath('/items')
         revalidatePath('/dashboard')
+
+        // Audit Log
+        await logAction('BULK_IMPORT', 'ITEM', null, { count: items.length })
+
         return { message: `Successfully imported ${items.length} items` }
 
     } catch (error: any) {

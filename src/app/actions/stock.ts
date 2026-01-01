@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { sendLowStockAlert } from '@/lib/email'
+import { logAction } from './audit'
 
 export type StockMovementState = {
     message?: string
@@ -105,6 +106,15 @@ export async function recordStockMovement(
         revalidatePath('/stock')
         revalidatePath('/dashboard')
         revalidatePath('/items')
+
+        // Audit Log
+        await logAction('STOCK_UPDATE', 'ITEM', item_id, {
+            type,
+            quantity,
+            reason,
+            old_stock: item.current_stock,
+            new_stock: newStock
+        })
 
         return { message: `Stock updated successfully${alertMessage}` }
     } catch (error: any) {

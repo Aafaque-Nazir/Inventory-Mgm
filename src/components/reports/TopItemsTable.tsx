@@ -32,26 +32,28 @@ export function TopItemsTable({ title, items, type }: TopItemsTableProps) {
                 {items.length === 0 ? (
                     <p className="text-sm text-muted-foreground text-center py-4">No data available</p>
                 ) : (
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>#</TableHead>
-                                <TableHead>Item</TableHead>
-                                <TableHead className="text-right">Quantity</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {items.map((item, i) => (
-                                <TableRow key={i}>
-                                    <TableCell className="font-bold">{i + 1}</TableCell>
-                                    <TableCell>{item.name}</TableCell>
-                                    <TableCell className={`text-right font-mono ${colorClass}`}>
-                                        {item.total} {item.unit}
-                                    </TableCell>
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>#</TableHead>
+                                    <TableHead>Item</TableHead>
+                                    <TableHead className="text-right">Quantity</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {items.map((item, i) => (
+                                    <TableRow key={i}>
+                                        <TableCell className="font-bold">{i + 1}</TableCell>
+                                        <TableCell className="max-w-[150px] truncate" title={item.name}>{item.name}</TableCell>
+                                        <TableCell className={`text-right font-mono whitespace-nowrap ${colorClass}`}>
+                                            {item.total} {item.unit}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
                 )}
             </CardContent>
         </Card>

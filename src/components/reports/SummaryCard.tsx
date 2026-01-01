@@ -46,7 +46,7 @@ export function SummaryCard({ title, value, subtitle, icon, trend }: SummaryCard
                 </div>
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">{value}</div>
+                <div className="text-2xl font-bold truncate" title={String(value)}>{value}</div>
                 {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
 
                 {/* Optional visual trend indicator only if specifically requested */}

@@ -115,6 +115,14 @@ export default async function SettingsPage() {
                                     </Badge>
                                 </div>
                             </div>
+                            <div className="grid gap-2 pt-4">
+                                <span className="font-semibold">Security:</span>
+                                <div>
+                                    <Button variant="outline" asChild>
+                                        <Link href="/settings/audit">View Audit Logs 🛡️</Link>
+                                    </Button>
+                                </div>
+                            </div>
                         </CardContent>
                     </Card>
                 </TabsContent>

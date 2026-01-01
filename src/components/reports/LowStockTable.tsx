@@ -29,30 +29,32 @@ export function LowStockTable({ items }: LowStockTableProps) {
                 {items.length === 0 ? (
                     <p className="text-sm text-muted-foreground text-center py-4">All items are well-stocked! 🎉</p>
                 ) : (
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Item</TableHead>
-                                <TableHead className="text-right">Current</TableHead>
-                                <TableHead className="text-right">Min</TableHead>
-                                <TableHead>Status</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {items.map((item, i) => (
-                                <TableRow key={i}>
-                                    <TableCell className="font-medium">{item.name}</TableCell>
-                                    <TableCell className="text-right">{item.current_stock} {item.unit}</TableCell>
-                                    <TableCell className="text-right">{item.min_stock} {item.unit}</TableCell>
-                                    <TableCell>
-                                        <Badge variant={item.current_stock === 0 ? "destructive" : "secondary"}>
-                                            {item.current_stock === 0 ? 'Out of Stock' : 'Low'}
-                                        </Badge>
-                                    </TableCell>
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Item</TableHead>
+                                    <TableHead className="text-right">Current</TableHead>
+                                    <TableHead className="text-right">Min</TableHead>
+                                    <TableHead>Status</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {items.map((item, i) => (
+                                    <TableRow key={i}>
+                                        <TableCell className="font-medium max-w-[150px] truncate" title={item.name}>{item.name}</TableCell>
+                                        <TableCell className="text-right whitespace-nowrap">{item.current_stock} {item.unit}</TableCell>
+                                        <TableCell className="text-right whitespace-nowrap">{item.min_stock} {item.unit}</TableCell>
+                                        <TableCell>
+                                            <Badge variant={item.current_stock === 0 ? "destructive" : "secondary"}>
+                                                {item.current_stock === 0 ? 'Out of Stock' : 'Low'}
+                                            </Badge>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
                 )}
             </CardContent>
         </Card>
