@@ -1,6 +1,7 @@
 'use client'
 
-import { Check, X, Zap, Loader2 } from 'lucide-react'
+import { Check, X, Zap, Loader2, Sparkles } from 'lucide-react'
+import { TrialOfferDialog } from '@/components/subscription/TrialOfferDialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
@@ -23,6 +24,9 @@ export default function PricingPage() {
     const router = useRouter()
     const searchParams = useSearchParams()
     // const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null // BROKEN: Causes infinite loop
+    const [trialUsed, setTrialUsed] = useState(false)
+    const [orgId, setOrgId] = useState<string>('')
+    const [showTrialDialog, setShowTrialDialog] = useState(false)
     const supabase = createClient()
 
     // Verify Payment Effect
@@ -68,15 +72,19 @@ export default function PricingPage() {
             if (user) {
                 const { data: profile } = await supabase
                     .from('profiles')
-                    .select('organizations(plan_type)')
+                    .select('organization_id, organizations(plan_type, trial_used)')
                     .eq('id', user.id)
                     .single()
 
                 // @ts-ignore
                 if (profile?.organizations?.plan_type) {
                     // @ts-ignore
+                    // @ts-ignore
                     setCurrentPlan(profile.organizations.plan_type)
+                    // @ts-ignore
+                    setTrialUsed(profile.organizations.trial_used || false)
                 }
+                if (profile?.organization_id) setOrgId(profile.organization_id)
             }
             setIsLoadingPlan(false)
         }
@@ -192,14 +200,26 @@ export default function PricingPage() {
                                 <Check className="mr-2 h-4 w-4" /> Current Plan
                             </Button>
                         ) : (
-                            <Button
-                                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md"
-                                onClick={handlePayment}
-                                disabled={loading}
-                            >
-                                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Zap className="mr-2 h-4 w-4 fill-current" />}
-                                {loading ? 'Processing...' : 'Upgrade to Pro'}
-                            </Button>
+                            <>
+                                {currentPlan === 'FREE' && !trialUsed ? (
+                                    <Button
+                                        className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 shadow-md text-white font-bold"
+                                        onClick={() => setShowTrialDialog(true)}
+                                    >
+                                        <Sparkles className="mr-2 h-4 w-4 fill-white" />
+                                        Start 5-Day Free Trial
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md"
+                                        onClick={handlePayment}
+                                        disabled={loading}
+                                    >
+                                        {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Zap className="mr-2 h-4 w-4 fill-current" />}
+                                        {loading ? 'Processing...' : 'Upgrade to Pro'}
+                                    </Button>
+                                )}
+                            </>
                         )}
                     </CardFooter>
                 </Card>
@@ -237,6 +257,13 @@ export default function PricingPage() {
                     Secure payments via Cashfree Payments. Cancel anytime.
                 </p>
             </div>
-        </div>
+            <TrialOfferDialog
+                open={showTrialDialog}
+                onOpenChange={setShowTrialDialog}
+                organizationId={orgId}
+                trialUsed={trialUsed}
+                planType={currentPlan}
+            />
+        </div >
     )
 }

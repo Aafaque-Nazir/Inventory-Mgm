@@ -56,7 +56,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             let status = org?.subscription_status || 'NONE'
 
             // Check for Expiry
-            if (status === 'ACTIVE' && org?.subscription_end_date) {
+            if ((status === 'ACTIVE' || status === 'TRIALING') && org?.subscription_end_date) {
                 const expiryDate = new Date(org.subscription_end_date)
                 if (expiryDate < new Date()) {
                     status = 'EXPIRED'

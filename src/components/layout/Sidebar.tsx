@@ -16,8 +16,12 @@ import {
     Lock,
     HelpCircle,
     Settings,
-    Crown
+    Crown,
+    Sparkles,
+    Clock
 } from 'lucide-react'
+import { differenceInDays } from 'date-fns'
+import { Button } from '@/components/ui/button'
 
 const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -36,6 +40,7 @@ export function Sidebar() {
     const supabase = createClient()
     const [isSuperAdmin, setIsSuperAdmin] = useState(false)
     const [planType, setPlanType] = useState<string>('FREE')
+    const [trialDays, setTrialDays] = useState<number | null>(null)
 
     useEffect(() => {
         async function checkRole() {
@@ -44,7 +49,7 @@ export function Sidebar() {
                 // Fetch Profile and Org Plan
                 const { data: profile } = await supabase
                     .from('profiles')
-                    .select('is_super_admin, organizations(plan_type, subscription_end_date)')
+                    .select('is_super_admin, organizations(plan_type, subscription_end_date, subscription_status)')
                     .eq('id', user.id)
                     .single()
 
@@ -61,7 +66,15 @@ export function Sidebar() {
                         // @ts-ignore
                         if (profile.organizations?.subscription_end_date) {
                             // @ts-ignore
+                            // @ts-ignore
                             const expiry = new Date(profile.organizations.subscription_end_date)
+
+                            // Check for Trial
+                            // @ts-ignore
+                            if (profile.organizations.subscription_status === 'TRIALING') {
+                                const days = differenceInDays(expiry, new Date())
+                                setTrialDays(days >= 0 ? days + 1 : 0)
+                            }
                             if (expiry < new Date()) {
                                 effectivePlan = 'FREE' // Downgrade locally
                             }
@@ -81,10 +94,25 @@ export function Sidebar() {
 
     return (
         <div className="hidden border-r bg-card md:flex md:w-64 md:flex-col">
-            <div className="flex h-16 items-center border-b px-6">
+            <div className="flex bg-card h-16 items-center border-b px-6">
                 <Link href="/dashboard" className="text-xl font-bold tracking-tight">Inventory <span className="text-primary">Management</span></Link>
             </div>
             <nav className="flex-1 space-y-1 px-3 py-4">
+                {trialDays !== null && trialDays > 0 && (
+                    <div className="mb-4 rounded-md bg-gradient-to-r from-orange-500/10 to-pink-500/10 p-3 border border-orange-500/20">
+                        <div className="flex items-center gap-2 mb-1">
+                            <Sparkles className="h-4 w-4 text-orange-500" />
+                            <span className="text-xs font-bold text-orange-600">Pro Trial Active</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {trialDays} days remaining
+                        </p>
+                        <Button variant="outline" size="sm" className="w-full mt-2 h-7 text-xs border-orange-200 bg-white/50 hover:bg-white hover:text-orange-700" asChild>
+                            <Link href="/pricing">Upgrade Now</Link>
+                        </Button>
+                    </div>
+                )}
                 {finalNavigation.map((item) => {
                     const isActive = pathname.startsWith(item.href)
                     const isLocked = item.name === 'Reports' && planType === 'FREE' && !isSuperAdmin
