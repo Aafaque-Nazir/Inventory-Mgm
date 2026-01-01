@@ -293,10 +293,16 @@ function FormCombobox({ items, value, onChange, placeholder, allowCustom = false
     const [open, setOpen] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
 
+    // If value is custom (not in items), add it to the display list
+    const displayItems = value && !items.includes(value)
+        ? [value, ...items]
+        : items
+
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <Button
+                    type="button"
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
@@ -309,14 +315,19 @@ function FormCombobox({ items, value, onChange, placeholder, allowCustom = false
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
-                <Command>
-                    <CommandInput placeholder={`Search ${placeholder.toLowerCase()}...`} onValueChange={setSearchTerm} />
+                <Command shouldFilter={true}>
+                    <CommandInput
+                        placeholder={`Search ${placeholder.toLowerCase()}...`}
+                        value={searchTerm}
+                        onValueChange={setSearchTerm}
+                    />
                     <CommandList>
                         <CommandEmpty>
                             {allowCustom && searchTerm ? (
                                 <div className="p-2">
                                     <p className="text-xs text-muted-foreground mb-2">No results found.</p>
                                     <Button
+                                        type="button"
                                         variant="secondary"
                                         size="sm"
                                         className="w-full h-auto py-1.5"
@@ -334,14 +345,14 @@ function FormCombobox({ items, value, onChange, placeholder, allowCustom = false
                             )}
                         </CommandEmpty>
                         <CommandGroup className="max-h-[200px] overflow-auto">
-                            {items.map((item) => (
+                            {displayItems.map((item) => (
                                 <CommandItem
                                     key={item}
                                     value={item}
-                                    onSelect={(currentValue) => {
-                                        // Use the exact casing from the item list, not the lowercased value from cmdk
+                                    onSelect={() => {
                                         onChange(item)
                                         setOpen(false)
+                                        setSearchTerm("")
                                     }}
                                 >
                                     <Check
