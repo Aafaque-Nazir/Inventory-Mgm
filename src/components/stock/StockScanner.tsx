@@ -1,5 +1,7 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
+
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ScanBarcode } from 'lucide-react'
@@ -14,6 +16,7 @@ interface StockScannerProps {
 }
 
 export function StockScanner({ isPro = false }: StockScannerProps) {
+    const router = useRouter()
     const [isScanning, setIsScanning] = useState(false)
     const [selectedItem, setSelectedItem] = useState<Item | null>(null)
     const [showStockDialog, setShowStockDialog] = useState(false)
@@ -47,11 +50,13 @@ export function StockScanner({ isPro = false }: StockScannerProps) {
                 className="gap-1 sm:gap-2 border-dashed sm:size-default"
                 onClick={() => {
                     if (!isPro) {
-                        toast.error("Stock scanner is a Pro feature", {
+                        toast("⭐ Locked Feature", {
+                            description: "Stock scanning is a Pro feature. Upgrade to unlock!",
                             action: {
-                                label: "Upgrade",
-                                onClick: () => window.location.href = "/pricing"
-                            }
+                                label: "Upgrade Now",
+                                onClick: () => router.push("/pricing")
+                            },
+                            duration: 4000
                         })
                         return
                     }

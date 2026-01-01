@@ -11,12 +11,14 @@ import { toast } from 'sonner'
 import type { Item } from '@/types'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 interface ScanItemButtonProps {
     isPro?: boolean
 }
 
 export function ScanItemButton({ isPro = false }: ScanItemButtonProps) {
+    const router = useRouter()
     const [isScanning, setIsScanning] = useState(false)
     const [showCreateDialog, setShowCreateDialog] = useState(false)
     const [showStockDialog, setShowStockDialog] = useState(false)
@@ -114,11 +116,13 @@ export function ScanItemButton({ isPro = false }: ScanItemButtonProps) {
             <Button
                 onClick={() => {
                     if (!isPro) {
-                        toast.error("Barcode scanning is a Pro feature", {
+                        toast("⭐ Locked Feature", {
+                            description: "Barcode scanning is a Pro feature. Upgrade to unlock!",
                             action: {
-                                label: "Upgrade",
-                                onClick: () => window.location.href = "/pricing"
-                            }
+                                label: "Upgrade Now",
+                                onClick: () => router.push("/pricing")
+                            },
+                            duration: 4000
                         })
                         return
                     }
