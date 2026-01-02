@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { ScanBarcode } from 'lucide-react'
+import { ScanBarcode, Crown } from 'lucide-react'
 import { BarcodeScanner } from '@/components/common/BarcodeScanner'
 import { QuickStockDialog } from '@/components/items/QuickStockDialog'
 import { getItemBySku } from '@/app/actions/items'
@@ -47,7 +47,7 @@ export function StockScanner({ isPro = false }: StockScannerProps) {
             <Button
                 variant="outline"
                 size="sm"
-                className="gap-1 sm:gap-2 border-dashed sm:size-default"
+                className="gap-1 sm:gap-2 border-dashed sm:size-default relative group overflow-visible"
                 onClick={() => {
                     if (!isPro) {
                         toast("⭐ Locked Feature", {
@@ -63,6 +63,11 @@ export function StockScanner({ isPro = false }: StockScannerProps) {
                     setIsScanning(true)
                 }}
             >
+                {!isPro && (
+                    <div className="absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow-sm border border-yellow-500/20">
+                        <Crown className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                    </div>
+                )}
                 <ScanBarcode className="h-4 w-4" />
                 <span className="hidden xs:inline">Scan to</span> Update
             </Button>

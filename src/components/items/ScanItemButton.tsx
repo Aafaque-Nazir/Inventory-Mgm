@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { ScanBarcode } from 'lucide-react'
+import { ScanBarcode, Crown } from 'lucide-react'
 import { BarcodeScanner } from '@/components/common/BarcodeScanner'
 import { CreateItemDialog } from './CreateItemDialog'
 import { QuickStockDialog } from '@/components/items/QuickStockDialog'
@@ -128,8 +128,13 @@ export function ScanItemButton({ isPro = false }: ScanItemButtonProps) {
                     }
                     setIsScanning(true)
                 }}
-                className="gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+                className="gap-2 bg-blue-600 hover:bg-blue-700 text-white relative group overflow-visible"
             >
+                {!isPro && (
+                    <div className="absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow-sm border border-yellow-500/20">
+                        <Crown className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                    </div>
+                )}
                 <ScanBarcode className="h-4 w-4" />
                 <span className="hidden xs:inline">Scan to Add</span>
                 <span className="xs:hidden">Scan</span>

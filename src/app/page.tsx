@@ -19,7 +19,8 @@ import {
   Sparkles,
   ArrowRightLeft,
   QrCode,
-  X
+  X,
+  Crown
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
@@ -299,42 +300,48 @@ export default function Home() {
                 title: "Multi-Warehouse",
                 desc: "Manage stock across multiple locations. Switch warehouses with a click.",
                 color: "text-blue-500",
-                bg: "bg-blue-500/10"
+                bg: "bg-blue-500/10",
+                isPro: true
               },
               {
                 icon: BarChart3,
                 title: "Profit Analytics",
                 desc: "Real-time P&L analysis. Know your margins on every single item sold.",
                 color: "text-green-500",
-                bg: "bg-green-500/10"
+                bg: "bg-green-500/10",
+                isPro: true
               },
               {
                 icon: Sparkles,
                 title: "AI Predictions",
                 desc: "Our AI predicts when you'll run out of stock based on past sales velocity.",
                 color: "text-purple-500",
-                bg: "bg-purple-500/10"
+                bg: "bg-purple-500/10",
+                isPro: true
               },
               {
                 icon: ArrowRightLeft,
                 title: "Stock Movement Logs",
                 desc: "Full audit trail. See every 'In' and 'Out' transaction with timestamps.",
                 color: "text-orange-500",
-                bg: "bg-orange-500/10"
+                bg: "bg-orange-500/10",
+                isPro: true
               },
               {
                 icon: QrCode,
                 title: "Barcode Scanning",
                 desc: "Use your phone camera to scan items. Add or deduct stock instantly.",
                 color: "text-pink-500",
-                bg: "bg-pink-500/10"
+                bg: "bg-pink-500/10",
+                isPro: true
               },
               {
                 icon: Mail,
                 title: "Smart Alerts",
                 desc: "Get notified via Email when critical items hit low stock levels.",
                 color: "text-yellow-500",
-                bg: "bg-yellow-500/10"
+                bg: "bg-yellow-500/10",
+                isPro: true
               }
             ].map((f, i) => (
               <motion.div
@@ -342,6 +349,14 @@ export default function Home() {
                 variants={fadeIn}
                 className="group relative overflow-hidden rounded-3xl border border-white/5 bg-slate-900/50 p-8 transition-all hover:border-primary/50 hover:bg-slate-900 hover:shadow-2xl hover:shadow-primary/5"
               >
+                {/* PRO Badge */}
+                {f.isPro && (
+                  <div className="absolute top-6 right-6 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-200/10 to-amber-500/10 px-3 py-1 text-xs font-bold text-amber-500 border border-amber-500/20 ring-1 ring-amber-500/10 backdrop-blur-md">
+                    <Crown className="h-3.5 w-3.5 fill-amber-500" />
+                    <span>PRO</span>
+                  </div>
+                )}
+
                 <div className={cn("mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl", f.bg, f.color)}>
                   <f.icon className="h-6 w-6" />
                 </div>
