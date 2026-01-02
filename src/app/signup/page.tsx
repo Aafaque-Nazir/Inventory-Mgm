@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createClient } from "@/lib/supabase/client"
+import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton'
 
 export default function SignupPage() {
     const router = useRouter()
@@ -112,56 +113,71 @@ export default function SignupPage() {
                         </p>
                     </div>
 
-                    <form onSubmit={onSubmit}>
-                        <div className="grid gap-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="fullName">Full Name</Label>
-                                <Input
-                                    id="fullName"
-                                    name="fullName"
-                                    placeholder="John Doe"
-                                    type="text"
-                                    autoCapitalize="none"
-                                    autoCorrect="off"
-                                    disabled={isPending}
-                                    required
-                                    className="h-11 bg-background"
-                                />
+                    <div className="grid gap-6">
+                        <GoogleSignInButton />
+
+                        <div className="relative">
+                            <div className="absolute inset-0 flex items-center">
+                                <span className="w-full border-t" />
                             </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email</Label>
-                                <Input
-                                    id="email"
-                                    name="email"
-                                    placeholder="name@example.com"
-                                    type="email"
-                                    autoCapitalize="none"
-                                    autoComplete="email"
-                                    autoCorrect="off"
-                                    disabled={isPending}
-                                    required
-                                    className="h-11 bg-background"
-                                />
+                            <div className="relative flex justify-center text-xs uppercase">
+                                <span className="bg-background px-2 text-muted-foreground">
+                                    Or continue with
+                                </span>
                             </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="password">Password</Label>
-                                <Input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    placeholder="••••••••"
-                                    disabled={isPending}
-                                    required
-                                    minLength={8}
-                                    className="h-11 bg-background"
-                                />
-                            </div>
-                            <Button disabled={isPending} className="h-11 font-medium bg-primary hover:bg-primary/90">
-                                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Sign Up with Email
-                            </Button>
                         </div>
-                    </form>
+
+                        <form onSubmit={onSubmit}>
+                            <div className="grid gap-4">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="fullName">Full Name</Label>
+                                    <Input
+                                        id="fullName"
+                                        name="fullName"
+                                        placeholder="John Doe"
+                                        type="text"
+                                        autoCapitalize="none"
+                                        autoCorrect="off"
+                                        disabled={isPending}
+                                        required
+                                        className="h-11 bg-background"
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="email">Email</Label>
+                                    <Input
+                                        id="email"
+                                        name="email"
+                                        placeholder="name@example.com"
+                                        type="email"
+                                        autoCapitalize="none"
+                                        autoComplete="email"
+                                        autoCorrect="off"
+                                        disabled={isPending}
+                                        required
+                                        className="h-11 bg-background"
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="password">Password</Label>
+                                    <Input
+                                        id="password"
+                                        name="password"
+                                        type="password"
+                                        placeholder="••••••••"
+                                        disabled={isPending}
+                                        required
+                                        minLength={8}
+                                        className="h-11 bg-background"
+                                    />
+                                </div>
+                                <Button disabled={isPending} className="h-11 font-medium bg-primary hover:bg-primary/90">
+                                    {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                    Sign Up with Email
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
 
                     <p className="px-8 text-center text-xs text-muted-foreground">
                         By clicking continue, you agree to our{' '}

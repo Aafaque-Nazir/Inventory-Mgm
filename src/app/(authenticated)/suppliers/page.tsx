@@ -32,7 +32,31 @@ export default async function SuppliersPage() {
         suppliersQuery = suppliersQuery.eq('organization_id', organizationId)
     }
 
-    const { data: suppliers } = await suppliersQuery
+    const { data: allSuppliers } = await suppliersQuery
+
+    // --- WAREHOUSE FILTERING START ---
+    const { getWarehouseCookie } = await import('@/app/actions/warehouse-cookie')
+    const warehouseId = await getWarehouseCookie()
+
+    let suppliers = allSuppliers || []
+
+    if (warehouseId && suppliers.length > 0) {
+        // 1. Get all items that have STOCK in this warehouse
+        const { data: stockItems } = await supabase
+            .from('item_stock')
+            .select('item:items(supplier_id)')
+            .eq('location_id', warehouseId)
+
+        // 2. Extract unique Supplier IDs from those items
+        // Note: item_stock -> item -> supplier_id
+        const relevantSupplierIds = new Set(
+            stockItems?.map((s: any) => s.item?.supplier_id).filter(Boolean)
+        )
+
+        // 3. Filter the main suppliers list
+        suppliers = suppliers.filter(s => relevantSupplierIds.has(s.id))
+    }
+    // --- WAREHOUSE FILTERING END ---
 
     return (
         <div className="space-y-6">

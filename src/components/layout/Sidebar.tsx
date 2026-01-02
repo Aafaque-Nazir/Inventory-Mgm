@@ -19,7 +19,8 @@ import {
     Crown,
     Sparkles,
     Clock,
-    Store
+    Store,
+    Book
 } from 'lucide-react'
 import { differenceInDays } from 'date-fns'
 import { Button } from '@/components/ui/button'
@@ -33,6 +34,7 @@ const navigation = [
     { name: 'Reports', href: '/reports', icon: BarChart3 },
     { name: 'Warehouses', href: '/warehouses', icon: Store },
     { name: 'Pricing', href: '/pricing', icon: CreditCard },
+    { name: 'User Guide', href: '/guide', icon: Book },
     { name: 'Help & Support', href: '/help', icon: HelpCircle },
     { name: 'Settings', href: '/settings', icon: Settings },
 ]

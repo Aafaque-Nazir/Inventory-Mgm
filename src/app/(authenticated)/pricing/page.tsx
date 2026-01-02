@@ -196,6 +196,8 @@ export default function PricingPage() {
                             <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> 5 Team Members</li>
                             <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> <strong>Advanced Financial Analytics</strong> 💰</li>
                             <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> <strong>Barcode Scanning App</strong> 📱</li>
+                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> Stock Movement Logs (Audit Trail) 📋</li>
+                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> Warehouse Transfers 🚚</li>
                             <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> Low Stock Email Alerts</li>
                             <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> AI Stock Predictions 🤖</li>
                             <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> Bulk CSV Import/Export 📤</li>

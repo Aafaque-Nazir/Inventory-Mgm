@@ -21,9 +21,8 @@ export default function ForgotPasswordPage() {
         startTransition(async () => {
             const supabase = createClient()
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${location.origin}/auth/update-password`,
+                redirectTo: `${location.origin}/auth/callback?next=/auth/update-password`,
             })
-
             if (error) {
                 toast.error(error.message)
             } else {

@@ -77,6 +77,11 @@ export default async function DashboardPage() {
             // Now calculate metrics based on this LOCAL tracking list
             itemsCount = trackedItems.length
 
+            // Filter Suppliers: Only count suppliers of items present in this warehouse
+            const relevantSupplierIds = new Set(trackedItems.map((i: any) => i.supplier_id).filter(Boolean))
+            suppliersCount = relevantSupplierIds.size
+
+
             const lowStockItems = trackedItems.filter((i: any) => i.current_stock < i.min_stock)
             lowStockCount = lowStockItems.length
             lowStockList = lowStockItems.slice(0, 5)
