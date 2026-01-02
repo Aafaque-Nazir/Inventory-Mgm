@@ -14,7 +14,12 @@ import {
   Mail,
   Users,
   CreditCard,
-  Lock
+  Lock,
+  Store,
+  Sparkles,
+  ArrowRightLeft,
+  QrCode,
+  X
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
@@ -264,6 +269,7 @@ export default function Home() {
             </div>
           </div>
         </section>
+        {/* Features Grid */}
         <section id="features" className="container mx-auto py-24 md:py-32 px-4 md:px-6">
           <motion.div
             initial="initial"
@@ -272,9 +278,11 @@ export default function Home() {
             variants={stagger}
             className="text-center mb-16 space-y-4"
           >
-            <motion.h2 variants={fadeIn} className="text-3xl font-bold tracking-tight sm:text-5xl">Everything You Need</motion.h2>
+            <motion.h2 variants={fadeIn} className="text-3xl font-bold tracking-tight sm:text-5xl">
+              Power-Packed Features
+            </motion.h2>
             <motion.p variants={fadeIn} className="mx-auto max-w-2xl text-slate-400">
-              Built for growing businesses. Start simple, scale up when you need to.
+              Everything you need to run your inventory like a pro.
             </motion.p>
           </motion.div>
 
@@ -287,44 +295,44 @@ export default function Home() {
           >
             {[
               {
-                icon: Users,
-                title: "Team Permissions",
-                desc: "Invite storekeepers and managers. Control who can edit items vs just view stock.",
+                icon: Store,
+                title: "Multi-Warehouse",
+                desc: "Manage stock across multiple locations. Switch warehouses with a click.",
                 color: "text-blue-500",
                 bg: "bg-blue-500/10"
               },
               {
-                icon: Mail,
-                title: "Email Alerts",
-                desc: "Never run out of stock. Get automated emails when items dip below minimum levels.",
-                color: "text-orange-500",
-                bg: "bg-orange-500/10"
-              },
-              {
                 icon: BarChart3,
-                title: "Advanced Reports",
-                desc: "Visualize your usage trends. See what's moving fast and what's stuck.",
-                color: "text-purple-500",
-                bg: "bg-purple-500/10"
-              },
-              {
-                icon: Box,
-                title: "Unlimited Items",
-                desc: "Scale without limits. Pro plan supports unlimited inventory items and SKUs.",
+                title: "Profit Analytics",
+                desc: "Real-time P&L analysis. Know your margins on every single item sold.",
                 color: "text-green-500",
                 bg: "bg-green-500/10"
               },
               {
-                icon: ShieldCheck,
-                title: "Audit Logs",
-                desc: "Track every movement. See exactly who added or removed stock and when.",
-                color: "text-emerald-500",
-                bg: "bg-emerald-500/10"
+                icon: Sparkles,
+                title: "AI Predictions",
+                desc: "Our AI predicts when you'll run out of stock based on past sales velocity.",
+                color: "text-purple-500",
+                bg: "bg-purple-500/10"
               },
               {
-                icon: Zap,
-                title: "Instant Search",
-                desc: "Find any item by Name, SKU, or Category in milliseconds.",
+                icon: ArrowRightLeft,
+                title: "Stock Movement Logs",
+                desc: "Full audit trail. See every 'In' and 'Out' transaction with timestamps.",
+                color: "text-orange-500",
+                bg: "bg-orange-500/10"
+              },
+              {
+                icon: QrCode,
+                title: "Barcode Scanning",
+                desc: "Use your phone camera to scan items. Add or deduct stock instantly.",
+                color: "text-pink-500",
+                bg: "bg-pink-500/10"
+              },
+              {
+                icon: Mail,
+                title: "Smart Alerts",
+                desc: "Get notified via Email when critical items hit low stock levels.",
                 color: "text-yellow-500",
                 bg: "bg-yellow-500/10"
               }
@@ -371,7 +379,10 @@ export default function Home() {
                     <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" /> Up to 50 Items
                   </li>
                   <li className="flex gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" /> Basic Tracking
+                    <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" /> Basic Reports
+                  </li>
+                  <li className="flex gap-3 text-sm text-slate-500/50 line-through">
+                    <X className="h-5 w-5 shrink-0" /> Multi-Warehouse
                   </li>
                 </ul>
                 <Link href="/signup">
@@ -382,8 +393,8 @@ export default function Home() {
               </div>
 
               {/* Pro Plan */}
-              <div className="relative rounded-3xl border border-primary/50 bg-slate-900 p-8 flex flex-col gap-6 shadow-2xl shadow-primary/10">
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
+              <div className="relative rounded-3xl border border-primary/50 bg-slate-900 p-8 flex flex-col gap-6 shadow-2xl shadow-primary/10 transition-transform hover:scale-105 duration-300">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg shadow-blue-500/20">
                   Most Popular
                 </div>
                 <div>
@@ -394,28 +405,28 @@ export default function Home() {
                   </div>
                   <p className="mt-4 text-sm text-slate-400">For growing teams and serious businesses.</p>
                 </div>
-                <ul className="space-y-3 flex-1">
+                <ul className="space-y-4 flex-1">
                   <li className="flex gap-3 text-sm text-white">
                     <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> <strong>5 Team Members</strong>
                   </li>
                   <li className="flex gap-3 text-sm text-white">
-                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> <strong>Unlimited Items</strong>
+                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> <strong>Multi-Warehouse (2 Warehouses)</strong> 🏢
                   </li>
                   <li className="flex gap-3 text-sm text-white">
-                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> Low Stock Email Alerts
+                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> <strong>Barcode Scanning App</strong> 📱
                   </li>
                   <li className="flex gap-3 text-sm text-white">
-                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> <strong>Profit & Margin Analytics</strong> 💰
+                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> Financial Analytics & Profits 💰
                   </li>
                   <li className="flex gap-3 text-sm text-white">
-                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> <strong>AI Stock Predictions</strong> 🤖
+                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> Stock Movement Logs
                   </li>
                   <li className="flex gap-3 text-sm text-white">
-                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> Bulk CSV Export 📤
+                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> AI Stock Predictions 🤖
                   </li>
                 </ul>
                 <Link href="/signup">
-                  <Button className="w-full rounded-full h-12 bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/25">
+                  <Button className="w-full rounded-full h-12 bg-gradient-to-r from-primary to-indigo-600 hover:to-indigo-500 text-white shadow-lg shadow-primary/25 font-bold">
                     Upgrade to Pro
                   </Button>
                 </Link>
