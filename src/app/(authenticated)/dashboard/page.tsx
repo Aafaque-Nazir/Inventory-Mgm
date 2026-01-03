@@ -38,7 +38,7 @@ export default async function DashboardPage() {
     let lowStockList: any[] = []
     let recentMovements: any[] = []
 
-    if (!isSuperAdmin && organizationId) {
+    if (organizationId) {
         // --- BASE QUERIES ---
         const warehouseId = await getWarehouseCookie() // From Cookie
 
@@ -118,22 +118,7 @@ export default async function DashboardPage() {
                 lowStockList = lowItems.slice(0, 5)
             }
         }
-    } else if (!isSuperAdmin && !organizationId) {
-        return (
-            <div className="space-y-6">
-                <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-                <p className="text-muted-foreground">Your account is not associated with any organization.</p>
-            </div>
-        )
-    } else {
-        // Super Admin View (Simplified)
-        const { count: iCount } = await supabase.from('items').select('*', { count: 'exact', head: true })
-        itemsCount = iCount || 0
-        const { count: sCount } = await supabase.from('suppliers').select('*', { count: 'exact', head: true })
-        suppliersCount = sCount || 0
-    }
-
-    // --- AI Forecast Data Fetching ---
+    }      // --- AI Forecast Data Fetching ---
     const { getAiInsights } = await import('@/app/actions/ai')
     const insights = await getAiInsights()
 

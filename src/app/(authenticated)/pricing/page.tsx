@@ -162,6 +162,7 @@ export default function PricingPage() {
                             <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-green-500" /> Single User</li>
                             <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-green-500" /> Basic Inventory Tracking</li>
                             <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-green-500" /> Basic Reports (KPIs & trends)</li>
+                            <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-green-500" /> <strong>Sales & Invoices</strong> 🧾</li>
                             <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-green-500" /> Low Stock Table</li>
                             <li className="flex items-center text-muted-foreground"><X className="mr-2 h-4 w-4" /> No Financial Analytics</li>
                             <li className="flex items-center text-muted-foreground"><X className="mr-2 h-4 w-4" /> No Barcode Scanning</li>

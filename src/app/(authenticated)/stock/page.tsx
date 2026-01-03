@@ -9,6 +9,7 @@ import { TrendingDown, TrendingUp, ArrowDown, ArrowUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { StockScanner } from '@/components/stock/StockScanner'
 import { ScanItemButton } from '@/components/items/ScanItemButton'
+import { RecordSaleDialog } from '@/components/sales/RecordSaleDialog'
 
 export const dynamic = 'force-dynamic'
 
@@ -65,10 +66,7 @@ export default async function StockPage() {
                 <div className="flex flex-wrap gap-2">
                     <ScanItemButton isPro={isPro || isSuperAdmin} />
                     <StockScanner isPro={isPro || isSuperAdmin} />
-                    <AddStockMovementDialog
-                        defaultType="OUT"
-                        defaultReason="Sale"
-                        title="Record Sale"
+                    <RecordSaleDialog
                         trigger={
                             <Button variant="destructive" size="sm" className="sm:size-default">
                                 <TrendingDown className="mr-1 sm:mr-2 h-4 w-4" />

@@ -57,8 +57,11 @@ export default async function ReportsPage() {
 
     let items: any[] = []
     let movements: any[] = []
+    let invoices: any[] = [] // NEW: Fetch Invoices
 
-    if (!isSuperAdmin && organizationId) {
+    const startDate = subDays(new Date(), 30).toISOString() // INCREASED TO 30 DAYS for better visibility
+
+    if (organizationId) {
 
         if (warehouseId) {
             // A. Fetch Only Tracked items in this warehouse (Strict Isolation)
@@ -73,7 +76,6 @@ export default async function ReportsPage() {
             })) || []
 
             // B. Fetch Movements for this Warehouse Only
-            const startDate = subDays(new Date(), 7).toISOString()
             const { data: locMovements } = await supabase
                 .from('stock_movements')
                 .select('created_at, type, quantity, item_id, unit_price')
@@ -84,28 +86,37 @@ export default async function ReportsPage() {
             movements = locMovements || []
 
         } else {
-            // Fallback: Global Data (Legacy / Aggregated)
-            // Fetch All Items
-            let itemsQuery = supabase.from('items').select('*')
-            if (!isSuperAdmin) itemsQuery = itemsQuery.eq('organization_id', organizationId!)
-            const { data: allItems } = await itemsQuery
+            // Fallback: Global Data (For Organization)
+            // Ensure we strictly filter by Organization ID even for defaults
+            const { data: allItems } = await supabase
+                .from('items')
+                .select('*')
+                .eq('organization_id', organizationId)
             items = allItems || []
 
-            // Fetch All Movements
-            const startDate = subDays(new Date(), 7).toISOString()
-            let moveQuery = supabase
+            const { data: allMovements } = await supabase
                 .from('stock_movements')
                 .select('created_at, type, quantity, item_id, unit_price')
                 .gte('created_at', startDate)
                 .order('created_at', { ascending: true })
-            if (!isSuperAdmin) moveQuery = moveQuery.eq('organization_id', organizationId!)
-            const { data: allMovements } = await moveQuery
+                .eq('organization_id', organizationId)
             movements = allMovements || []
         }
+
+        // C. Fetch Invoices (Global for Org for now, or could filter by warehouse if invoices had location_id - logic is org wide)
+        // Invoices usually don't have location_id in the schema yet, assuming org-wide for reports is safer or "All Locations"
+        const { data: orgInvoices } = await supabase
+            .from('invoices')
+            .select('created_at, total_amount, items')
+            .eq('organization_id', organizationId)
+            .gte('created_at', startDate)
+        invoices = orgInvoices || []
+
     } else {
-        // Super Admin Logic (Simplified)
-        const { data: allItems } = await supabase.from('items').select('*')
-        items = allItems || []
+        // No Organization Found (unlikely for valid users, maybe system admin without org)
+        items = []
+        movements = []
+        invoices = []
     }
 
     // --- KPI Calculations (Context Aware) ---
@@ -171,10 +182,6 @@ export default async function ReportsPage() {
     // ----------------------------------------
 
     // Financial Metrics
-    const totalValuation = items.reduce((sum, i) => sum + (Number(i.current_stock || 0) * Number(i.cost_price || 0)), 0)
-    const totalPotentialRevenue = items.reduce((sum, i) => sum + (Number(i.current_stock || 0) * Number(i.selling_price || 0)), 0)
-    const estimatedProfit = totalPotentialRevenue - totalValuation
-
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-IN', {
             style: 'currency',
@@ -182,6 +189,44 @@ export default async function ReportsPage() {
             maximumFractionDigits: 0,
         }).format(amount)
     }
+
+    const totalValuation = items.reduce((sum, i) => sum + (Number(i.current_stock || 0) * Number(i.cost_price || 0)), 0)
+    const totalPotentialRevenue = items.reduce((sum, i) => sum + (Number(i.current_stock || 0) * Number(i.selling_price || 0)), 0)
+    const estimatedProfit = totalPotentialRevenue - totalValuation
+
+    // 1. Total Sales (Realized from Invoices)
+    const totalSalesRealized = invoices.reduce((sum, inv) => sum + Number(inv.total_amount || 0), 0)
+
+    // 2. Stock Purchases (Realized from IN movements)
+    // Fallback: If unit_price is 0, try to use current item cost_price as best guess
+    const totalStockPurchases = movements
+        .filter(m => m.type === 'IN')
+        .reduce((sum, m) => {
+            let cost = Number(m.unit_price || 0)
+            if (cost === 0) {
+                const item = items.find(i => i.id === m.item_id)
+                cost = Number(item?.cost_price || 0)
+            }
+            return sum + (Number(m.quantity) * cost)
+        }, 0)
+
+    // 3. Net Profit (Realized) = Sales - Cost of Goods Sold (COGS)
+    // We calculate COGS only for the items SOLD in the invoices
+    let totalCOGS = 0
+    invoices.forEach(inv => {
+        if (Array.isArray(inv.items)) {
+            inv.items.forEach((lineItem: any) => {
+                // lineItem has quantity. Need cost price.
+                // We use CURRENT cost price of the item from database.
+                // Ideally, we should snapshot cost price at time of sale, but we only snapshotted unit_price (selling).
+                const item = items.find(i => i.id === lineItem.item_id)
+                const cost = Number(item?.cost_price || 0)
+                totalCOGS += (Number(lineItem.quantity) * cost)
+            })
+        }
+    })
+    const netProfitRealized = totalSalesRealized - totalCOGS
+
 
     return (
         <div className="space-y-6">
@@ -192,7 +237,7 @@ export default async function ReportsPage() {
                 <SummaryCard title="Total Items" value={totalItems} icon="package" />
                 <SummaryCard title="Inventory Value" value={formatCurrency(totalValuation)} icon="trendingUp" />
                 <ProLock isPro={isPro} title="Profit Est." className="h-full">
-                    <SummaryCard title="Est. Profit" value={formatCurrency(estimatedProfit)} icon="trendingUp" trend={estimatedProfit > 0 ? 'up' : 'neutral'} />
+                    <SummaryCard title="Est. Profit (Unrealized)" value={formatCurrency(estimatedProfit)} icon="trendingUp" trend={estimatedProfit > 0 ? 'up' : 'neutral'} />
                 </ProLock>
                 <SummaryCard title="Low Stock Alerts" value={lowStockItems.length} icon="alertTriangle" trend={lowStockItems.length > 0 ? 'down' : 'neutral'} />
             </div>
@@ -200,29 +245,27 @@ export default async function ReportsPage() {
             {/* Financial Performance Section - PRO ONLY */}
             <ProLock isPro={isPro} title="Financial Analytics" description="Unlock detailed revenue and profit analysis.">
                 <div className="space-y-4">
-                    <h2 className="text-xl font-bold tracking-tight pt-4">Financial Performance (Realized)</h2>
+                    <div className="flex items-center justify-between pt-4">
+                        <h2 className="text-xl font-bold tracking-tight">Financial Performance (Last 30 Days)</h2>
+                        <span className="text-xs text-muted-foreground bg-slate-100 px-2 py-1 rounded">Realized</span>
+                    </div>
+
                     <div className="grid gap-4 md:grid-cols-3">
                         <SummaryCard
                             title="Total Sales (Revenue)"
-                            value={formatCurrency(movements?.filter(m => m.type === 'OUT').reduce((sum, m) => sum + (Number(m.quantity) * Number(m.unit_price || 0)), 0) || 0)}
+                            value={formatCurrency(totalSalesRealized)}
                             icon="trendingUp"
                         />
                         <SummaryCard
                             title="Stock Purchases (Cost)"
-                            value={formatCurrency(movements?.filter(m => m.type === 'IN').reduce((sum, m) => sum + (Number(m.quantity) * Number(m.unit_price || 0)), 0) || 0)}
+                            value={formatCurrency(totalStockPurchases)}
                             icon="package"
                         />
                         <SummaryCard
-                            title="Net Profit (Est.)"
-                            value={formatCurrency(
-                                movements?.filter(m => m.type === 'OUT' && Number(m.unit_price) > 0).reduce((profit, m) => {
-                                    const revenue = Number(m.quantity) * Number(m.unit_price || 0)
-                                    const item = items.find(i => i.id === m.item_id)
-                                    const cost = Number(m.quantity) * Number(item?.cost_price || 0)
-                                    return profit + (revenue - cost)
-                                }, 0) || 0
-                            )}
+                            title="Net Profit"
+                            value={formatCurrency(netProfitRealized)}
                             icon="trendingUp"
+                            trend={netProfitRealized >= 0 ? 'up' : 'down'}
                         />
                     </div>
                 </div>

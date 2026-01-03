@@ -48,6 +48,7 @@ export function ItemsTable({ items }: ItemsTableProps) {
     const [deleteId, setDeleteId] = useState<string | null>(null)
     const [editItem, setEditItem] = useState<Item | null>(null)
     const [quickStockItem, setQuickStockItem] = useState<Item | null>(null)
+    const [quickStockType, setQuickStockType] = useState<'IN' | 'OUT'>('IN')
     const router = useRouter()
     const supabase = createClient()
 
@@ -136,11 +137,11 @@ export function ItemsTable({ items }: ItemsTableProps) {
                                                 Edit Item
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
-                                            <DropdownMenuItem onClick={() => setQuickStockItem(item)} className="flex items-center gap-2">
+                                            <DropdownMenuItem onClick={() => { setQuickStockItem(item); setQuickStockType('IN'); }} className="flex items-center gap-2">
                                                 <TrendingUp className="h-4 w-4 text-green-500" />
                                                 Add Stock
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => setQuickStockItem(item)} className="flex items-center gap-2">
+                                            <DropdownMenuItem onClick={() => { setQuickStockItem(item); setQuickStockType('OUT'); }} className="flex items-center gap-2">
                                                 <TrendingDown className="h-4 w-4 text-red-500" />
                                                 Remove Stock
                                             </DropdownMenuItem>
@@ -189,6 +190,7 @@ export function ItemsTable({ items }: ItemsTableProps) {
                     item={quickStockItem}
                     open={!!quickStockItem}
                     onOpenChange={(open) => !open && setQuickStockItem(null)}
+                    defaultType={quickStockType}
                 />
             )}
 

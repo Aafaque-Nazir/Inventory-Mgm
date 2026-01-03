@@ -1,10 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -27,6 +26,8 @@ import {
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Item } from '@/types'
+import { recordStockMovement } from '@/app/actions/stock'
+import { Loader2 } from 'lucide-react'
 
 const formSchema = z.object({
     quantity: z.coerce.number().min(0.01, 'Quantity must be positive'),
@@ -34,60 +35,55 @@ const formSchema = z.object({
     reason: z.string().optional(),
 })
 
+type FormValues = z.infer<typeof formSchema>
+
 interface QuickStockDialogProps {
     item: Item
     open: boolean
     onOpenChange: (open: boolean) => void
+    defaultType?: 'IN' | 'OUT'
 }
 
-export function QuickStockDialog({ item, open, onOpenChange }: QuickStockDialogProps) {
-    const router = useRouter()
-    const supabase = createClient()
+export function QuickStockDialog({ item, open, onOpenChange, defaultType = 'IN' }: QuickStockDialogProps) {
+    const [isPending, startTransition] = useTransition()
 
     const form = useForm<any>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             quantity: 0,
-            type: 'IN',
+            type: defaultType,
             reason: '',
         },
     })
 
-    async function onSubmit(values: z.infer<typeof formSchema>) {
-        try {
-            const { data: { user } } = await supabase.auth.getUser()
-
-            // Insert stock movement
-            const { error: movementError } = await supabase.from('stock_movements').insert({
-                item_id: item.id,
-                quantity: values.quantity,
-                type: values.type,
-                reason: values.reason,
-                created_by: user?.id,
+    // Reset form when dialog opens or defaultType changes
+    useEffect(() => {
+        if (open) {
+            form.reset({
+                quantity: 0,
+                type: defaultType,
+                reason: '',
             })
-
-            if (movementError) throw movementError
-
-            // Update item stock
-            const newStock = values.type === 'IN'
-                ? item.current_stock + values.quantity
-                : item.current_stock - values.quantity
-
-            const { error: updateError } = await supabase
-                .from('items')
-                .update({ current_stock: newStock })
-                .eq('id', item.id)
-
-            if (updateError) throw updateError
-
-            toast.success('Stock updated successfully')
-            onOpenChange(false)
-            form.reset()
-            router.refresh()
-        } catch (error: any) {
-            console.error('Stock movement error:', error)
-            toast.error(error.message || 'Failed to update stock')
         }
+    }, [open, defaultType, form])
+
+    async function onSubmit(values: FormValues) {
+        const formData = new FormData()
+        formData.append('item_id', item.id)
+        formData.append('quantity', values.quantity.toString())
+        formData.append('type', values.type)
+        if (values.reason) formData.append('reason', values.reason)
+
+        startTransition(async () => {
+            const result = await recordStockMovement({}, formData)
+
+            if (result.error) {
+                toast.error(result.error)
+            } else {
+                toast.success(result.message)
+                onOpenChange(false)
+            }
+        })
     }
 
     return (
@@ -96,7 +92,7 @@ export function QuickStockDialog({ item, open, onOpenChange }: QuickStockDialogP
                 <DialogHeader>
                     <DialogTitle>Quick Stock Update</DialogTitle>
                     <DialogDescription>
-                        Adjust stock for {item.name} (Current: {item.current_stock} {item.unit})
+                        Adjust stock for {item.name}. Current: {item.current_stock} {item.unit}
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
@@ -121,7 +117,7 @@ export function QuickStockDialog({ item, open, onOpenChange }: QuickStockDialogP
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Type</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                                             <FormControl>
                                                 <SelectTrigger>
                                                     <SelectValue />
@@ -151,7 +147,10 @@ export function QuickStockDialog({ item, open, onOpenChange }: QuickStockDialogP
                             )}
                         />
                         <DialogFooter>
-                            <Button type="submit">Update Stock</Button>
+                            <Button type="submit" disabled={isPending}>
+                                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Update Stock
+                            </Button>
                         </DialogFooter>
                     </form>
                 </Form>

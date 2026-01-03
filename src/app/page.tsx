@@ -396,6 +396,9 @@ export default function Home() {
                   <li className="flex gap-3 text-sm text-slate-300">
                     <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" /> Basic Reports
                   </li>
+                  <li className="flex gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" /> <strong>Sales & Invoices</strong> 🧾
+                  </li>
                   <li className="flex gap-3 text-sm text-slate-500/50 line-through">
                     <X className="h-5 w-5 shrink-0" /> Multi-Warehouse
                   </li>
@@ -438,6 +441,12 @@ export default function Home() {
                   </li>
                   <li className="flex gap-3 text-sm text-white">
                     <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> AI Stock Predictions 🤖
+                  </li>
+                  <li className="flex gap-3 text-sm text-white">
+                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> Low Stock Email Alerts 📧
+                  </li>
+                  <li className="flex gap-3 text-sm text-white">
+                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> Bulk CSV Import/Export 📤
                   </li>
                 </ul>
                 <Link href="/signup">

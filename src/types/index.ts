@@ -93,3 +93,24 @@ export interface AuditLog {
     created_at: string
     profile?: Profile // Joined
 }
+
+export interface InvoiceItem {
+    item_id: string
+    name: string
+    quantity: number
+    unit_price: number
+    total: number
+}
+
+export interface Invoice {
+    id: string
+    created_at: string
+    organization_id: string
+    customer_name: string | null
+    customer_phone: string | null
+    total_amount: number
+    payment_method: 'CASH' | 'UPI' | 'CARD' | 'OTHER'
+    items: InvoiceItem[]
+    created_by: string
+    profile?: Profile // Joined
+}

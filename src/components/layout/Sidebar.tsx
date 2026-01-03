@@ -20,7 +20,8 @@ import {
     Sparkles,
     Clock,
     Store,
-    Book
+    Book,
+    FileText
 } from 'lucide-react'
 import { differenceInDays } from 'date-fns'
 import { Button } from '@/components/ui/button'
@@ -29,6 +30,7 @@ const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Inventory', href: '/items', icon: Package },
     { name: 'Stock Movements', href: '/stock', icon: ArrowRightLeft },
+    { name: 'Sales & Invoices', href: '/sales', icon: FileText },
     { name: 'Suppliers', href: '/suppliers', icon: Users },
     { name: 'Purchase Orders', href: '/purchase-orders', icon: ShoppingCart },
     { name: 'Reports', href: '/reports', icon: BarChart3 },
@@ -245,6 +247,7 @@ export function Sidebar() {
                     )
                 })}
             </nav>
+
         </div>
     )
 }
