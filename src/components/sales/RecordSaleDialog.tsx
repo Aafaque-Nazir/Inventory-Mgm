@@ -22,10 +22,25 @@ import { getWarehouseCookie } from '@/app/actions/warehouse-cookie' // Server Ac
 interface RecordSaleDialogProps {
     trigger?: React.ReactNode
     initialItem?: Item
+    open?: boolean
+    onOpenChange?: (open: boolean) => void
 }
 
-export function RecordSaleDialog({ trigger, initialItem }: RecordSaleDialogProps) {
-    const [open, setOpen] = useState(false)
+export function RecordSaleDialog({ trigger, initialItem, open: controlledOpen, onOpenChange: setControlledOpen }: RecordSaleDialogProps) {
+    const [internalOpen, setInternalOpen] = useState(false)
+
+    // Use controlled state if provided, otherwise internal
+    const isControlled = controlledOpen !== undefined
+    const open = isControlled ? controlledOpen : internalOpen
+
+    const setOpen = (newOpen: boolean) => {
+        if (isControlled) {
+            setControlledOpen?.(newOpen)
+        } else {
+            setInternalOpen(newOpen)
+        }
+    }
+
     const [step, setStep] = useState<'CART' | 'DETAILS' | 'SUCCESS'>('CART')
     const [items, setItems] = useState<Item[]>([])
     const [cart, setCart] = useState<InvoiceItem[]>([])

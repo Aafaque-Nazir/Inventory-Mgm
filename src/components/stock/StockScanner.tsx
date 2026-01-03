@@ -172,8 +172,7 @@ export function StockScanner({ isPro = false }: StockScannerProps) {
             {selectedItem && showSaleDialog && (
                 <RecordSaleDialog
                     initialItem={selectedItem}
-                    // @ts-ignore: Temporary until I add controlled props
-                    forceOpen={true}
+                    open={showSaleDialog}
                     onOpenChange={setShowSaleDialog}
                 />
             )}
