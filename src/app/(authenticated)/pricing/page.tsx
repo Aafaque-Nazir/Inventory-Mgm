@@ -192,7 +192,7 @@ export default function PricingPage() {
                         <CardDescription>For growing businesses that need control.</CardDescription>
                     </CardHeader>
                     <CardContent className="flex-1">
-                        <div className="text-3xl font-bold">₹1499<span className="text-sm font-normal text-muted-foreground">/mo</span></div>
+                        <div className="text-3xl font-bold">₹499<span className="text-sm font-normal text-muted-foreground">/mo</span></div>
                         <ul className="mt-6 space-y-2 text-sm font-medium">
                             <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> 5 Team Members</li>
                             <li className="flex items-center"><Check className="mr-2 h-4 w-4 text-primary" /> <strong>Advanced Financial Analytics</strong> 💰</li>

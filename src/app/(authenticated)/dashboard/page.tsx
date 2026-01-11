@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Package, Users, AlertTriangle, ArrowRightLeft } from 'lucide-react'
+import { StatCard } from '@/components/dashboard/StatCard'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { format } from 'date-fns'
 import { AiInsightsCard } from '@/components/dashboard/AiInsightsCard'
@@ -123,119 +123,122 @@ export default async function DashboardPage() {
     const insights = await getAiInsights()
 
     return (
-        <div className="space-y-6">
-            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <div className="space-y-8 p-2">
+            <div className="flex items-center justify-between">
+                <h1 className="text-3xl font-bold tracking-tight text-white/90">Dashboard</h1>
+                <div className="text-sm text-slate-400">Overview</div>
+            </div>
 
             {/* AI Insights Section */}
             <AiInsightsCard insights={insights} />
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Items</CardTitle>
-                        <Package className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{itemsCount}</div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Suppliers</CardTitle>
-                        <Users className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{suppliersCount}</div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Low Stock Items</CardTitle>
-                        <AlertTriangle className="h-4 w-4 text-destructive" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-destructive">{lowStockCount}</div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Recent Activity</CardTitle>
-                        <ArrowRightLeft className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{recentMovements?.length || 0}</div>
-                        <p className="text-xs text-muted-foreground">Movements in last 24h</p>
-                    </CardContent>
-                </Card>
-            </div >
+            {/* Stats Grid */}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                <StatCard
+                    title="Total Items"
+                    value={itemsCount}
+                    icon={<Package className="h-6 w-6" />}
+                    color="blue"
+                    delay={0.1}
+                />
+                <StatCard
+                    title="Total Suppliers"
+                    value={suppliersCount}
+                    icon={<Users className="h-6 w-6" />}
+                    color="purple"
+                    delay={0.2}
+                />
+                <StatCard
+                    title="Low Stock Items"
+                    value={lowStockCount}
+                    icon={<AlertTriangle className="h-6 w-6" />}
+                    color="orange"
+                    delay={0.3}
+                    trend={{ value: lowStockList.length, label: 'Items critical', positive: false }}
+                />
+                <StatCard
+                    title="Recent Activity"
+                    value={recentMovements?.length || 0}
+                    icon={<ArrowRightLeft className="h-6 w-6" />}
+                    color="green"
+                    delay={0.4}
+                    description="Movements in last 24h"
+                />
+            </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4">
-                    <CardHeader>
-                        <CardTitle>Recent Stock Movements</CardTitle>
-                    </CardHeader>
-                    <CardContent>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+                {/* Recent Movements */}
+                <div className="col-span-4 rounded-3xl border border-white/5 bg-white/5 p-6 backdrop-blur-sm">
+                    <div className="mb-6 flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-white/90">Recent Stock Movements</h3>
+                    </div>
+                    <div className="overflow-hidden rounded-xl border border-white/5 bg-slate-900/30">
                         <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Item</TableHead>
-                                    <TableHead>Type</TableHead>
-                                    <TableHead>Quantity</TableHead>
-                                    <TableHead>Date</TableHead>
+                            <TableHeader className="bg-white/5 hover:bg-white/5">
+                                <TableRow className="border-white/5 hover:bg-transparent">
+                                    <TableHead className="text-slate-400">Item</TableHead>
+                                    <TableHead className="text-slate-400">Type</TableHead>
+                                    <TableHead className="text-slate-400">Quantity</TableHead>
+                                    <TableHead className="text-slate-400">Date</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {recentMovements?.map((movement: any) => (
-                                    <TableRow key={movement.id}>
-                                        <TableCell>{movement.item?.name}</TableCell>
+                                    <TableRow key={movement.id} className="border-white/5 hover:bg-white/5 transition-colors">
+                                        <TableCell className="font-medium text-slate-200">{movement.item?.name}</TableCell>
                                         <TableCell>
-                                            <span className={movement.type === 'IN' ? 'text-green-500' : 'text-red-500'}>
+                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${movement.type === 'IN'
+                                                ? 'bg-green-500/10 text-green-400 ring-1 ring-inset ring-green-500/20'
+                                                : 'bg-red-500/10 text-red-400 ring-1 ring-inset ring-red-500/20'
+                                                }`}>
                                                 {movement.type}
                                             </span>
                                         </TableCell>
-                                        <TableCell>{movement.quantity}</TableCell>
-                                        <TableCell>{format(new Date(movement.created_at), 'MMM d, HH:mm')}</TableCell>
+                                        <TableCell className="text-slate-300">{movement.quantity}</TableCell>
+                                        <TableCell className="text-slate-400">{format(new Date(movement.created_at), 'MMM d, HH:mm')}</TableCell>
                                     </TableRow>
                                 ))}
                                 {(!recentMovements || recentMovements.length === 0) && (
-                                    <TableRow>
-                                        <TableCell colSpan={4} className="text-center">No recent movements</TableCell>
+                                    <TableRow className="hover:bg-transparent border-white/5">
+                                        <TableCell colSpan={4} className="text-center text-slate-500 py-8">No recent movements</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
                         </Table>
-                    </CardContent>
-                </Card>
-                <Card className="col-span-3">
-                    <CardHeader>
-                        <CardTitle>Low Stock Alerts</CardTitle>
-                    </CardHeader>
-                    <CardContent>
+                    </div>
+                </div>
+
+                {/* Low Stock Alerts */}
+                <div className="col-span-3 rounded-3xl border border-white/5 bg-white/5 p-6 backdrop-blur-sm">
+                    <div className="mb-6 flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-white/90">Low Stock Alerts</h3>
+                    </div>
+                    <div className="overflow-hidden rounded-xl border border-white/5 bg-slate-900/30">
                         <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Item</TableHead>
-                                    <TableHead>Stock</TableHead>
-                                    <TableHead>Min</TableHead>
+                            <TableHeader className="bg-white/5 hover:bg-white/5">
+                                <TableRow className="border-white/5 hover:bg-transparent">
+                                    <TableHead className="text-slate-400">Item</TableHead>
+                                    <TableHead className="text-slate-400">Stock</TableHead>
+                                    <TableHead className="text-slate-400">Min</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {lowStockList.map((item: any) => (
-                                    <TableRow key={item.id}>
-                                        <TableCell className="font-medium">{item.name}</TableCell>
-                                        <TableCell className="text-destructive">{item.current_stock}</TableCell>
-                                        <TableCell>{item.min_stock}</TableCell>
+                                    <TableRow key={item.id} className="border-white/5 hover:bg-white/5 transition-colors">
+                                        <TableCell className="font-medium text-slate-200">{item.name}</TableCell>
+                                        <TableCell className="text-red-400 font-bold">{item.current_stock}</TableCell>
+                                        <TableCell className="text-slate-400">{item.min_stock}</TableCell>
                                     </TableRow>
                                 ))}
                                 {lowStockList.length === 0 && (
-                                    <TableRow>
-                                        <TableCell colSpan={3} className="text-center">All items well stocked</TableCell>
+                                    <TableRow className="hover:bg-transparent border-white/5">
+                                        <TableCell colSpan={3} className="text-center text-slate-500 py-8">All items well stocked</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
                         </Table>
-                    </CardContent>
-                </Card>
+                    </div>
+                </div>
             </div>
         </div >
     )
