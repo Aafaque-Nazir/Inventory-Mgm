@@ -110,7 +110,7 @@ export function ExportButton({ items, isPro }: ExportButtonProps) {
                             handleClick()
                         }
                     }}
-                    className={!isPro ? "opacity-70" : ""}
+                    className={!isPro ? "opacity-70" : "bg-white/5 border-white/10 text-slate-200 hover:bg-white/10 hover:text-white rounded-xl backdrop-blur-sm transition-all"}
                 >
                     <Download className="mr-2 h-4 w-4" />
                     Export CSV

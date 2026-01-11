@@ -111,11 +111,11 @@ export default async function ItemsPage() {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8 p-2">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Inventory</h1>
-                    <p className="text-muted-foreground">Manage your stock and items.</p>
+                    <h1 className="text-3xl font-bold tracking-tight text-white/90">Inventory</h1>
+                    <p className="text-sm text-slate-400">Manage your stock and items.</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
                     <ScanItemButton isPro={isPro || isSuperAdmin} />

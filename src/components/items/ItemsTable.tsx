@@ -71,84 +71,92 @@ export function ItemsTable({ items }: ItemsTableProps) {
     }
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-6">
             <div className="flex items-center gap-2 w-full md:w-auto">
                 <Input
                     placeholder="Search items..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="flex-1 md:max-w-sm"
+                    className="flex-1 md:max-w-sm bg-white/5 border-white/10 text-white placeholder:text-slate-500 hover:bg-white/10 focus:ring-indigo-500/50 transition-all rounded-xl"
                 />
             </div>
-            <div className="rounded-md border">
+            <div className="rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-2xl">
                 <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead className="hidden md:table-cell">SKU</TableHead>
-                            <TableHead className="hidden md:table-cell">Category</TableHead>
-                            <TableHead className="hidden md:table-cell">Size</TableHead>
-                            <TableHead className="hidden md:table-cell">Color</TableHead>
-                            <TableHead>Stock</TableHead>
-                            <TableHead className="hidden md:table-cell">Unit</TableHead>
-                            <TableHead>Status</TableHead>
+                    <TableHeader className="bg-white/5 hover:bg-white/5">
+                        <TableRow className="border-white/5 hover:bg-transparent">
+                            <TableHead className="text-slate-400 font-medium">Name</TableHead>
+                            <TableHead className="hidden md:table-cell text-slate-400 font-medium">SKU</TableHead>
+                            <TableHead className="hidden md:table-cell text-slate-400 font-medium">Category</TableHead>
+                            <TableHead className="hidden md:table-cell text-slate-400 font-medium">Size</TableHead>
+                            <TableHead className="hidden md:table-cell text-slate-400 font-medium">Color</TableHead>
+                            <TableHead className="text-slate-400 font-medium">Stock</TableHead>
+                            <TableHead className="hidden md:table-cell text-slate-400 font-medium">Unit</TableHead>
+                            <TableHead className="text-slate-400 font-medium">Status</TableHead>
                             <TableHead className="w-[50px]"></TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {filteredItems.map((item) => (
-                            <TableRow key={item.id}>
+                        {filteredItems.map((item, index) => (
+                            <TableRow key={item.id} className="border-white/5 hover:bg-white/5 transition-all duration-200 group">
                                 <TableCell className="font-medium">
                                     <div className="flex flex-col">
-                                        <span>{item.name}</span>
+                                        <span className="text-slate-200 group-hover:text-white transition-colors">{item.name}</span>
                                         <span className="text-xs text-muted-foreground md:hidden">{item.sku}</span>
                                     </div>
                                 </TableCell>
-                                <TableCell className="hidden md:table-cell">{item.sku}</TableCell>
-                                <TableCell className="hidden md:table-cell">{item.category || '-'}</TableCell>
-                                <TableCell className="hidden md:table-cell">{item.size || '-'}</TableCell>
-                                <TableCell className="hidden md:table-cell">{item.color || '-'}</TableCell>
-                                <TableCell className="font-mono">{item.current_stock}</TableCell>
-                                <TableCell className="hidden md:table-cell">{item.unit}</TableCell>
+                                <TableCell className="hidden md:table-cell text-slate-400 group-hover:text-slate-300">{item.sku}</TableCell>
+                                <TableCell className="hidden md:table-cell text-slate-400 group-hover:text-slate-300">
+                                    {item.category && (
+                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                            {item.category}
+                                        </span>
+                                    )}
+                                    {!item.category && '-'}
+                                </TableCell>
+                                <TableCell className="hidden md:table-cell text-slate-400 group-hover:text-slate-300">{item.size || '-'}</TableCell>
+                                <TableCell className="hidden md:table-cell text-slate-400 group-hover:text-slate-300">{item.color || '-'}</TableCell>
+                                <TableCell className="font-mono font-bold text-slate-200">{item.current_stock}</TableCell>
+                                <TableCell className="hidden md:table-cell text-slate-400">{item.unit}</TableCell>
                                 <TableCell>
                                     {item.current_stock < item.min_stock ? (
-                                        <Badge variant="destructive" className="h-5 px-1.5 text-[10px] md:h-6 md:px-2.5 md:text-xs">Low</Badge>
+                                        <Badge variant="destructive" className="bg-red-500/20 text-red-500 hover:bg-red-500/30 border border-red-500/20">Low Stock</Badge>
                                     ) : (
-                                        <Badge variant="secondary" className="h-5 px-1.5 text-[10px] md:h-6 md:px-2.5 md:text-xs">OK</Badge>
+                                        <Badge variant="secondary" className="bg-green-500/10 text-green-500 hover:bg-green-500/20 border border-green-500/20">In Stock</Badge>
                                     )}
                                 </TableCell>
                                 <TableCell>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                            <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-white/10 text-slate-400 hover:text-white rounded-lg">
                                                 <MoreHorizontal className="h-4 w-4" />
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
+                                        <DropdownMenuContent align="end" className="bg-slate-900 border-white/10 text-slate-200">
                                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                            <DropdownMenuItem asChild>
+                                            <DropdownMenuSeparator className="bg-white/10" />
+                                            <DropdownMenuItem asChild className="focus:bg-white/10 focus:text-white cursor-pointer">
                                                 <Link href={`/items/${item.id}`} className="flex items-center gap-2">
                                                     <Eye className="h-4 w-4" />
                                                     View Details
                                                 </Link>
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => setEditItem(item)} className="flex items-center gap-2">
+                                            <DropdownMenuItem onClick={() => setEditItem(item)} className="flex items-center gap-2 focus:bg-white/10 focus:text-white cursor-pointer">
                                                 <Edit className="h-4 w-4" />
                                                 Edit Item
                                             </DropdownMenuItem>
-                                            <DropdownMenuSeparator />
-                                            <DropdownMenuItem onClick={() => { setQuickStockItem(item); setQuickStockType('IN'); }} className="flex items-center gap-2">
+                                            <DropdownMenuSeparator className="bg-white/10" />
+                                            <DropdownMenuItem onClick={() => { setQuickStockItem(item); setQuickStockType('IN'); }} className="flex items-center gap-2 focus:bg-white/10 focus:text-white cursor-pointer">
                                                 <TrendingUp className="h-4 w-4 text-green-500" />
                                                 Add Stock
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => { setQuickStockItem(item); setQuickStockType('OUT'); }} className="flex items-center gap-2">
+                                            <DropdownMenuItem onClick={() => { setQuickStockItem(item); setQuickStockType('OUT'); }} className="flex items-center gap-2 focus:bg-white/10 focus:text-white cursor-pointer">
                                                 <TrendingDown className="h-4 w-4 text-red-500" />
                                                 Remove Stock
                                             </DropdownMenuItem>
-                                            <DropdownMenuSeparator />
+                                            <DropdownMenuSeparator className="bg-white/10" />
                                             <DropdownMenuItem
                                                 onClick={() => setDeleteId(item.id)}
-                                                className="flex items-center gap-2 text-destructive"
+                                                className="flex items-center gap-2 text-red-500 focus:bg-red-500/10 focus:text-red-500 cursor-pointer"
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                                 Delete

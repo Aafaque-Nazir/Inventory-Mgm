@@ -229,15 +229,18 @@ export default async function ReportsPage() {
 
 
     return (
-        <div className="space-y-6">
-            <h1 className="text-3xl font-bold tracking-tight">Analytics & Reports</h1>
+        <div className="space-y-8 p-2">
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight text-white/90">Analytics & Reports</h1>
+                <p className="text-sm text-slate-400">Insights into your inventory performance.</p>
+            </div>
 
             {/* KPI Summary Cards - Always Visible */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                 <SummaryCard title="Total Items" value={totalItems} icon="package" />
                 <SummaryCard title="Inventory Value" value={formatCurrency(totalValuation)} icon="trendingUp" />
                 <ProLock isPro={isPro} title="Profit Est." className="h-full">
-                    <SummaryCard title="Est. Profit (Unrealized)" value={formatCurrency(estimatedProfit)} icon="trendingUp" trend={estimatedProfit > 0 ? 'up' : 'neutral'} />
+                    <SummaryCard title="Est. Profit" subtitle="(Unrealized)" value={formatCurrency(estimatedProfit)} icon="trendingUp" trend={estimatedProfit > 0 ? 'up' : 'neutral'} />
                 </ProLock>
                 <SummaryCard title="Low Stock Alerts" value={lowStockItems.length} icon="alertTriangle" trend={lowStockItems.length > 0 ? 'down' : 'neutral'} />
             </div>

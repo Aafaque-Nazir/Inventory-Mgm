@@ -19,39 +19,34 @@ interface StatCardProps {
 
 const colorStyles = {
     blue: {
-        bg: 'bg-blue-500/10',
-        text: 'text-blue-500',
-        border: 'border-blue-500/20',
-        ring: 'ring-blue-500/10',
-        gradient: 'from-blue-500/20 to-transparent'
+        text: 'text-blue-400',
+        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(59,130,246,0.5)]',
+        border: 'group-hover:border-blue-500/30',
+        bg: 'group-hover:bg-blue-500/5'
     },
     green: {
-        bg: 'bg-green-500/10',
-        text: 'text-green-500',
-        border: 'border-green-500/20',
-        ring: 'ring-green-500/10',
-        gradient: 'from-green-500/20 to-transparent'
+        text: 'text-emerald-400',
+        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.5)]',
+        border: 'group-hover:border-emerald-500/30',
+        bg: 'group-hover:bg-emerald-500/5'
     },
     purple: {
-        bg: 'bg-purple-500/10',
-        text: 'text-purple-500',
-        border: 'border-purple-500/20',
-        ring: 'ring-purple-500/10',
-        gradient: 'from-purple-500/20 to-transparent'
+        text: 'text-purple-400',
+        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(147,51,234,0.5)]',
+        border: 'group-hover:border-purple-500/30',
+        bg: 'group-hover:bg-purple-500/5'
     },
     orange: {
-        bg: 'bg-orange-500/10',
-        text: 'text-orange-500',
-        border: 'border-orange-500/20',
-        ring: 'ring-orange-500/10',
-        gradient: 'from-orange-500/20 to-transparent'
+        text: 'text-orange-400',
+        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(249,115,22,0.5)]',
+        border: 'group-hover:border-orange-500/30',
+        bg: 'group-hover:bg-orange-500/5'
     },
     pink: {
-        bg: 'bg-pink-500/10',
-        text: 'text-pink-500',
-        border: 'border-pink-500/20',
-        ring: 'ring-pink-500/10',
-        gradient: 'from-pink-500/20 to-transparent'
+        text: 'text-pink-400',
+        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(236,72,153,0.5)]',
+        border: 'group-hover:border-pink-500/30',
+        bg: 'group-hover:bg-pink-500/5'
     }
 }
 
@@ -60,44 +55,48 @@ export function StatCard({ title, value, icon, description, trend, color = 'blue
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay }}
+            transition={{ duration: 0.4, delay }}
             className={cn(
-                "relative overflow-hidden rounded-2xl border bg-white/5 p-6 backdrop-blur-sm transition-all hover:bg-white/10 hover:shadow-lg",
-                styles.border
+                "group relative rounded-[2rem] border border-white/[0.08] bg-white/[0.02] p-7 backdrop-blur-xl transition-all duration-500",
+                "hover:-translate-y-1 hover:bg-white/[0.04]",
+                styles.glow,
+                styles.border,
+                styles.bg
             )}
         >
-            {/* Ambient Gradient Background */}
-            <div className={cn("absolute -top-20 -right-20 h-40 w-40 rounded-full bg-gradient-to-br opacity-20 blur-3xl", styles.gradient)} />
+            {/* Inner Glow Gradient */}
+            <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-            <div className="relative z-10 flex items-start justify-between">
-                <div>
-                    <p className="text-sm font-medium text-slate-400">{title}</p>
-                    <h3 className="mt-2 text-3xl font-bold tracking-tight text-white">{value}</h3>
-
-                    {description && (
-                        <p className="mt-1 text-xs text-slate-500">{description}</p>
-                    )}
-
+            <div className="relative z-10 space-y-4">
+                <div className="flex items-center justify-between">
+                    <div className={cn(
+                        "p-2.5 rounded-xl bg-white/5 border border-white/5 backdrop-blur-md transition-colors",
+                        "group-hover:bg-white/10 group-hover:scale-110 duration-300",
+                        styles.text
+                    )}>
+                        {icon}
+                    </div>
                     {trend && (
                         <div className={cn(
-                            "mt-3 flex items-center text-xs font-medium",
-                            trend.positive ? "text-green-400" : "text-red-400"
+                            "flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm px-2 py-0.5 rounded-full border border-white/5",
+                            trend.positive
+                                ? "text-emerald-400 bg-emerald-500/5"
+                                : "text-rose-400 bg-rose-500/5"
                         )}>
-                            <span>{trend.positive ? '+' : ''}{trend.value}%</span>
-                            <span className="ml-1 text-slate-500">{trend.label}</span>
+                            <span>{trend.positive ? '↑' : '↓'}</span>
+                            <span>{trend.value}%</span>
                         </div>
                     )}
                 </div>
 
-                <div className={cn(
-                    "flex h-12 w-12 items-center justify-center rounded-xl border shadow-inner",
-                    styles.bg,
-                    styles.text,
-                    styles.border
-                )}>
-                    {icon}
+                <div className="space-y-1">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{title}</p>
+                    <h3 className="text-3xl font-black tracking-tight text-white drop-shadow-sm">{value}</h3>
+                    {description && (
+                        <p className="text-[11px] text-slate-500 font-medium group-hover:text-slate-400 transition-colors">{description}</p>
+                    )}
                 </div>
             </div>
         </motion.div>

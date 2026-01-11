@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Plus, MapPin, Trash2, Edit, Store } from 'lucide-react'
@@ -97,139 +96,132 @@ export function WarehouseList({ locations, organizationId, isPro }: WarehouseLis
 
     if (!isPro) {
         return (
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        Warehouses <Badge variant="secondary">Pro Feature</Badge>
-                    </CardTitle>
-                    <CardDescription>Manage multiple warehouses and store locations.</CardDescription>
-                </CardHeader>
-                <CardContent className="py-8 text-center bg-muted/20">
-                    <Store className="h-12 w-12 mx-auto text-muted-foreground mb-4 opacity-50" />
-                    <h3 className="text-lg font-semibold mb-2">Upgrade to Multi-Warehouse</h3>
-                    <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                        Track inventory across multiple physical locations, shops, or godowns.
-                    </p>
-                    <Button variant="default" asChild>
-                        <a href="/pricing">Upgrade to Pro</a>
-                    </Button>
-                </CardContent>
-            </Card>
+            <div className="rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-2xl p-12 text-center">
+                <Store className="h-16 w-16 mx-auto text-slate-600 mb-6" />
+                <h3 className="text-xl font-bold text-white mb-2">Upgrade to Multi-Warehouse</h3>
+                <p className="text-slate-400 mb-8 max-w-md mx-auto">
+                    Track inventory across multiple physical locations, shops, or godowns.
+                </p>
+                <Button asChild className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white border-0 shadow-lg shadow-indigo-500/25 rounded-xl px-8">
+                    <a href="/pricing">Upgrade to Pro</a>
+                </Button>
+            </div>
         )
     }
 
     return (
-        <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+        <div className="rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-2xl p-6">
+            <div className="flex flex-row items-center justify-between mb-6">
                 <div>
-                    <CardTitle>Warehouses</CardTitle>
-                    <CardDescription>Manage your physical inventory locations.</CardDescription>
+                    <h3 className="text-lg font-semibold text-white/90">Your Locations</h3>
                 </div>
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger asChild>
-                        <Button>
+                        <Button className="bg-indigo-500 hover:bg-indigo-600 text-white border-0 rounded-xl shadow-lg shadow-indigo-500/20">
                             <Plus className="mr-2 h-4 w-4" /> Add Warehouse
                         </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent className="bg-slate-900 border-white/10 text-white">
                         <DialogHeader>
                             <DialogTitle>Add New Warehouse</DialogTitle>
-                            <DialogDescription>Create a new warehouse or store location.</DialogDescription>
+                            <DialogDescription className="text-slate-400">Create a new warehouse or store location.</DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Warehouse Name</Label>
+                                <Label htmlFor="name" className="text-slate-300">Warehouse Name</Label>
                                 <Input
                                     id="name"
                                     placeholder="e.g., Downtown Store"
                                     value={newLocation.name}
                                     onChange={(e) => setNewLocation({ ...newLocation, name: e.target.value })}
+                                    className="bg-white/5 border-white/10 text-white placeholder:text-slate-600"
                                 />
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="address">Address (Optional)</Label>
+                                <Label htmlFor="address" className="text-slate-300">Address (Optional)</Label>
                                 <Input
                                     id="address"
                                     placeholder="e.g., 123 Main St"
                                     value={newLocation.address}
                                     onChange={(e) => setNewLocation({ ...newLocation, address: e.target.value })}
+                                    className="bg-white/5 border-white/10 text-white placeholder:text-slate-600"
                                 />
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button variant="outline" onClick={() => setIsCreateOpen(false)}>Cancel</Button>
-                            <Button onClick={handleCreate} disabled={isLoading}>
+                            <Button variant="ghost" onClick={() => setIsCreateOpen(false)} className="text-slate-400 hover:text-white hover:bg-white/5">Cancel</Button>
+                            <Button onClick={handleCreate} disabled={isLoading} className="bg-indigo-600 hover:bg-indigo-700 text-white">
                                 {isLoading ? "Creating..." : "Create Warehouse"}
                             </Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
-            </CardHeader>
-            <CardContent>
-                <div className="space-y-4">
-                    {locations.map((loc) => (
-                        <div key={loc.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                            <div className="flex items-start gap-3">
-                                <div className="p-2 bg-primary/10 rounded-md">
-                                    <Store className="h-5 w-5 text-primary" />
-                                </div>
-                                <div>
-                                    <h4 className="font-semibold flex items-center gap-2">
-                                        {loc.name}
-                                        {loc.is_default && <Badge variant="secondary" className="text-xs">Default</Badge>}
-                                    </h4>
-                                    {loc.address && <p className="text-sm text-muted-foreground">{loc.address}</p>}
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Button variant="ghost" size="icon" onClick={() => openEditDialog(loc)}>
-                                    <Edit className="h-4 w-4 text-muted-foreground" />
-                                </Button>
-                                {!loc.is_default && (
-                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(loc.id)}>
-                                        <Trash2 className="h-4 w-4 text-destructive" />
-                                    </Button>
-                                )}
-                            </div>
-                        </div>
-                    ))}
-                </div>
+            </div>
 
-                {/* Edit Dialog */}
-                <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Edit Warehouse</DialogTitle>
-                            <DialogDescription>Update warehouse details.</DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="edit-name">Warehouse Name</Label>
-                                <Input
-                                    id="edit-name"
-                                    value={editingLocation?.name || ''}
-                                    onChange={(e) => setEditingLocation(prev => prev ? { ...prev, name: e.target.value } : null)}
-                                />
+            <div className="space-y-4">
+                {locations.map((loc) => (
+                    <div key={loc.id} className="flex items-center justify-between p-4 border border-white/5 bg-slate-900/30 rounded-xl hover:bg-white/5 transition-all duration-200 group">
+                        <div className="flex items-start gap-4">
+                            <div className="p-3 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
+                                <Store className="h-5 w-5 text-indigo-400" />
                             </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="edit-address">Address (Optional)</Label>
-                                <Input
-                                    id="edit-address"
-                                    value={editingLocation?.address || ''}
-                                    onChange={(e) => setEditingLocation(prev => prev ? { ...prev, address: e.target.value } : null)}
-                                />
+                            <div>
+                                <h4 className="font-medium text-slate-200 group-hover:text-white transition-colors flex items-center gap-2">
+                                    {loc.name}
+                                    {loc.is_default && <Badge variant="secondary" className="bg-indigo-500/10 text-indigo-300 border-indigo-500/20 text-[10px] px-1.5 h-5">Default</Badge>}
+                                </h4>
+                                {loc.address && <p className="text-sm text-slate-500 mt-1">{loc.address}</p>}
                             </div>
                         </div>
-                        <DialogFooter>
-                            <Button variant="outline" onClick={() => setIsEditOpen(false)}>Cancel</Button>
-                            <Button onClick={handleEdit} disabled={isLoading}>
-                                {isLoading ? "Saving..." : "Save Changes"}
+                        <div className="flex items-center gap-2">
+                            <Button variant="ghost" size="icon" onClick={() => openEditDialog(loc)} className="text-slate-400 hover:text-white hover:bg-white/10 rounded-lg">
+                                <Edit className="h-4 w-4" />
                             </Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                            {!loc.is_default && (
+                                <Button variant="ghost" size="icon" onClick={() => handleDelete(loc.id)} className="text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg">
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            )}
+                        </div>
+                    </div>
+                ))}
+            </div>
 
-            </CardContent>
-        </Card>
+            {/* Edit Dialog */}
+            <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+                <DialogContent className="bg-slate-900 border-white/10 text-white">
+                    <DialogHeader>
+                        <DialogTitle>Edit Warehouse</DialogTitle>
+                        <DialogDescription className="text-slate-400">Update warehouse details.</DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="edit-name" className="text-slate-300">Warehouse Name</Label>
+                            <Input
+                                id="edit-name"
+                                value={editingLocation?.name || ''}
+                                onChange={(e) => setEditingLocation(prev => prev ? { ...prev, name: e.target.value } : null)}
+                                className="bg-white/5 border-white/10 text-white"
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="edit-address" className="text-slate-300">Address (Optional)</Label>
+                            <Input
+                                id="edit-address"
+                                value={editingLocation?.address || ''}
+                                onChange={(e) => setEditingLocation(prev => prev ? { ...prev, address: e.target.value } : null)}
+                                className="bg-white/5 border-white/10 text-white"
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="ghost" onClick={() => setIsEditOpen(false)} className="text-slate-400 hover:text-white hover:bg-white/5">Cancel</Button>
+                        <Button onClick={handleEdit} disabled={isLoading} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+                            {isLoading ? "Saving..." : "Save Changes"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </div>
     )
 }

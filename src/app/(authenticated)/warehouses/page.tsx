@@ -2,7 +2,6 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { getLocations } from '@/app/actions/locations'
 import { WarehouseList } from '@/components/warehouses/WarehouseList'
-import { Store } from 'lucide-react'
 
 export default async function WarehousesPage() {
     const supabase = await createClient()
@@ -31,13 +30,11 @@ export default async function WarehousesPage() {
     const isPro = org.plan_type === 'PRO' || org.plan_type === 'ENTERPRISE'
 
     return (
-        <div className="flex-1 space-y-4 p-8 pt-6">
-            <div className="flex items-center justify-between space-y-2">
-                <div className="flex items-center gap-2">
-                    <div className="p-2 bg-primary/10 rounded-lg">
-                        <Store className="h-6 w-6 text-primary" />
-                    </div>
-                    <h2 className="text-3xl font-bold tracking-tight">Warehouses</h2>
+        <div className="flex-1 space-y-8 p-2">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight text-white/90">Warehouses</h1>
+                    <p className="text-sm text-slate-400">Manage your inventory locations.</p>
                 </div>
             </div>
 

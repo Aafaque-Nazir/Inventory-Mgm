@@ -16,9 +16,6 @@ import {
 import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select'
-import {
-    Table, TableBody, TableCell, TableHead, TableHeader, TableRow
-} from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 
 const inviteSchema = z.object({
@@ -77,43 +74,51 @@ export function TeamTab({
     const userCount = members.length + invitations.length
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h3 className="text-lg font-medium">Team Members</h3>
-                    <p className="text-sm text-muted-foreground">
-                        Manage who has access to your organization.
-                    </p>
-                    <p className="text-sm mt-1">
-                        <span className={userCount >= maxUsers ? "text-red-500 font-medium" : "text-green-600 font-medium"}>
+        <div className="space-y-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                    <p className="text-sm">
+                        <span className={userCount >= maxUsers ? "text-red-400 font-bold" : "text-emerald-400 font-bold"}>
                             {userCount} / {maxUsers} Users Used
-                        </span> (Pro Plan: 5, Free: 1)
+                        </span>
+                        <span className="text-slate-500 ml-1">(Pro Plan: 5, Free: 1)</span>
                     </p>
                 </div>
 
                 <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
-                        <Button disabled={userCount >= maxUsers}>Add Member</Button>
+                        <Button
+                            disabled={userCount >= maxUsers}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white border-0 rounded-xl disabled:opacity-50"
+                        >
+                            Add Member
+                        </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent className="glass-modal border-white/10 bg-black/90 text-white">
                         <DialogHeader>
-                            <DialogTitle>Invite new member</DialogTitle>
-                            <DialogDescription>
+                            <DialogTitle className="text-white">Invite new member</DialogTitle>
+                            <DialogDescription className="text-slate-400">
                                 Send an invitation link to their email.
                             </DialogDescription>
                         </DialogHeader>
                         <form onSubmit={onSubmit} className="space-y-4">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Email</label>
-                                <Input name="email" type="email" placeholder="colleague@example.com" required />
+                                <label className="text-sm font-medium text-slate-300">Email</label>
+                                <Input
+                                    name="email"
+                                    type="email"
+                                    placeholder="colleague@example.com"
+                                    required
+                                    className="bg-white/5 border-white/10 text-white"
+                                />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Role</label>
+                                <label className="text-sm font-medium text-slate-300">Role</label>
                                 <Select name="role" defaultValue="STOREKEEPER">
-                                    <SelectTrigger>
+                                    <SelectTrigger className="bg-white/5 border-white/10 text-white">
                                         <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent className="bg-slate-900 border-white/10 text-white">
                                         <SelectItem value="STOREKEEPER">Storekeeper (View/Add Stock)</SelectItem>
                                         <SelectItem value="MANAGER">Manager (Edit Items)</SelectItem>
                                         <SelectItem value="ADMIN">Admin (Full Access)</SelectItem>
@@ -121,7 +126,7 @@ export function TeamTab({
                                 </Select>
                             </div>
                             <DialogFooter>
-                                <Button type="submit" disabled={isPending}>
+                                <Button type="submit" disabled={isPending} className="bg-indigo-600 hover:bg-indigo-700 text-white">
                                     {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Mail className="mr-2 h-4 w-4" />}
                                     Send Invitation
                                 </Button>
@@ -131,62 +136,86 @@ export function TeamTab({
                 </Dialog>
             </div>
 
-            <div className="rounded-md border">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>User</TableHead>
-                            <TableHead>Role</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {/* Active Members */}
-                        {members.map((member) => (
-                            <TableRow key={member.id}>
-                                <TableCell>
-                                    <div className="font-medium">{member.full_name}</div>
-                                    <div className="text-xs text-muted-foreground">{member.id}</div>
-                                </TableCell>
-                                <TableCell>
-                                    <Badge variant="outline">{member.role}</Badge>
-                                </TableCell>
-                                <TableCell>
-                                    <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Active</Badge>
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    {member.role !== 'ADMIN' && (
-                                        <Button variant="ghost" size="icon" onClick={() => onRemove(member.id)} disabled={isPending}>
-                                            <Trash2 className="h-4 w-4 text-red-500" />
-                                        </Button>
-                                    )}
-                                </TableCell>
-                            </TableRow>
-                        ))}
+            <div className="rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-xl">
+                {/* Header */}
+                <div className="grid grid-cols-12 gap-4 p-4 border-b border-white/5 bg-white/5 text-xs uppercase font-semibold text-slate-400">
+                    <div className="col-span-5 md:col-span-4">User</div>
+                    <div className="col-span-3">Role</div>
+                    <div className="col-span-2">Status</div>
+                    <div className="col-span-2 text-right">Actions</div>
+                </div>
 
-                        {/* Pending Invitations */}
-                        {invitations.map((invite) => (
-                            <TableRow key={invite.id}>
-                                <TableCell>
-                                    <div className="font-medium">{invite.email}</div>
-                                    <div className="text-xs text-muted-foreground">Expires: {new Date(invite.expires_at).toLocaleDateString()}</div>
-                                </TableCell>
-                                <TableCell>
-                                    <Badge variant="outline">{invite.role}</Badge>
-                                </TableCell>
-                                <TableCell>
-                                    <Badge variant="secondary">Pending</Badge>
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <Button variant="ghost" size="icon" onClick={() => onCancel(invite.id)} disabled={isPending}>
-                                        <X className="h-4 w-4" />
+                <div className="divide-y divide-white/5">
+                    {/* Active Members */}
+                    {members.map((member) => (
+                        <div key={member.id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-white/5 transition-colors">
+                            <div className="col-span-5 md:col-span-4">
+                                <div className="font-medium text-white">{member.full_name}</div>
+                                <div className="text-xs text-slate-500 truncate">{member.id}</div>
+                            </div>
+                            <div className="col-span-3">
+                                <Badge variant="outline" className="border-white/10 text-slate-300">
+                                    {member.role}
+                                </Badge>
+                            </div>
+                            <div className="col-span-2">
+                                <Badge className="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20">
+                                    Active
+                                </Badge>
+                            </div>
+                            <div className="col-span-2 text-right">
+                                {member.role !== 'ADMIN' && (
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => onRemove(member.id)}
+                                        disabled={isPending}
+                                        className="text-slate-400 hover:text-red-400 hover:bg-red-500/10"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
                                     </Button>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+
+                    {/* Pending Invitations */}
+                    {invitations.map((invite) => (
+                        <div key={invite.id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-white/5 transition-colors bg-white/[0.02]">
+                            <div className="col-span-5 md:col-span-4">
+                                <div className="font-medium text-slate-300">{invite.email}</div>
+                                <div className="text-xs text-slate-500">Expires: {new Date(invite.expires_at).toLocaleDateString()}</div>
+                            </div>
+                            <div className="col-span-3">
+                                <Badge variant="outline" className="border-dashed border-white/20 text-slate-400">
+                                    {invite.role}
+                                </Badge>
+                            </div>
+                            <div className="col-span-2">
+                                <Badge variant="secondary" className="bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                    Pending
+                                </Badge>
+                            </div>
+                            <div className="col-span-2 text-right">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => onCancel(invite.id)}
+                                    disabled={isPending}
+                                    className="text-slate-400 hover:text-white hover:bg-white/10"
+                                >
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+                    ))}
+
+                    {members.length === 0 && invitations.length === 0 && (
+                        <div className="p-8 text-center text-slate-500">
+                            No team members found.
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     )
