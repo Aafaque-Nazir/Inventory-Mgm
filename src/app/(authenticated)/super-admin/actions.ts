@@ -269,3 +269,48 @@ export async function deleteAnnouncement(id: string) {
     revalidatePath('/')
     return { message: 'Announcement deleted' }
 }
+
+export async function deleteOrganization(orgId: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: 'Unauthorized' }
+
+    const { data: profile } = await supabase.from('profiles').select('is_super_admin').eq('id', user.id).single()
+    if (!profile?.is_super_admin) return { error: 'Forbidden' }
+
+    // Manual Cascade Delete
+    // 1. Stock Movements
+    const { error: smError } = await supabase.from('stock_movements').delete().eq('organization_id', orgId)
+    if (smError) return { error: `Failed to delete stock movements: ${smError.message}` }
+
+    // 2. PO Items
+    const { error: poiError } = await supabase.from('purchase_order_items').delete().eq('organization_id', orgId)
+    if (poiError) return { error: `Failed to delete PO items: ${poiError.message}` }
+
+    // 3. Purchase Orders
+    const { error: poError } = await supabase.from('purchase_orders').delete().eq('organization_id', orgId)
+    if (poError) return { error: `Failed to delete purchase orders: ${poError.message}` }
+
+    // 4. Items
+    const { error: itemsError } = await supabase.from('items').delete().eq('organization_id', orgId)
+    if (itemsError) return { error: `Failed to delete items: ${itemsError.message}` }
+
+    // 5. Suppliers
+    const { error: suppError } = await supabase.from('suppliers').delete().eq('organization_id', orgId)
+    if (suppError) return { error: `Failed to delete suppliers: ${suppError.message}` }
+
+    // 6. Profiles (Detach users or Delete them? Ideally detach, but if we delete org, users with that org_id become orphans unless updated. 
+    // For now, let's set their organization_id to NULL to avoid FK constraint if any, though profiles.organization_id is nullable in schema?)
+    // Checking schema: organization_id uuid references organizations(id) - it IS nullable by default if not specified NOT NULL.
+    // Let's check schema.sql line 19: organization_id uuid references organizations(id) -> Default is nullable.
+    
+    // We update profiles to remove org reference
+    await supabase.from('profiles').update({ organization_id: null }).eq('organization_id', orgId)
+
+    // 7. Organization
+    const { error: orgError } = await supabase.from('organizations').delete().eq('id', orgId)
+    if (orgError) return { error: `Failed to delete organization: ${orgError.message}` }
+
+    revalidatePath('/super-admin')
+    return { message: 'Organization deleted successfully' }
+}
