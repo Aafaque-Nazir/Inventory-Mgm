@@ -123,7 +123,7 @@ export function OrgManager() {
 
             <div className="rounded-3xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-2xl">
                 {/* Header Row */}
-                <div className="grid grid-cols-12 gap-4 p-5 border-b border-white/5 bg-white/5 text-[10px] uppercase font-black tracking-widest text-slate-500">
+                <div className="hidden md:grid grid-cols-12 gap-4 p-5 border-b border-white/5 bg-white/5 text-[10px] uppercase font-black tracking-widest text-slate-500">
                     <div className="col-span-4 pl-4">Company / Entity</div>
                     <div className="col-span-2">Plan Type</div>
                     <div className="col-span-2">Current Status</div>
@@ -146,12 +146,29 @@ export function OrgManager() {
                         </div>
                     ) : (
                         orgs.map((org) => (
-                            <div key={org.id} className="grid grid-cols-12 gap-4 p-5 items-center hover:bg-white/[0.03] transition-colors group">
-                                <div className="col-span-4 pl-4">
-                                    <div className="font-bold text-white group-hover:text-indigo-400 transition-colors">{org.name}</div>
-                                    <div className="text-xs text-slate-500 font-mono tracking-tighter">org_slug: {org.slug}</div>
+                            <div key={org.id} className="flex flex-col gap-4 p-5 md:grid md:grid-cols-12 md:items-center md:gap-4 hover:bg-white/[0.03] transition-colors group">
+                                {/* Name Section */}
+                                <div className="md:col-span-4 md:pl-4 flex items-center justify-between md:block">
+                                    <div>
+                                        <div className="font-bold text-white group-hover:text-indigo-400 transition-colors">{org.name}</div>
+                                        <div className="text-xs text-slate-500 font-mono tracking-tighter">org_slug: {org.slug}</div>
+                                    </div>
+                                    {/* Mobile Edit Button (Visible only on mobile for quick access) */}
+                                    <div className="md:hidden">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => handleEdit(org)}
+                                            className="h-8 w-8 p-0 rounded-lg bg-white/5 text-slate-400"
+                                        >
+                                            <Edit2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
                                 </div>
-                                <div className="col-span-2">
+
+                                {/* Plan Section */}
+                                <div className="md:col-span-2 flex items-center justify-between md:block">
+                                    <span className="text-[10px] font-bold uppercase text-slate-500 md:hidden">Plan</span>
                                     <div className={`w-fit px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter shadow-md ${org.plan_type === 'PRO' ? 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-500 border border-amber-500/20 shadow-amber-500/5' :
                                         org.plan_type === 'ENTERPRISE' ? 'bg-gradient-to-r from-purple-500/20 to-indigo-500/20 text-purple-400 border border-purple-500/20 shadow-indigo-500/5' :
                                             'bg-white/5 text-slate-400 border border-white/10'
@@ -159,7 +176,10 @@ export function OrgManager() {
                                         {org.plan_type}
                                     </div>
                                 </div>
-                                <div className="col-span-2">
+
+                                {/* Status Section */}
+                                <div className="md:col-span-2 flex items-center justify-between md:block">
+                                    <span className="text-[10px] font-bold uppercase text-slate-500 md:hidden">Status</span>
                                     <div className={`w-fit px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1.5 ${org.status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
                                         org.status === 'SUSPENDED' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
                                             'bg-rose-500/10 text-rose-400 border border-rose-500/20'
@@ -170,10 +190,17 @@ export function OrgManager() {
                                         {org.status || 'ACTIVE'}
                                     </div>
                                 </div>
-                                <div className="col-span-2 text-sm text-slate-400 font-medium">
-                                    {new Date(org.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+
+                                {/* Date Section */}
+                                <div className="md:col-span-2 md:text-sm text-slate-400 font-medium flex items-center justify-between md:block">
+                                    <span className="text-[10px] font-bold uppercase text-slate-500 md:hidden">Joined</span>
+                                    <span className="text-sm">
+                                        {new Date(org.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                    </span>
                                 </div>
-                                <div className="col-span-2 text-right pr-4">
+
+                                {/* Options Section (Desktop) */}
+                                <div className="hidden md:block col-span-2 text-right pr-4">
                                     <Button
                                         variant="ghost"
                                         size="sm"
