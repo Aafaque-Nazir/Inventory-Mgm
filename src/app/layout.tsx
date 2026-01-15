@@ -51,6 +51,11 @@ export const metadata: Metadata = {
     description: "Stop guessing, start tracking. Switch to InvMaster today.",
     images: ["https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&h=630&auto=format&fit=crop"],
   },
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
