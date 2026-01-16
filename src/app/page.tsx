@@ -45,14 +45,14 @@ export default function Home() {
       {/* Navbar */}
       <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-slate-950/50 backdrop-blur-md">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-          <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20">
               <Box className="h-6 w-6 text-white" />
             </div>
             <span className="text-xl font-bold tracking-tight">
               Inv<span className="text-primary">Master</span>
             </span>
-          </div>
+          </Link>
           <div className="hidden md:flex items-center gap-8">
             <Link href="#features" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Features</Link>
             <Link href="#pricing" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Pricing</Link>
@@ -69,7 +69,7 @@ export default function Home() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden pt-16">
+        <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden pt-20 pb-10">
           <div className="absolute inset-0 z-0">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] bg-primary/20 rounded-full blur-[120px]" />
             <div className="absolute top-1/4 left-1/4 h-[300px] w-[300px] bg-blue-500/10 rounded-full blur-[100px]" />
@@ -80,9 +80,9 @@ export default function Home() {
             initial="initial"
             animate="animate"
             variants={stagger}
-            className="container mx-auto relative z-10 px-4 text-center md:px-6"
+            className="container mx-auto relative z-10 px-4 text-center md:px-6 flex flex-col items-center"
           >
-            <motion.div variants={fadeIn} className="mx-auto mb-6 flex max-w-fit items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 backdrop-blur-sm">
+            <motion.div variants={fadeIn} className="mb-4 flex max-w-fit items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 backdrop-blur-sm z-20">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75"></span>
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
@@ -92,7 +92,7 @@ export default function Home() {
 
             <motion.h1
               variants={fadeIn}
-              className="mx-auto max-w-4xl text-5xl font-bold tracking-tight sm:text-7xl md:text-8xl"
+              className="mx-auto max-w-4xl text-4xl font-bold tracking-tight sm:text-6xl md:text-7xl leading-tight"
             >
               Inventory Management <br />
               <span className="text-white">
@@ -102,22 +102,22 @@ export default function Home() {
 
             <motion.p
               variants={fadeIn}
-              className="mx-auto mt-8 max-w-2xl text-lg text-slate-400 md:text-xl"
+              className="mx-auto mt-6 max-w-2xl text-base text-slate-400 md:text-lg"
             >
               Collaborate with your storekeepers, get automated low-stock alerts, and track every movement. Visual, Fast, and Secure.
             </motion.p>
 
             <motion.div
               variants={fadeIn}
-              className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row"
+              className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row"
             >
               <Link href="/signup">
-                <Button size="lg" className="h-14 rounded-full px-10 text-lg shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95">
-                  Start for Free <ChevronRight className="ml-2 h-5 w-5" />
+                <Button size="lg" className="h-12 rounded-full px-8 text-base shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95">
+                  Start for Free <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
               <Link href="#features">
-                <Button size="lg" variant="outline" className="h-14 rounded-full border-white/10 bg-white/5 px-10 text-lg backdrop-blur-sm transition-all hover:bg-white/10">
+                <Button variant="outline" className="h-12 rounded-full border-white/10 bg-white/5 px-8 text-base backdrop-blur-sm transition-all hover:bg-white/10">
                   Explore Features
                 </Button>
               </Link>
@@ -126,7 +126,7 @@ export default function Home() {
             {/* Dashboard Preview */}
             <motion.div
               variants={fadeIn}
-              className="mt-20 relative mx-auto max-w-5xl rounded-xl border border-white/10 bg-slate-900/50 shadow-2xl backdrop-blur-sm p-2"
+              className="mt-12 relative mx-auto max-w-5xl rounded-xl border border-white/10 bg-slate-900/50 shadow-2xl backdrop-blur-sm p-2 w-full"
             >
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-10" />
               <Image
