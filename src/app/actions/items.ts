@@ -105,6 +105,8 @@ export async function createItem(prevState: any, formData: FormData) {
         if (insertError) throw insertError
 
         // 4. Initial Stock Movement & Item Stock Entry
+        const postCreationPromises: Promise<any>[] = []
+
         if (initial_stock && initial_stock > 0) {
 
             // Determine Location for Initial Stock
@@ -122,44 +124,53 @@ export async function createItem(prevState: any, formData: FormData) {
 
             if (location_id) {
                 // A. Insert into item_stock
-                await supabase.from('item_stock').insert({
-                    item_id: newItem.id,
-                    location_id: location_id,
-                    quantity: initial_stock,
-                })
+                postCreationPromises.push(
+                    supabase.from('item_stock').insert({
+                        item_id: newItem.id,
+                        location_id: location_id,
+                        quantity: initial_stock,
+                    })
+                )
 
                 // B. Insert Movement
-                await supabase.from('stock_movements').insert({
-                    organization_id: orgId,
-                    item_id: newItem.id,
-                    quantity: initial_stock,
-                    type: 'IN',
-                    reason: 'Initial stock',
-                    location_id: location_id,
-                    unit_price: itemData.cost_price,
-                    created_by: user.id
-                })
+                postCreationPromises.push(
+                    supabase.from('stock_movements').insert({
+                        organization_id: orgId,
+                        item_id: newItem.id,
+                        quantity: initial_stock,
+                        type: 'IN',
+                        reason: 'Initial stock',
+                        location_id: location_id,
+                        unit_price: itemData.cost_price,
+                        created_by: user.id
+                    })
+                )
             } else {
-                // Fallback if no location found (shouldn't happen with default logic): 
-                // Just creates global logs or maybe fails silently on location specific logic
-                // But we want to be safe.
-                await supabase.from('stock_movements').insert({
-                    organization_id: orgId,
-                    item_id: newItem.id,
-                    quantity: initial_stock,
-                    type: 'IN',
-                    reason: 'Initial stock (No Location)',
-                    unit_price: itemData.cost_price,
-                    created_by: user.id
-                })
+                // Fallback if no location found
+                postCreationPromises.push(
+                    supabase.from('stock_movements').insert({
+                        organization_id: orgId,
+                        item_id: newItem.id,
+                        quantity: initial_stock,
+                        type: 'IN',
+                        reason: 'Initial stock (No Location)',
+                        unit_price: itemData.cost_price,
+                        created_by: user.id
+                    })
+                )
             }
         }
 
+        // Audit Log (Add to parallel execution)
+        postCreationPromises.push(
+            logAction('ITEM_CREATE', 'ITEM', newItem.id, { name: newItem.name, sku: newItem.sku })
+        )
+
+        // Execute all independent side-effects in parallel
+        await Promise.all(postCreationPromises)
+
         revalidatePath('/dashboard')
         revalidatePath('/items')
-
-        // Audit Log
-        await logAction('ITEM_CREATE', 'ITEM', newItem.id, { name: newItem.name, sku: newItem.sku })
 
         return { message: 'Item created successfully' }
 
