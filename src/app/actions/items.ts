@@ -105,7 +105,7 @@ export async function createItem(prevState: any, formData: FormData) {
         if (insertError) throw insertError
 
         // 4. Initial Stock Movement & Item Stock Entry
-        const postCreationPromises: Promise<any>[] = []
+        const postCreationPromises: any[] = []
 
         if (initial_stock && initial_stock > 0) {
 
