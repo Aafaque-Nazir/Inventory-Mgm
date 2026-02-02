@@ -2,15 +2,19 @@ import { LoginForm } from '@/components/auth/LoginForm'
 import { Command } from 'lucide-react'
 import Link from 'next/link'
 
+import Image from 'next/image'
+
 export default function LoginPage() {
     return (
         <div className="container relative h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
             <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
                 <div className="absolute inset-0 bg-zinc-900">
-                    <img
+                    <Image
                         src="https://images.unsplash.com/photo-1639322537228-f710d846310a?q=80&w=2232&auto=format&fit=crop"
                         alt="Login Background"
-                        className="h-full w-full object-cover opacity-40 mix-blend-overlay"
+                        fill
+                        className="object-cover opacity-40 mix-blend-overlay"
+                        priority
                     />
                     <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/90 via-purple-900/90 to-black/90 mix-blend-multiply" />
                 </div>

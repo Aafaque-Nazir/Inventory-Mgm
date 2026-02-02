@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 import { LayoutDashboard, Loader2 } from "lucide-react"
 import { toast } from "sonner"
+import Image from "next/image"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -83,10 +84,12 @@ export default function SignupPage() {
         <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
             <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
                 <div className="absolute inset-0 bg-zinc-900">
-                    <img
+                    <Image
                         src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2670&auto=format&fit=crop"
                         alt="Signup Background"
-                        className="h-full w-full object-cover opacity-30 mix-blend-color-dodge"
+                        fill
+                        className="object-cover opacity-30 mix-blend-color-dodge"
+                        priority
                     />
                     <div className="absolute inset-0 bg-gradient-to-tr from-indigo-950/90 via-slate-950/90 to-black/90" />
                 </div>

@@ -418,7 +418,7 @@ export default function Home() {
                 <div>
                   <h3 className="text-xl font-semibold text-white">Pro</h3>
                   <div className="mt-2 flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-white">₹9</span>
+                    <span className="text-4xl font-bold text-white">₹399</span>
                     <span className="text-sm text-slate-500">/month</span>
                   </div>
                   <p className="mt-4 text-sm text-slate-400">For growing teams and serious businesses.</p>

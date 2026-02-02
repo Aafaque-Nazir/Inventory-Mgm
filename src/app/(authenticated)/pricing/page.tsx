@@ -222,7 +222,7 @@ export default function PricingPage() {
                             )}
                         </div>
                         <div className="mt-6 flex items-baseline">
-                            <span className="text-5xl font-bold text-white">₹9</span>
+                            <span className="text-5xl font-bold text-white">₹399</span>
                             <span className="ml-1 text-sm font-medium text-indigo-200/60">/mo</span>
                         </div>
                     </div>

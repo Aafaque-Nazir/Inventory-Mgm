@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
         const orderId = 'order_' + Date.now() + '_' + user.id.slice(0, 5)
 
         const request = {
-            order_amount: 9,
+            order_amount: 399,
             order_currency: 'INR',
             order_id: orderId,
             customer_details: {
