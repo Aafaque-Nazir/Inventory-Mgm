@@ -96,7 +96,7 @@ export async function getAdminOverviewStats() {
             supabase.from('organizations').select('created_at, plan_type').order('created_at', { ascending: true })
         ])
 
-        const mrr = (proOrgs || 0) * 499 + (entOrgs || 0) * 9999
+        const mrr = (proOrgs || 0) * 9 + (entOrgs || 0) * 9999
 
         // Calculate simulated history based on creation dates
         // 1. Group by Month
@@ -132,7 +132,7 @@ export async function getAdminOverviewStats() {
             const activeOrgs = (allOrgs || []).filter(o => new Date(o.created_at) < monthEnd)
 
             const rev = activeOrgs.reduce((sum, org) => {
-                if (org.plan_type === 'PRO') return sum + 499
+                if (org.plan_type === 'PRO') return sum + 9
                 if (org.plan_type === 'ENTERPRISE') return sum + 9999
                 return sum
             }, 0)
