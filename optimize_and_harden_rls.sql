@@ -93,13 +93,14 @@ DROP POLICY IF EXISTS "Super Admins organizations access" ON organizations;
 DROP POLICY IF EXISTS "Super Admins can do everything on organizations" ON organizations;
 DROP POLICY IF EXISTS "Users can create organizations" ON organizations;
 DROP POLICY IF EXISTS "Users can view their own organization" ON organizations;
+DROP POLICY IF EXISTS "Create Organization" ON organizations;
 
 CREATE POLICY "View Own Organization" ON organizations FOR SELECT
 USING (id = (select public.get_my_org_id()) OR (select public.is_super_admin()));
 
 -- Allow creating if not in org? Usually regulated. Assuming standard flow:
 CREATE POLICY "Create Organization" ON organizations FOR INSERT
-WITH CHECK (true); -- Usually restricted by app logic or further constraints, keeping basic for now.
+WITH CHECK (auth.role() = 'authenticated'); -- Restrict to logged-in users
 
 CREATE POLICY "Update Own Organization" ON organizations FOR UPDATE
 USING (id = (select public.get_my_org_id()) AND (select public.auth_user_role()) = 'ADMIN');
