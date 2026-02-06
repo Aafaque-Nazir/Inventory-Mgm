@@ -1,206 +1,67 @@
-'use client'
+import { SignupForm } from '@/components/auth/SignupForm'
+import { LayoutDashboard, Rocket } from 'lucide-react'
+import Link from 'next/link'
+import { Metadata } from 'next'
 
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useState, useTransition } from "react"
-import { LayoutDashboard, Loader2 } from "lucide-react"
-import { toast } from "sonner"
-import Image from "next/image"
-
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { createClient } from "@/lib/supabase/client"
-import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton'
+export const metadata: Metadata = {
+  title: 'Sign Up - InvMaster',
+  description: 'Create your account',
+}
 
 export default function SignupPage() {
-    const router = useRouter()
-    const [isPending, startTransition] = useTransition()
-    const [isSuccess, setIsSuccess] = useState(false)
-
-    async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-        event.preventDefault()
-        const formData = new FormData(event.currentTarget)
-        const email = formData.get("email") as string
-        const password = formData.get("password") as string
-        const fullName = formData.get("fullName") as string
-
-        startTransition(async () => {
-            const supabase = createClient()
-
-            const { data, error } = await supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: {
-                        full_name: fullName,
-                        role: 'STOREKEEPER' // Default role, org setup happens in onboarding
-                    },
-                    emailRedirectTo: `${location.origin}/auth/callback`
-                }
-            })
-
-            if (error) {
-                toast.error(error.message)
-                return
-            }
-
-            // If email confirmation is enabled in Supabase, data.user will be present but session might be null
-            // If email confirmation is enabled in Supabase, data.user will be present but session might be null
-            if (data.user && !data.session) {
-                setIsSuccess(true)
-                toast.success("Signup successful! Please verify your email to continue.")
-            } else if (data.session) {
-                // If email confirmation is disabled or auto-confirmed
-                toast.success("Account created successfully!")
-                router.push("/onboarding")
-            } else if (!data.user && !data.session) {
-                // Edge case
-                toast.error("Something went wrong. Please try again.")
-            }
-        })
-    }
-
-    if (isSuccess) {
-        return (
-            <div className="container flex h-screen w-screen flex-col items-center justify-center">
-                <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-                    <div className="flex flex-col space-y-2 text-center">
-                        <LayoutDashboard className="mx-auto h-10 w-10 text-primary" />
-                        <h1 className="text-2xl font-semibold tracking-tight">Check your email</h1>
-                        <p className="text-sm text-muted-foreground">
-                            We&apos;ve sent you a verification link. Please click the link to verify your account and continue.
-                        </p>
-                    </div>
-                    <Button variant="outline" className="w-full" onClick={() => router.push('/login')}>
-                        Back to Login
-                    </Button>
-                </div>
-            </div>
-        )
-    }
-
     return (
-        <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-            <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
-                <div className="absolute inset-0 bg-zinc-900">
-                    <Image
-                        src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2670&auto=format&fit=crop"
-                        alt="Signup Background"
-                        fill
-                        className="object-cover opacity-30 mix-blend-color-dodge"
-                        priority
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-tr from-indigo-950/90 via-slate-950/90 to-black/90" />
+        <div className="container relative h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0 overflow-hidden bg-black">
+             {/* Left Column: Visuals */}
+            <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex items-center justify-center overflow-hidden">
+                {/* Backgrounds */}
+                <div className="absolute inset-0 bg-zinc-900" />
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+                
+                 {/* Animated Blobs - CYAN/BLUE mix */}
+                <div className="absolute top-[-20%] right-[-20%] w-[80%] h-[80%] bg-cyan-600/20 rounded-full blur-[150px] animate-pulse duration-10000" />
+                <div className="absolute bottom-[-20%] left-[-20%] w-[80%] h-[80%] bg-blue-600/20 rounded-full blur-[150px] animate-pulse duration-7000 delay-1000" />
+
+                <div className="relative z-20 flex items-center text-2xl font-bold tracking-tight absolute top-10 left-10">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-600 shadow-lg shadow-cyan-500/30 mr-3">
+                        <LayoutDashboard className="h-6 w-6 text-white" />
+                    </div>
+                    InvMaster
                 </div>
-                <div className="relative z-20 flex items-center text-2xl font-bold tracking-tight">
-                    <LayoutDashboard className="mr-2 h-8 w-8 text-indigo-400" />
-                    Inventory Management
-                </div>
-                <div className="relative z-20 mt-auto">
-                    <blockquote className="space-y-2 border-l-2 border-indigo-500 pl-6">
-                        <p className="text-xl font-medium leading-relaxed italic text-indigo-100">
-                            &ldquo;Join thousands of businesses streamlining their operations with our advanced inventory solutions.&rdquo;
+
+                <div className="relative z-20 mt-auto max-w-lg text-center pb-20">
+                     <div className="inline-flex items-center justify-center mb-6 rounded-full bg-white/10 px-4 py-1.5 backdrop-blur-md border border-white/10">
+                        <Rocket className="mr-2 h-4 w-4 text-cyan-300" />
+                        <span className="text-sm font-medium text-slate-200">Start your growth journey</span>
+                     </div>
+                    <blockquote className="space-y-4">
+                        <p className="text-3xl font-bold leading-tight text-white drop-shadow-md">
+                            &quot;InvMaster isn't just a tool; it's the backbone of our operations. We scaled from 1 store to 15 without skipping a beat.&quot;
                         </p>
+                        <footer className="text-lg text-cyan-200 font-medium pt-4">
+                            Marcus Chen <br/> 
+                            <span className="text-sm text-slate-400 font-normal">CEO, RetailFlow</span>
+                        </footer>
                     </blockquote>
                 </div>
             </div>
-            <div className="p-4 lg:p-8 flex items-center justify-center min-h-screen lg:min-h-0">
-                <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+
+             {/* Right Column: Form */}
+            <div className="lg:p-8 relative w-full h-full flex items-center justify-center bg-black">
+                 {/* Background Glow for Form */}
+                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-cyan-500/10 blur-[100px] rounded-full pointer-events-none" />
+
+                <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[450px] relative z-10 p-8 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl">
                     <div className="flex flex-col space-y-2 text-center">
-                        <h1 className="text-2xl font-semibold tracking-tight">
+                        <h1 className="text-3xl font-bold tracking-tight text-white">
                             Create an account
                         </h1>
-                        <p className="text-sm text-muted-foreground">
-                            Enter your details below to create your account
+                        <p className="text-sm text-slate-400">
+                            Enter your details to get started with InvMaster
                         </p>
                     </div>
-
-                    <div className="grid gap-6">
-                        <GoogleSignInButton />
-
-                        <div className="relative">
-                            <div className="absolute inset-0 flex items-center">
-                                <span className="w-full border-t" />
-                            </div>
-                            <div className="relative flex justify-center text-xs uppercase">
-                                <span className="bg-background px-2 text-muted-foreground">
-                                    Or continue with
-                                </span>
-                            </div>
-                        </div>
-
-                        <form onSubmit={onSubmit}>
-                            <div className="grid gap-4">
-                                <div className="grid gap-2">
-                                    <Label htmlFor="fullName">Full Name</Label>
-                                    <Input
-                                        id="fullName"
-                                        name="fullName"
-                                        placeholder="John Doe"
-                                        type="text"
-                                        autoCapitalize="none"
-                                        autoCorrect="off"
-                                        disabled={isPending}
-                                        required
-                                        className="h-11 bg-background"
-                                    />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="email">Email</Label>
-                                    <Input
-                                        id="email"
-                                        name="email"
-                                        placeholder="name@example.com"
-                                        type="email"
-                                        autoCapitalize="none"
-                                        autoComplete="email"
-                                        autoCorrect="off"
-                                        disabled={isPending}
-                                        required
-                                        className="h-11 bg-background"
-                                    />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="password">Password</Label>
-                                    <Input
-                                        id="password"
-                                        name="password"
-                                        type="password"
-                                        placeholder="••••••••"
-                                        disabled={isPending}
-                                        required
-                                        minLength={8}
-                                        className="h-11 bg-background"
-                                    />
-                                </div>
-                                <Button disabled={isPending} className="h-11 font-medium bg-primary hover:bg-primary/90">
-                                    {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    Sign Up with Email
-                                </Button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <p className="px-8 text-center text-xs text-muted-foreground">
-                        By clicking continue, you agree to our{' '}
-                        <Link href="/terms" className="underline underline-offset-4 hover:text-primary transition-colors">
-                            Terms of Service
-                        </Link>{' '}
-                        and{' '}
-                        <Link href="/privacy" className="underline underline-offset-4 hover:text-primary transition-colors">
-                            Privacy Policy
-                        </Link>
-                        .
-                    </p>
-
-                    <div className="text-center text-sm">
-                        Already have an account?{" "}
-                        <Link href="/login" className="underline">
-                            Login
-                        </Link>
-                    </div>
-
+                    
+                    <SignupForm />
+                    
                 </div>
             </div>
         </div>

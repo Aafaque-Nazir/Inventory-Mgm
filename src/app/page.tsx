@@ -20,543 +20,450 @@ import {
   ArrowRightLeft,
   QrCode,
   X,
-  Crown
+  Crown,
+  Play
 } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { motion, useScroll, useTransform, Variants } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { useRef } from 'react'
 
-const fadeIn = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6 }
+const fadeIn: Variants = {
+  initial: { opacity: 0, y: 30 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
 }
 
-const stagger = {
+const stagger: Variants = {
   animate: {
     transition: {
-      staggerChildren: 0.1
+      staggerChildren: 0.15
     }
   }
 }
 
 export default function Home() {
+  const containerRef = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"]
+  })
+
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"])
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
+
   return (
-    <div className="flex min-h-screen flex-col bg-slate-950 text-slate-50 selection:bg-primary selection:text-primary-foreground">
+    <div className="flex min-h-screen flex-col bg-black text-white selection:bg-blue-500/30 selection:text-blue-200 overflow-x-hidden">
+      
+      {/* Dynamic Background - BLUE & BLACK Theme */}
+      <div className="fixed inset-0 z-0">
+         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-900/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
+         <div className="absolute top-[20%] right-[-5%] w-[30%] h-[50%] bg-sky-900/20 rounded-full blur-[100px] animate-pulse" style={{ animationDuration: '12s', animationDelay: '2s' }} />
+         <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[40%] bg-blue-800/10 rounded-full blur-[150px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '4s' }} />
+         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 mix-blend-overlay"></div>
+      </div>
+
       {/* Navbar */}
-      <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-slate-950/50 backdrop-blur-md">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20">
+      <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-black/50 backdrop-blur-xl supports-[backdrop-filter]:bg-black/20">
+        <div className="container mx-auto flex h-20 items-center justify-between px-6 md:px-12">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-sky-600 shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/40 transition-all duration-300">
               <Box className="h-6 w-6 text-white" />
+              <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/20"></div>
             </div>
-            <span className="text-xl font-bold tracking-tight">
-              Inv<span className="text-primary">Master</span>
+            <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
+              InvMaster
             </span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
-            <Link href="#features" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Features</Link>
-            <Link href="#pricing" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Pricing</Link>
-            <Link href="#how-it-works" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">How it Works</Link>
+            <Link href="#features" className="text-sm font-medium text-slate-300 hover:text-white transition-colors relative hover:after:w-full after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[2px] after:bg-blue-500 after:transition-all after:duration-300">Features</Link>
+            <Link href="#pricing" className="text-sm font-medium text-slate-300 hover:text-white transition-colors relative hover:after:w-full after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[2px] after:bg-blue-500 after:transition-all after:duration-300">Pricing</Link>
+            <Link href="#how-it-works" className="text-sm font-medium text-slate-300 hover:text-white transition-colors relative hover:after:w-full after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[2px] after:bg-blue-500 after:transition-all after:duration-300">How it Works</Link>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Sign In</Link>
+            <Link href="/login" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Sign In</Link>
             <Link href="/signup">
-              <Button size="sm" className="rounded-full px-6">Get Started</Button>
+              <Button size="sm" className="rounded-full px-6 bg-white text-black hover:bg-slate-200 font-semibold shadow-[0_0_20px_-5px_rgba(255,255,255,0.3)] transition-all hover:scale-105 active:scale-95">
+                Get Started
+              </Button>
             </Link>
           </div>
         </div>
       </nav>
 
-      <main className="flex-1">
+      <main className="flex-1 relative z-10" ref={containerRef}>
         {/* Hero Section */}
-        <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden pt-20 pb-10">
-          <div className="absolute inset-0 z-0">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] bg-primary/20 rounded-full blur-[120px]" />
-            <div className="absolute top-1/4 left-1/4 h-[300px] w-[300px] bg-blue-500/10 rounded-full blur-[100px]" />
-            <div className="absolute bottom-1/4 right-1/4 h-[400px] w-[400px] bg-purple-500/10 rounded-full blur-[110px]" />
-          </div>
-
-          <motion.div
-            initial="initial"
-            animate="animate"
-            variants={stagger}
-            className="container mx-auto relative z-10 px-4 text-center md:px-6 flex flex-col items-center"
-          >
-            <motion.div variants={fadeIn} className="mb-4 flex max-w-fit items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 backdrop-blur-sm z-20">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75"></span>
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
-              </span>
-              <span className="text-xs font-medium text-slate-300">Free Tier Available Now</span>
-            </motion.div>
-
-            <motion.h1
-              variants={fadeIn}
-              className="mx-auto max-w-4xl text-4xl font-bold tracking-tight sm:text-6xl md:text-7xl leading-tight"
-            >
-              Inventory Management <br />
-              <span className="text-white">
-                For Modern Teams
-              </span>
-            </motion.h1>
-
-            <motion.p
-              variants={fadeIn}
-              className="mx-auto mt-6 max-w-2xl text-base text-slate-400 md:text-lg"
-            >
-              Collaborate with your storekeepers, get automated low-stock alerts, and track every movement. Visual, Fast, and Secure.
-            </motion.p>
+        <section className="relative flex min-h-screen flex-col items-center justify-center pt-32 pb-20 px-6 overflow-hidden">
+             
+             <motion.div 
+               style={{ y, opacity }}
+               className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-tr from-blue-500/10 via-sky-500/10 to-transparent rounded-full blur-[100px] pointer-events-none" 
+             />
 
             <motion.div
-              variants={fadeIn}
-              className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row"
+                initial="initial"
+                animate="animate"
+                variants={stagger}
+                className="container mx-auto relative z-10 flex flex-col items-center text-center max-w-5xl"
             >
-              <Link href="/signup">
-                <Button size="lg" className="h-12 rounded-full px-8 text-base shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95">
-                  Start for Free <ChevronRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-              <Link href="#features">
-                <Button variant="outline" className="h-12 rounded-full border-white/10 bg-white/5 px-8 text-base backdrop-blur-sm transition-all hover:bg-white/10">
-                  Explore Features
-                </Button>
-              </Link>
-            </motion.div>
+                <motion.div variants={fadeIn} className="mb-8 inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-1.5 backdrop-blur-md shadow-[0_0_15px_-3px_rgba(59,130,246,0.2)]">
+                    <span className="relative flex h-2 w-2">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75"></span>
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-400"></span>
+                    </span>
+                    <span className="text-xs font-semibold text-blue-200 tracking-wide uppercase">New: AI Stock Predictions</span>
+                </motion.div>
 
-            {/* Dashboard Preview */}
-            <motion.div
-              variants={fadeIn}
-              className="mt-12 relative mx-auto max-w-5xl rounded-xl border border-white/10 bg-slate-900/50 shadow-2xl backdrop-blur-sm p-2 w-full"
-            >
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-10" />
-              <Image
-                src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2670&auto=format&fit=crop"
-                alt="Dashboard Preview"
-                className="rounded-lg opacity-80"
-                width={1200}
-                height={600}
-                style={{ width: '100%', height: 'auto' }}
-                priority
-              />
+                <motion.h1
+                    variants={fadeIn}
+                    className="text-5xl font-extrabold tracking-tight sm:text-7xl md:text-8xl leading-[1.1] mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white via-white/90 to-white/50"
+                >
+                    Inventory control <br/>
+                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-sky-400 to-blue-400 animate-gradient-x">reimagined.</span>
+                </motion.h1>
+
+                <motion.p
+                    variants={fadeIn}
+                    className="max-w-2xl text-lg text-slate-400 md:text-xl leading-relaxed mb-10"
+                >
+                    Stop wrestling with spreadsheets. InvMaster gives you real-time visibility, automated alerts, and AI-driven insights. It's not just software; it's your <span className="text-blue-400 font-medium">growth engine</span>.
+                </motion.p>
+
+                <motion.div
+                    variants={fadeIn}
+                    className="flex flex-col sm:flex-row gap-4 items-center justify-center"
+                >
+                    <Link href="/signup">
+                        <Button size="lg" className="h-14 rounded-full px-8 text-base bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-[0_10px_40px_-10px_rgba(37,99,235,0.5)] transition-all hover:scale-105 active:scale-95 group">
+                            Start Tracking Free 
+                            <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                        </Button>
+                    </Link>
+                    <div className="flex items-center gap-4 text-sm text-slate-500">
+                        <div className="flex -space-x-2">
+                            {[1,2,3,4].map(i => (
+                                <div key={i} className="h-8 w-8 rounded-full border-2 border-black bg-slate-800 flex items-center justify-center text-[10px] text-white font-bold overflow-hidden">
+                                     <Image src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i}`} alt="User" width={32} height={32} />
+                                </div>
+                            ))}
+                        </div>
+                        <p>Trusted by <span className="text-white font-bold">500+</span> teams</p>
+                    </div>
+                </motion.div>
+
+                {/* Dashboard Mockup */}
+                <motion.div
+                    variants={fadeIn}
+                    className="mt-20 relative w-full perspective-1000"
+                >
+                    <div className="relative rounded-xl border border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl overflow-hidden group transform transition-all duration-700 hover:rotate-x-2 hover:scale-[1.02]">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10 opacity-60"></div>
+                        <div className="absolute inset-0 bg-blue-500/5 mix-blend-overlay group-hover:bg-blue-500/10 transition-colors duration-500"></div>
+                        
+                         {/* Mockup Header */}
+                         <div className="h-8 border-b border-white/5 bg-white/5 flex items-center px-4 gap-2">
+                             <div className="flex gap-1.5">
+                                 <div className="h-2.5 w-2.5 rounded-full bg-red-500/20 border border-red-500/50"></div>
+                                 <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/20 border border-yellow-500/50"></div>
+                                 <div className="h-2.5 w-2.5 rounded-full bg-green-500/20 border border-green-500/50"></div>
+                             </div>
+                             <div className="mx-auto h-4 w-40 rounded-full bg-white/5"></div>
+                         </div>
+
+                        <Image
+                            src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2670&auto=format&fit=crop"
+                            alt="Dashboard Preview"
+                            className="w-full h-auto object-cover opacity-90"
+                            width={1400}
+                            height={800}
+                            priority
+                        />
+                        
+                        {/* Floating elements */}
+                         <motion.div 
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 1, duration: 0.8 }}
+                            className="absolute -right-6 bottom-20 z-20 hidden md:flex items-center gap-3 p-4 rounded-xl border border-white/10 bg-slate-900/90 backdrop-blur-md shadow-xl"
+                        >
+                             <div className="h-10 w-10 rounded-full bg-green-500/20 flex items-center justify-center">
+                                 <CheckCircle2 className="h-5 w-5 text-green-500" />
+                             </div>
+                             <div>
+                                 <p className="text-sm font-bold text-white">Stock Updated</p>
+                                 <p className="text-xs text-slate-400">Just now via Mobile App</p>
+                             </div>
+                         </motion.div>
+
+                    </div>
+                    {/* Shadow/Glow under mockup */}
+                    <div className="absolute -inset-10 bg-blue-500/20 blur-[60px] -z-10 rounded-[40px] opacity-40"></div>
+                </motion.div>
+
             </motion.div>
-          </motion.div>
         </section>
 
-        {/* The Problem Section */}
-        <section className="relative py-24 overflow-hidden">
-          <div className="container mx-auto px-4 md:px-6">
-            <motion.div
-              initial="initial"
-              whileInView="animate"
-              viewport={{ once: true }}
-              variants={stagger}
-              className="grid lg:grid-cols-2 gap-12 items-center"
-            >
-              <motion.div variants={fadeIn} className="space-y-6">
-                <div className="inline-block rounded-lg bg-red-500/10 px-3 py-1 text-sm font-medium text-red-500 ring-1 ring-inset ring-red-500/20">
-                  The Problem
-                </div>
-                <h2 className="text-3xl font-bold tracking-tight sm:text-5xl">
-                  Inventory Chaos is Costing You Money
-                </h2>
-                <p className="text-lg text-slate-400">
-                  Spreadsheets are prone to errors. Sticky notes get lost. Without a system, you are flying blind.
-                </p>
-
-                <div className="space-y-4 pt-4">
-                  <div className="flex gap-4">
-                    <div className="h-10 w-10 shrink-0 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500">
-                      <BarChart3 className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-slate-200">Stockouts & Lost Sales</h4>
-                      <p className="text-sm text-slate-500">Running out of popular items means customers go to competitors.</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-4">
-                    <div className="h-10 w-10 shrink-0 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500">
-                      <Box className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-slate-200">Overstocking Waste</h4>
-                      <p className="text-sm text-slate-500">Cash tied up in dust-gathering inventory that never sells.</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-4">
-                    <div className="h-10 w-10 shrink-0 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500">
-                      <Users className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-slate-200">Theft & unaccountability</h4>
-                      <p className="text-sm text-slate-500">Without logs, items disappear and no one knows who took them.</p>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-              <motion.div variants={fadeIn} className="relative">
-                <div className="absolute -inset-4 bg-gradient-to-r from-red-500/20 to-orange-500/20 blur-2xl opacity-50 rounded-full" />
-                <div className="relative rounded-2xl border border-white/10 bg-slate-900/80 p-6 backdrop-blur-sm">
-                  {/* Abstract visuals representing chaos */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 rounded bg-red-500/5 border border-red-500/10">
-                      <div className="flex items-center gap-3">
-                        <div className="h-2 w-2 rounded-full bg-red-500" />
-                        <span className="text-sm text-red-200 font-mono">CRITICAL: Stock mismatch (SKU-102)</span>
-                      </div>
-                      <span className="text-xs text-red-400">Just now</span>
-                    </div>
-                    <div className="flex items-center justify-between p-3 rounded bg-slate-800/50 border border-white/5 opacity-60">
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm text-slate-400 font-mono">Excel_Sheet_Final_v2_FINAL.xlsx</span>
-                      </div>
-                      <span className="text-xs text-slate-500">Corrupted</span>
-                    </div>
-                    <div className="flex items-center justify-between p-3 rounded bg-slate-800/50 border border-white/5 opacity-60">
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm text-slate-400 font-mono">Stock Count (Sticky Note)</span>
-                      </div>
-                      <span className="text-xs text-slate-500">Lost</span>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* The Solution Section */}
-        <section className="relative py-24 bg-slate-900/30 border-y border-white/5">
-          <div className="container mx-auto px-4 md:px-6">
-            <motion.div
-              initial="initial"
-              whileInView="animate"
-              viewport={{ once: true }}
-              variants={stagger}
-              className="text-center mb-16"
-            >
-              <div className="inline-block rounded-lg bg-green-500/10 px-3 py-1 text-sm font-medium text-green-500 ring-1 ring-inset ring-green-500/20 mb-4">
-                The Solution
-              </div>
-              <motion.h2 variants={fadeIn} className="text-3xl font-bold tracking-tight sm:text-5xl">
-                Turn Chaos into Control
-              </motion.h2>
-              <motion.p variants={fadeIn} className="mx-auto mt-4 max-w-2xl text-slate-400">
-                InvMaster replaces guesswork with data. It travels with you, scales with you, and keeps your team aligned.
-              </motion.p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              <motion.div variants={fadeIn} className="bg-slate-950 border border-white/10 p-8 rounded-3xl relative overflow-hidden group hover:border-green-500/30 transition-colors">
-                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <Zap className="h-24 w-24 text-green-500" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">Real-Time Sync</h3>
-                <p className="text-slate-400 text-sm">Update stock on mobile, see it on desktop instantly. Everyone sees the same numbers.</p>
-              </motion.div>
-              <motion.div variants={fadeIn} className="bg-slate-950 border border-white/10 p-8 rounded-3xl relative overflow-hidden group hover:border-blue-500/30 transition-colors">
-                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <ShieldCheck className="h-24 w-24 text-blue-500" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">Smart Safety Nets</h3>
-                <p className="text-slate-400 text-sm">Permission controls prevent unauthorized edits. Logs capture every mistake.</p>
-              </motion.div>
-              <motion.div variants={fadeIn} className="bg-slate-950 border border-white/10 p-8 rounded-3xl relative overflow-hidden group hover:border-purple-500/30 transition-colors">
-                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <BarChart3 className="h-24 w-24 text-purple-500" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">Growth Ready</h3>
-                <p className="text-slate-400 text-sm">Start with 50 items. Scale to 50,000. We handle the infrastructure.</p>
-              </motion.div>
-            </div>
-          </div>
-        </section>
         {/* Features Grid */}
-        <section id="features" className="container mx-auto py-24 md:py-32 px-4 md:px-6">
-          <motion.div
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-            variants={stagger}
-            className="text-center mb-16 space-y-4"
-          >
-            <motion.h2 variants={fadeIn} className="text-3xl font-bold tracking-tight sm:text-5xl">
-              Power-Packed Features
-            </motion.h2>
-            <motion.p variants={fadeIn} className="mx-auto max-w-2xl text-slate-400">
-              Everything you need to run your inventory like a pro.
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-            variants={stagger}
-            className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
-          >
-            {[
-              {
-                icon: Store,
-                title: "Multi-Warehouse",
-                desc: "Manage stock across multiple locations. Switch warehouses with a click.",
-                color: "text-blue-500",
-                bg: "bg-blue-500/10",
-                isPro: true
-              },
-              {
-                icon: BarChart3,
-                title: "Profit Analytics",
-                desc: "Real-time P&L analysis. Know your margins on every single item sold.",
-                color: "text-green-500",
-                bg: "bg-green-500/10",
-                isPro: true
-              },
-              {
-                icon: Sparkles,
-                title: "AI Predictions",
-                desc: "Our AI predicts when you'll run out of stock based on past sales velocity.",
-                color: "text-purple-500",
-                bg: "bg-purple-500/10",
-                isPro: true
-              },
-              {
-                icon: ArrowRightLeft,
-                title: "Stock Movement Logs",
-                desc: "Full audit trail. See every 'In' and 'Out' transaction with timestamps.",
-                color: "text-orange-500",
-                bg: "bg-orange-500/10",
-                isPro: true
-              },
-              {
-                icon: QrCode,
-                title: "Barcode Scanning",
-                desc: "Use your phone camera to scan items. Add or deduct stock instantly.",
-                color: "text-pink-500",
-                bg: "bg-pink-500/10",
-                isPro: true
-              },
-              {
-                icon: Mail,
-                title: "Smart Alerts",
-                desc: "Get notified via Email when critical items hit low stock levels.",
-                color: "text-yellow-500",
-                bg: "bg-yellow-500/10",
-                isPro: true
-              }
-            ].map((f, i) => (
-              <motion.div
-                key={i}
-                variants={fadeIn}
-                className="group relative overflow-hidden rounded-3xl border border-white/5 bg-slate-900/50 p-8 transition-all hover:border-primary/50 hover:bg-slate-900 hover:shadow-2xl hover:shadow-primary/5"
-              >
-                {/* PRO Badge */}
-                {f.isPro && (
-                  <div className="absolute top-6 right-6 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-200/10 to-amber-500/10 px-3 py-1 text-xs font-bold text-amber-500 border border-amber-500/20 ring-1 ring-amber-500/10 backdrop-blur-md">
-                    <Crown className="h-3.5 w-3.5 fill-amber-500" />
-                    <span>PRO</span>
-                  </div>
-                )}
-
-                <div className={cn("mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl", f.bg, f.color)}>
-                  <f.icon className="h-6 w-6" />
+        <section id="features" className="py-32 relative">
+             <div className="container mx-auto px-6 relative z-10">
+                <div className="mb-20 text-center max-w-3xl mx-auto">
+                    <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60 mb-6">Designed for speed. <br/> Built for scale.</h2>
+                    <p className="text-lg text-slate-400">Every interaction is crafted to save you milliseconds. Multiply those savings by your team, and you get hours back every week.</p>
                 </div>
-                <h3 className="mb-3 text-xl font-bold">{f.title}</h3>
-                <p className="text-slate-400 leading-relaxed">{f.desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
+
+                <div className="grid md:grid-cols-3 gap-6">
+                    {/* Feature 1 */}
+                    <div className="col-span-1 md:col-span-2 row-span-2 relative group overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-8 transition-all hover:bg-white/10">
+                         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                         <div className="relative z-10 h-full flex flex-col">
+                             <div className="mb-auto">
+                                 <div className="h-12 w-12 rounded-2xl bg-blue-500/20 flex items-center justify-center mb-6">
+                                     <BarChart3 className="h-6 w-6 text-blue-400" />
+                                 </div>
+                                 <h3 className="text-2xl font-bold text-white mb-2">Real-time Analytics</h3>
+                                 <p className="text-slate-400 max-w-sm">Watch your profits grow with live P&L tracking. Deep dive into item-level performance and spot trends before they happen.</p>
+                             </div>
+                             <div className="mt-8 border border-white/10 rounded-xl bg-black/40 backdrop-blur overflow-hidden h-48 relative">
+                                 {/* Decorative Chart UI */}
+                                 <div className="absolute bottom-0 left-0 right-0 h-32 flex items-end justify-between px-4 pb-4 gap-1">
+                                     {[40, 65, 45, 80, 55, 90, 70, 85, 60, 75, 50, 95].map((h, i) => (
+                                         <motion.div 
+                                            key={i} 
+                                            initial={{ height: 0 }}
+                                            whileInView={{ height: `${h}%` }}
+                                            viewport={{ once: true }}
+                                            transition={{ delay: i * 0.05, duration: 0.5 }}
+                                            className="w-full bg-blue-500/50 rounded-t-sm hover:bg-blue-400 transition-colors"
+                                         />
+                                     ))}
+                                 </div>
+                             </div>
+                         </div>
+                    </div>
+
+                    {/* Feature 2 */}
+                    <div className="relative group overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-8 transition-all hover:bg-white/10">
+                         <div className="absolute top-0 right-0 p-32 bg-sky-500/20 blur-[80px]"></div>
+                        <div className="h-12 w-12 rounded-2xl bg-sky-500/20 flex items-center justify-center mb-6">
+                            <Zap className="h-6 w-6 text-sky-400" />
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2">Instant Action</h3>
+                        <p className="text-slate-400 text-sm">Keyboard shortcuts for everything. Add stock, create orders, and check reports without lifting your mouse.</p>
+                    </div>
+
+                    {/* Feature 3 */}
+                    <div className="relative group overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-8 transition-all hover:bg-white/10">
+                         <div className="absolute top-0 right-0 p-32 bg-blue-500/20 blur-[80px]"></div>
+                        <div className="h-12 w-12 rounded-2xl bg-blue-500/20 flex items-center justify-center mb-6">
+                            <ShieldCheck className="h-6 w-6 text-blue-400" />
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2">Role-Based Access</h3>
+                        <p className="text-slate-400 text-sm">Granular permissions. Give storekeepers access to 'Warehouses' only, while managers see 'Sales'.</p>
+                    </div>
+
+                     {/* Feature 4 (Wide) */}
+                     <div className="col-span-1 md:col-span-3 relative group overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-8 md:p-12 transition-all hover:bg-white/10">
+                         <div className="grid md:grid-cols-2 gap-12 items-center">
+                             <div>
+                                 <div className="inline-flex items-center gap-2 rounded-lg bg-green-500/10 px-3 py-1 text-xs font-medium text-green-400 mb-6">
+                                     <Sparkles className="h-3 w-3" /> AI Powered
+                                 </div>
+                                 <h3 className="text-3xl font-bold text-white mb-4">Stockout Prediction</h3>
+                                 <p className="text-slate-400 text-lg mb-6">Our AI analyzes your sales velocity and lead times to warn you days before you run out of stock. Never lose a sale again.</p>
+                                 <Button variant="outline" className="rounded-full border-white/10 hover:bg-white/10 hover:text-white">Learn more</Button>
+                             </div>
+                             <div className="relative">
+                                  {/* Glass card decoration */}
+                                  <div className="absolute -inset-4 bg-green-500/20 blur-3xl opacity-20"></div>
+                                  <div className="relative rounded-xl border border-white/10 bg-black/60 backdrop-blur-xl p-6">
+                                      <div className="flex items-center gap-4 mb-4">
+                                          <div className="h-10 w-10 rounded-full bg-slate-800 flex items-center justify-center">
+                                              <Box className="h-5 w-5 text-slate-400" />
+                                          </div>
+                                          <div className="flex-1">
+                                              <div className="h-2 w-24 bg-slate-700 rounded mb-2"></div>
+                                              <div className="h-2 w-16 bg-slate-800 rounded"></div>
+                                          </div>
+                                          <div className="text-right">
+                                              <div className="text-red-400 font-bold text-sm">Low Stock</div>
+                                          </div>
+                                      </div>
+                                      <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                                          <motion.div 
+                                            initial={{ width: "100%" }}
+                                            whileInView={{ width: "15%" }}
+                                            transition={{ duration: 1.5, ease: "easeInOut" }}
+                                            className="h-full bg-red-500" 
+                                          />
+                                      </div>
+                                      <div className="mt-2 flex justify-between text-xs text-slate-500">
+                                          <span>12 units remaining</span>
+                                          <span className="text-red-400">Restock recommended</span>
+                                      </div>
+                                  </div>
+                             </div>
+                         </div>
+                    </div>
+                </div>
+             </div>
+        </section>
+
+        {/* How it Works Section */}
+        <section id="how-it-works" className="py-24 relative">
+             <div className="container mx-auto px-6 relative z-10">
+                 <div className="text-center mb-16">
+                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">From chaos to control in minutes</h2>
+                     <p className="text-lg text-slate-400">No complex setup. No training required. Just sign up and start shipping.</p>
+                 </div>
+
+                 <div className="grid md:grid-cols-3 gap-8 relative">
+                     {/* Connecting Line (Desktop) */}
+                     <div className="hidden md:block absolute top-12 left-[16%] right-[16%] h-0.5 bg-gradient-to-r from-blue-500/0 via-blue-500/30 to-blue-500/0 border-t border-dashed border-slate-700 z-0"></div>
+
+                     {[
+                         {
+                             step: "01",
+                             title: "Connect",
+                             desc: "Import your products via CSV or connect your existing store (Shopify, WooCommerce) in one click.",
+                             icon: <QrCode className="h-6 w-6 text-blue-400" />
+                         },
+                         {
+                             step: "02",
+                             title: "Automate",
+                             desc: "Set low-stock alerts and let our AI predict when you need to reorder based on sales velocity.",
+                             icon: <Zap className="h-6 w-6 text-cyan-400" />
+                         },
+                         {
+                             step: "03",
+                             title: "Scale",
+                             desc: "Use real-time analytics to cut dead stock, optimize margins, and expand to new locations.",
+                             icon: <BarChart3 className="h-6 w-6 text-sky-400" />
+                         }
+                     ].map((item, i) => (
+                         <div key={i} className="relative z-10 flex flex-col items-center text-center group">
+                             <div className="h-24 w-24 rounded-3xl bg-black border border-white/10 flex items-center justify-center mb-6 shadow-2xl relative overflow-hidden group-hover:scale-110 transition-transform duration-500">
+                                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                 <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center backdrop-blur-md">
+                                     {item.icon}
+                                 </div>
+                                 <div className="absolute top-2 right-4 text-xs font-bold text-slate-700 font-mono">
+                                     {item.step}
+                                 </div>
+                             </div>
+                             <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
+                             <p className="text-slate-400 leading-relaxed max-w-xs">{item.desc}</p>
+                         </div>
+                     ))}
+                 </div>
+             </div>
         </section>
 
         {/* Pricing Section */}
-        <section id="pricing" className="relative py-24 bg-slate-900/50">
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="flex flex-col items-center text-center space-y-4 mb-16">
-              <h2 className="text-3xl font-bold tracking-tight sm:text-5xl">Simple, Transparent Pricing</h2>
-              <p className="text-slate-400 max-w-2xl">Start for free, upgrade when you grow. No hidden fees.</p>
-            </div>
+        <section id="pricing" className="py-24 relative overflow-hidden">
+             {/* Background Glow */}
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-blue-900/40 blur-[120px] rounded-full -z-10"></div>
+             
+             <div className="container mx-auto px-6">
+                 <div className="text-center mb-16">
+                     <h2 className="text-4xl font-bold text-white mb-4">Simple, Transparent Pricing</h2>
+                     <p className="text-slate-400 text-lg">Start for free. Grow without limits.</p>
+                 </div>
 
-            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              {/* Free Plan */}
-              <div className="rounded-3xl border border-white/10 bg-slate-950 p-8 flex flex-col gap-6">
-                <div>
-                  <h3 className="text-xl font-semibold text-slate-200">Starter</h3>
-                  <div className="mt-2 flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-white">₹0</span>
-                    <span className="text-sm text-slate-500">/month</span>
-                  </div>
-                  <p className="mt-4 text-sm text-slate-400">For small shops and solo founders.</p>
-                </div>
-                <ul className="space-y-3 flex-1">
-                  <li className="flex gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" /> 1 User (Admin)
-                  </li>
-                  <li className="flex gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" /> Up to 50 Items
-                  </li>
-                  <li className="flex gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" /> Basic Reports
-                  </li>
-                  <li className="flex gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" /> <strong>Sales & Invoices</strong> 🧾
-                  </li>
-                  <li className="flex gap-3 text-sm text-slate-500/50 line-through">
-                    <X className="h-5 w-5 shrink-0" /> Multi-Warehouse
-                  </li>
-                </ul>
-                <Link href="/signup">
-                  <Button variant="outline" className="w-full rounded-full h-12 border-white/20 hover:bg-white/10 text-white">
-                    Start for Free
-                  </Button>
-                </Link>
-              </div>
+                 <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                     {/* Free Plan */}
+                     <div className="rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl p-8 flex flex-col hover:border-white/20 transition-all group">
+                         <div className="mb-8">
+                             <h3 className="text-lg font-medium text-slate-300 mb-2">Starter</h3>
+                             <div className="flex items-baseline gap-1">
+                                 <span className="text-5xl font-bold text-white tracking-tight">₹0</span>
+                                 <span className="text-slate-500">/month</span>
+                             </div>
+                             <p className="mt-4 text-slate-400 text-sm">Perfect for hobbyists and side projects.</p>
+                         </div>
+                         <ul className="space-y-4 mb-8 flex-1">
+                             {['1 Admin User', 'Up to 50 Items', 'Basic Reporting', 'Mobile App Access'].map((feat, i) => (
+                                 <li key={i} className="flex items-center gap-3 text-slate-300 text-sm">
+                                     <CheckCircle2 className="h-5 w-5 text-slate-500" /> {feat}
+                                 </li>
+                             ))}
+                         </ul>
+                         <Link href="/signup">
+                            <Button variant="outline" className="w-full rounded-2xl h-12 border-white/10 bg-transparent hover:bg-white/5 hover:text-white transition-all">Get Started</Button>
+                         </Link>
+                     </div>
 
-              {/* Pro Plan */}
-              <div className="relative rounded-3xl border border-primary/50 bg-slate-900 p-8 flex flex-col gap-6 shadow-2xl shadow-primary/10 transition-transform hover:scale-105 duration-300">
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg shadow-blue-500/20">
-                  Most Popular
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-white">Pro</h3>
-                  <div className="mt-2 flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-white">₹399</span>
-                    <span className="text-sm text-slate-500">/month</span>
-                  </div>
-                  <p className="mt-4 text-sm text-slate-400">For growing teams and serious businesses.</p>
-                </div>
-                <ul className="space-y-4 flex-1">
-                  <li className="flex gap-3 text-sm text-white">
-                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> <strong>5 Team Members</strong>
-                  </li>
-                  <li className="flex gap-3 text-sm text-white">
-                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> <strong>Multi-Warehouse (2 Warehouses)</strong> 🏢
-                  </li>
-                  <li className="flex gap-3 text-sm text-white">
-                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> <strong>Barcode Scanning App</strong> 📱
-                  </li>
-                  <li className="flex gap-3 text-sm text-white">
-                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> Financial Analytics & Profits 💰
-                  </li>
-                  <li className="flex gap-3 text-sm text-white">
-                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> Stock Movement Logs
-                  </li>
-                  <li className="flex gap-3 text-sm text-white">
-                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> AI Stock Predictions 🤖
-                  </li>
-                  <li className="flex gap-3 text-sm text-white">
-                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> Low Stock Email Alerts 📧
-                  </li>
-                  <li className="flex gap-3 text-sm text-white">
-                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" /> Bulk CSV Import/Export 📤
-                  </li>
-                </ul>
-                <Link href="/signup">
-                  <Button className="w-full rounded-full h-12 bg-gradient-to-r from-primary to-indigo-600 hover:to-indigo-500 text-white shadow-lg shadow-primary/25 font-bold">
-                    Upgrade to Pro
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
+                     {/* Pro Plan */}
+                     <div className="relative rounded-3xl border border-blue-500/50 bg-black/60 backdrop-blur-xl p-8 flex flex-col shadow-2xl shadow-blue-500/10 scale-105 z-10">
+                         <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-500 to-sky-500 px-4 py-1 rounded-full text-xs font-bold text-white shadow-lg">
+                             MOST POPULAR
+                         </div>
+                         <div className="mb-8">
+                             <h3 className="text-lg font-medium text-blue-300 mb-2">Pro</h3>
+                             <div className="flex items-baseline gap-1">
+                                 <span className="text-5xl font-bold text-white tracking-tight">₹399</span>
+                                 <span className="text-slate-500">/month</span>
+                             </div>
+                             <p className="mt-4 text-slate-400 text-sm">For growing businesses that need power.</p>
+                         </div>
+                         <ul className="space-y-4 mb-8 flex-1">
+                             {[
+                                 'Unlimited Users', 
+                                 'Multi-Warehouse Support', 
+                                 'Advanced Analytics & P&L', 
+                                 'AI Stock Predictions',
+                                 'Priority Email Support',
+                                 'Bulk Data Export'
+                            ].map((feat, i) => (
+                                 <li key={i} className="flex items-center gap-3 text-white text-sm">
+                                     <div className="h-5 w-5 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0">
+                                         <CheckCircle2 className="h-3.5 w-3.5 text-blue-400" />
+                                     </div> 
+                                     {feat}
+                                 </li>
+                             ))}
+                         </ul>
+                         <Link href="/signup">
+                            <Button className="w-full rounded-2xl h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-500/25">Start Free Trial</Button>
+                         </Link>
+                     </div>
+                 </div>
+             </div>
         </section>
 
-        {/* How It Works Section */}
-        <section id="how-it-works" className="py-24 relative overflow-hidden">
-          <div className="container mx-auto px-4 md:px-6 relative z-10">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold tracking-tight sm:text-5xl">Get Started in 3 Steps</h2>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-12">
-              <div className="text-center space-y-4">
-                <div className="mx-auto h-16 w-16 rounded-2xl bg-slate-800 flex items-center justify-center text-2xl font-bold text-white border border-white/10">1</div>
-                <h3 className="text-xl font-bold">Sign Up</h3>
-                <p className="text-slate-400">Create your account. No credit card required for the Free plan.</p>
-              </div>
-              <div className="text-center space-y-4">
-                <div className="mx-auto h-16 w-16 rounded-2xl bg-slate-800 flex items-center justify-center text-2xl font-bold text-white border border-white/10">2</div>
-                <h3 className="text-xl font-bold">Create Organization</h3>
-                <p className="text-slate-400">Name your workspace. You'll be the Admin automatically.</p>
-              </div>
-              <div className="text-center space-y-4">
-                <div className="mx-auto h-16 w-16 rounded-2xl bg-slate-800 flex items-center justify-center text-2xl font-bold text-white border border-white/10">3</div>
-                <h3 className="text-xl font-bold">Invite Team</h3>
-                <p className="text-slate-400">Add your managers and storekeepers to start collaborating.</p>
-              </div>
-            </div>
-          </div>
+        {/* CTA */}
+        <section className="py-24 relative overflow-hidden">
+             <div className="container mx-auto px-6 relative z-10 text-center">
+                 <h2 className="text-5xl md:text-7xl font-bold text-white tracking-tight mb-8">Ready to evolve?</h2>
+                 <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">Join thousands of modern teams using InvMaster to streamline their operations.</p>
+                 <Link href="/signup">
+                    <Button size="lg" className="h-16 rounded-full px-10 text-lg bg-white text-black hover:bg-slate-200 font-bold shadow-2xl hover:scale-105 transition-transform">
+                        Start your 14-day free trial
+                    </Button>
+                 </Link>
+             </div>
         </section>
 
-        {/* Final CTA */}
-        <section className="relative py-24 md:py-32 overflow-hidden">
-          <div className="container mx-auto relative z-10 px-4 md:px-6">
-            <motion.div
-              initial="initial"
-              whileInView="animate"
-              viewport={{ once: true }}
-              variants={stagger}
-              className="flex flex-col items-center text-center space-y-8 max-w-4xl mx-auto"
-            >
-              <motion.h2 variants={fadeIn} className="text-4xl font-bold tracking-tight sm:text-6xl">Ready to take control?</motion.h2>
-              <motion.p variants={fadeIn} className="text-xl text-slate-400">
-                Join our premium inventory platform. Stop guessing, start tracking.
-              </motion.p>
-              <motion.div variants={fadeIn} className="flex flex-col gap-4 sm:flex-row">
-                <Link href="/signup">
-                  <Button size="lg" className="h-16 rounded-full px-12 text-lg shadow-2xl shadow-primary/30">
-                    Get Started Now
-                  </Button>
-                </Link>
-              </motion.div>
-            </motion.div>
-          </div>
-        </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-white/5 bg-slate-950 py-12">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="grid gap-12 md:grid-cols-4">
-            <div className="space-y-4 col-span-2">
-              <div className="flex items-center gap-2 text-xl font-bold tracking-tight">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                  <Box className="h-5 w-5 text-white" />
+      <footer className="border-t border-white/5 bg-black py-12 relative z-10">
+        <div className="container mx-auto px-6">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center">
+                        <Box className="h-5 w-5 text-white" />
+                    </div>
+                    <span className="text-lg font-bold text-white">InvMaster</span>
                 </div>
-                <span>InvMaster</span>
-              </div>
-              <p className="max-w-xs text-sm text-slate-500">
-                The modern inventory OS for growing businesses.
-              </p>
+                <div className="flex gap-8 text-sm text-slate-400">
+                    <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+                    <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
+                    <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
+                </div>
+                <div className="text-slate-600 text-sm">
+                    © 2025 InvMaster Inc.
+                </div>
             </div>
-            <div className="space-y-4">
-              <h4 className="font-bold text-sm uppercase tracking-widest text-slate-500">Product</h4>
-              <ul className="space-y-2 text-sm text-slate-400">
-                <li><Link href="#features" className="hover:text-white transition-colors">Features</Link></li>
-                <li><Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link></li>
-                <li><Link href="#how-it-works" className="hover:text-white transition-colors">How it Works</Link></li>
-              </ul>
-            </div>
-            <div className="space-y-4">
-              <h4 className="font-bold text-sm uppercase tracking-widest text-slate-500">Contact</h4>
-              <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="mailto:aafaquebuisness@gmail.com" className="hover:text-white transition-colors">aafaquebuisness@gmail.com</a></li>
-              </ul>
-            </div>
-            <div className="space-y-4">
-              <h4 className="font-bold text-sm uppercase tracking-widest text-slate-500">Legal</h4>
-              <ul className="space-y-2 text-sm text-slate-400">
-                <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
-                <li><Link href="/refund" className="hover:text-white transition-colors">Refund Policy</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-12 flex flex-col items-center justify-between border-t border-white/5 pt-8 md:flex-row">
-            <p className="text-sm text-slate-500">
-              &copy; 2025 InvMaster. All rights reserved.
-            </p>
-          </div>
         </div>
       </footer>
+
     </div>
   )
 }

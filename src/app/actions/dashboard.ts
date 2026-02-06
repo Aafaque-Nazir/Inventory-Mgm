@@ -1,0 +1,122 @@
+'use server'
+
+import { createClient } from '@/lib/supabase/server'
+import { getWarehouseCookie } from './warehouse-cookie'
+import { addDays, format, subDays, startOfDay, endOfDay } from 'date-fns'
+
+export interface DashboardMetric {
+    label: string
+    value: number
+    change?: number
+    trend?: 'up' | 'down' | 'neutral'
+}
+
+export type ChartData = {
+    date: string
+    revenue: number
+    orders: number
+}[]
+
+export async function getDashboardMetrics() {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return null
+
+    // Get Org ID
+    const { data: profile } = await supabase.from('profiles').select('organization_id').eq('id', user.id).single()
+    const organizationId = profile?.organization_id
+
+    if (!organizationId) return null
+
+    const warehouseId = await getWarehouseCookie()
+
+    // 1. Fetch Item Stats
+    let itemsCount = 0
+    let lowStockCount = 0
+    let totalStockValue = 0
+
+    if (warehouseId) {
+        // Local Scope
+         const { data: stockItems } = await supabase
+            .from('item_stock')
+            .select(`
+                quantity,
+                item:items (id, min_stock, price)
+            `)
+            .eq('location_id', warehouseId)
+        
+        if (stockItems) {
+            itemsCount = stockItems.length
+            // @ts-ignore
+            lowStockCount = stockItems.filter(i => i.quantity < (i.item?.min_stock || 0)).length
+            // @ts-ignore
+            totalStockValue = stockItems.reduce((acc, curr) => acc + (curr.quantity * (curr.item?.price || 0)), 0)
+        }
+
+    } else {
+        // Global Scope
+        const { data: allItems } = await supabase
+            .from('items')
+            .select('current_stock, min_stock, price')
+            .eq('organization_id', organizationId)
+        
+        if (allItems) {
+            itemsCount = allItems.length
+            lowStockCount = allItems.filter(i => (i.current_stock || 0) < (i.min_stock || 0)).length
+             totalStockValue = allItems.reduce((acc, curr) => acc + ((curr.current_stock || 0) * (curr.price || 0)), 0)
+        }
+    }
+
+    return {
+        itemsCount,
+        lowStockCount,
+        totalStockValue,
+    }
+}
+
+export async function getRevenueChartData(period: '7d' | '30d' = '7d'): Promise<ChartData> {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return []
+
+    const { data: profile } = await supabase.from('profiles').select('organization_id').eq('id', user.id).single()
+    const organizationId = profile?.organization_id
+    if (!organizationId) return []
+
+    const days = period === '30d' ? 30 : 7
+    const startDate = subDays(new Date(), days)
+
+    // Fetch invoices in range
+    const { data: invoices } = await supabase
+        .from('invoices')
+        .select(`created_at, total_amount`)
+        .eq('organization_id', organizationId)
+        .gte('created_at', startDate.toISOString())
+        .order('created_at', { ascending: true })
+    
+    // Group by day
+    const groupedData = new Map<string, { revenue: number, orders: number }>()
+
+    // Initialize all days
+    for (let i = 0; i <= days; i++) {
+        const d = addDays(startDate, i)
+        const dateKey = format(d, 'MMM dd')
+        groupedData.set(dateKey, { revenue: 0, orders: 0 })
+    }
+
+    // Populate actuals
+    invoices?.forEach(inv => {
+        const dateKey = format(new Date(inv.created_at), 'MMM dd')
+        const current = groupedData.get(dateKey) || { revenue: 0, orders: 0 }
+        groupedData.set(dateKey, {
+            revenue: current.revenue + (inv.total_amount || 0),
+            orders: current.orders + 1
+        })
+    })
+
+    return Array.from(groupedData.entries()).map(([date, data]) => ({
+        date,
+        revenue: data.revenue,
+        orders: data.orders
+    }))
+}

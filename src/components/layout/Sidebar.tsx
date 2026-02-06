@@ -21,24 +21,82 @@ import {
     Clock,
     Store,
     Book,
-    FileText
+    FileText,
+    ChevronLeft,
+    ChevronRight,
+    LogOut,
+    ChevronDown,
+    MoreVertical
 } from 'lucide-react'
 import { differenceInDays } from 'date-fns'
 import { Button } from '@/components/ui/button'
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
-const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Inventory', href: '/items', icon: Package },
-    { name: 'Stock Movements', href: '/stock', icon: ArrowRightLeft },
-    { name: 'Sales & Invoices', href: '/sales', icon: FileText },
-    { name: 'Suppliers', href: '/suppliers', icon: Users },
-    { name: 'Purchase Orders', href: '/purchase-orders', icon: ShoppingCart },
-    { name: 'Reports', href: '/reports', icon: BarChart3 },
-    { name: 'Warehouses', href: '/warehouses', icon: Store },
-    { name: 'Pricing', href: '/pricing', icon: CreditCard },
-    { name: 'User Guide', href: '/guide', icon: Book },
-    { name: 'Help & Support', href: '/help', icon: HelpCircle },
-    { name: 'Settings', href: '/settings', icon: Settings },
+// Define navigation groups
+type NavItem = {
+    name: string
+    href: string
+    icon: any
+    isPro?: boolean
+}
+
+type NavGroup = {
+    title: string
+    items: NavItem[]
+}
+
+const navGroups: NavGroup[] = [
+    {
+        title: 'Overview',
+        items: [
+            { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+            { name: 'Reports', href: '/reports', icon: BarChart3 },
+        ]
+    },
+    {
+        title: 'Inventory',
+        items: [
+            { name: 'Items', href: '/items', icon: Package },
+            { name: 'Stock Movements', href: '/stock', icon: ArrowRightLeft },
+            { name: 'Warehouses', href: '/warehouses', icon: Store, isPro: true },
+            { name: 'Suppliers', href: '/suppliers', icon: Users },
+        ]
+    },
+    {
+        title: 'Sales & Orders',
+        items: [
+            { name: 'Sales & Invoices', href: '/sales', icon: FileText },
+            { name: 'Purchase Orders', href: '/purchase-orders', icon: ShoppingCart },
+        ]
+    },
+    {
+        title: 'Finance',
+        items: [
+            { name: 'Pricing', href: '/pricing', icon: CreditCard },
+        ]
+    },
+    {
+        title: 'System',
+        items: [
+            { name: 'Settings', href: '/settings', icon: Settings },
+            { name: 'User Guide', href: '/guide', icon: Book },
+            { name: 'Help & Support', href: '/help', icon: HelpCircle },
+        ]
+    }
 ]
 
 export function Sidebar() {
@@ -47,19 +105,28 @@ export function Sidebar() {
     const [isSuperAdmin, setIsSuperAdmin] = useState(false)
     const [planType, setPlanType] = useState<string>('FREE')
     const [trialDays, setTrialDays] = useState<number | null>(null)
+    const [collapsed, setCollapsed] = useState(false)
+    const [mounted, setMounted] = useState(false)
+    const [userProfile, setUserProfile] = useState<any>(null)
 
     useEffect(() => {
+        setMounted(true)
+        const storedCollapsed = localStorage.getItem('sidebar-collapsed')
+        if (storedCollapsed) {
+            setCollapsed(storedCollapsed === 'true')
+        }
+
         async function checkRole() {
             const { data: { user } } = await supabase.auth.getUser()
             if (user) {
-                // Fetch Profile and Org Plan
                 const { data: profile } = await supabase
                     .from('profiles')
-                    .select('is_super_admin, organizations(plan_type, subscription_end_date, subscription_status)')
+                    .select('*, organizations(plan_type, subscription_end_date, subscription_status)')
                     .eq('id', user.id)
                     .single()
 
                 if (profile) {
+                    setUserProfile(profile)
                     if (profile.is_super_admin) setIsSuperAdmin(true)
 
                     let effectivePlan = 'FREE'
@@ -67,22 +134,17 @@ export function Sidebar() {
                     if (profile.organizations?.plan_type) {
                         // @ts-ignore
                         effectivePlan = profile.organizations.plan_type
-
-                        // Check for Expiry
                         // @ts-ignore
                         if (profile.organizations?.subscription_end_date) {
                             // @ts-ignore
-                            // @ts-ignore
                             const expiry = new Date(profile.organizations.subscription_end_date)
-
-                            // Check for Trial
                             // @ts-ignore
                             if (profile.organizations.subscription_status === 'TRIALING') {
                                 const days = differenceInDays(expiry, new Date())
                                 setTrialDays(days >= 0 ? days + 1 : 0)
                             }
                             if (expiry < new Date()) {
-                                effectivePlan = 'FREE' // Downgrade locally
+                                effectivePlan = 'FREE' 
                             }
                         }
                     }
@@ -93,161 +155,252 @@ export function Sidebar() {
         checkRole()
     }, [])
 
-    const finalNavigation = [
-        ...navigation,
-        ...(isSuperAdmin ? [{ name: 'Super Admin', href: '/super-admin', icon: Lock }] : [])
-    ]
+    const toggleCollapse = () => {
+        const newState = !collapsed
+        setCollapsed(newState)
+        localStorage.setItem('sidebar-collapsed', String(newState))
+    }
+
+    if (!mounted) return null // Prevent hydration mismatch
+
+    const isLocked = (item: NavItem) => item.name === 'Reports' && planType === 'FREE' && !isSuperAdmin
 
     return (
-        <div className="hidden border-r bg-card md:flex md:w-64 md:flex-col">
-            <div className="flex bg-card h-16 items-center border-b px-6">
-                <Link href="/dashboard" className="text-xl font-bold tracking-tight">Inventory <span className="text-primary">Management</span></Link>
-            </div>
-            <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto">
-                {trialDays !== null && trialDays > 0 && (
-                    <div className="mb-4 rounded-md bg-gradient-to-r from-orange-500/10 to-pink-500/10 p-3 border border-orange-500/20">
-                        <div className="flex items-center gap-2 mb-1">
-                            <Sparkles className="h-4 w-4 text-orange-500" />
-                            <span className="text-xs font-bold text-orange-600">Pro Trial Active</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {trialDays} days remaining
-                        </p>
-                        <Button variant="outline" size="sm" className="w-full mt-2 h-7 text-xs border-orange-200 bg-white/50 hover:bg-white hover:text-orange-700" asChild>
-                            <Link href="/pricing">Upgrade Now</Link>
-                        </Button>
-                    </div>
+        <TooltipProvider delayDuration={0}>
+            <div 
+                className={cn(
+                    "hidden border-r bg-card md:flex flex-col transition-all duration-300 ease-in-out relative z-10",
+                    collapsed ? "w-[80px]" : "w-[280px]"
                 )}
-                {finalNavigation.map((item) => {
-                    if (item.name === 'Settings') {
-                        return (
-                            <div key="settings-group" className="space-y-1">
-                                <div className="flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium text-muted-foreground">
-                                    <div className="flex items-center">
-                                        <Settings className="mr-3 h-5 w-5 flex-shrink-0" />
-                                        Settings
-                                    </div>
-                                </div>
-                                <div className="ml-4 space-y-1 border-l pl-2">
-                                    <Link
-                                        href="/settings/profile"
-                                        className={cn(
-                                            'block rounded-md px-3 py-2 text-sm transition-colors',
-                                            pathname.startsWith('/settings/profile') ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:text-foreground'
-                                        )}
-                                    >
-                                        Profile
-                                    </Link>
-                                    <Link
-                                        href="/settings/organization"
-                                        className={cn(
-                                            'block rounded-md px-3 py-2 text-sm transition-colors',
-                                            pathname.startsWith('/settings/organization') ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:text-foreground'
-                                        )}
-                                    >
-                                        Organization
-                                    </Link>
-                                    <Link
-                                        href="/warehouses"
-                                        className={cn(
-                                            'block rounded-md px-3 py-2 text-sm transition-colors flex items-center justify-between',
-                                            pathname.startsWith('/warehouses') ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:text-foreground'
-                                        )}
-                                    >
-                                        <span>Warehouses</span>
-                                        <span className="text-[10px] font-bold text-indigo-500 bg-indigo-500/10 px-1 rounded ml-2">PRO</span>
-                                    </Link>
-                                    <Link
-                                        href="/settings/team"
-                                        className={cn(
-                                            'block rounded-md px-3 py-2 text-sm transition-colors',
-                                            pathname.startsWith('/settings/team') ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:text-foreground'
-                                        )}
-                                    >
-                                        Team
-                                    </Link>
-                                    <Link
-                                        href="/settings/billing"
-                                        className={cn(
-                                            'block rounded-md px-3 py-2 text-sm transition-colors',
-                                            pathname.startsWith('/settings/billing') ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:text-foreground'
-                                        )}
-                                    >
-                                        Billing
-                                    </Link>
-                                </div>
+            >
+                {/* Toggle Button */}
+                <Button
+                    variant="ghost" 
+                    size="icon"
+                    className="absolute -right-3 top-6 h-6 w-6 rounded-full border bg-background shadow-sm hover:bg-accent z-50 hidden md:flex"
+                    onClick={toggleCollapse}
+                >
+                    {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
+                </Button>
+
+                {/* Header */}
+                <div className={cn(
+                    "flex h-16 items-center border-b px-6 transition-all duration-300",
+                    collapsed ? "justify-center px-2" : "justify-between"
+                )}>
+                    <Link href="/dashboard" className="flex items-center gap-2 overflow-hidden">
+                        <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                            <Store className="h-5 w-5 text-primary" />
+                        </div>
+                        {!collapsed && (
+                            <div className="flex flex-col">
+                                <span className="text-sm font-bold tracking-tight">Inventory</span>
+                                <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Management</span>
                             </div>
-                        )
-                    }
+                        )}
+                    </Link>
+                </div>
 
-                    const isActive = pathname.startsWith(item.href)
-                    const isLocked = item.name === 'Reports' && planType === 'FREE' && !isSuperAdmin
+                {/* Navigation */}
+                <nav className="flex-1 space-y-6 overflow-y-auto py-6 px-3 custom-scrollbar">
+                    
+                    {/* Trial Banner - Only show when expanded */}
+                    {!collapsed && trialDays !== null && trialDays > 0 && (
+                        <div className="mx-2 mb-6 rounded-xl bg-gradient-to-br from-orange-500/10 via-orange-500/5 to-transparent p-4 border border-orange-500/10 shadow-sm relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <Sparkles className="h-12 w-12" />
+                            </div>
+                            <div className="flex items-center gap-2 mb-2 relative z-10">
+                                <BadgeIcon className="h-4 w-4 text-orange-600" />
+                                <span className="text-xs font-bold text-orange-600 uppercase tracking-wide">Pro Trial</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground mb-3 relative z-10 font-medium">
+                                <span className="text-foreground font-bold">{trialDays} days</span> remaining in your trial.
+                            </p>
+                            <Button variant="default" size="sm" className="w-full h-8 text-xs bg-orange-600 hover:bg-orange-700 text-white shadow-sm border-0" asChild>
+                                <Link href="/pricing">Upgrade Plan</Link>
+                            </Button>
+                        </div>
+                    )}
 
-                    // Skip separate Warehouses link if we moved it to Settings (User asked to move 'Locations' to sidebar, 
-                    // and 'settings' to sidebar. I put Warehouses as a top level item before. 
-                    // User said: "wo right wali settings h usko navigation laga setting kliye jo side bar me h" 
-                    // This implies grouping. Let's keep 'Warehouses' in the Settings group mostly? 
-                    // actually the user said "settings mese location bahar nikal and usko side bar me daal" (Remove location from settings and put in sidebar).
-                    // So Warehouses should probably stay Top Level? 
-                    // BUT then "right wali settings h usko navigation laga setting kliye jo side bar me h".
-                    // This means the Tab items (Profile, Org, Billing) should go to Sidebar under Settings.
-                    // So Warehouses -> Top Level. Settings -> Group with Profile, Org, Billing, Team.
+                    {navGroups.map((group, groupIndex) => (
+                        <div key={group.title} className="space-y-2">
+                             {!collapsed && (
+                                <h4 className="px-4 text-xs font-semibold text-muted-foreground/50 uppercase tracking-wider mb-2">
+                                    {group.title}
+                                </h4>
+                            )}
+                            <div className="space-y-1">
+                                {group.items.map((item) => {
+                                    const isActive = pathname.startsWith(item.href)
+                                    const locked = isLocked(item)
 
-                    if (item.name === 'Warehouses') {
-                        return (
+                                    if (collapsed) {
+                                        return (
+                                            <Tooltip key={item.href}>
+                                                <TooltipTrigger asChild>
+                                                    <Link
+                                                        href={item.href}
+                                                        className={cn(
+                                                            "flex h-10 w-10 items-center justify-center rounded-lg transition-all mx-auto relative group",
+                                                            isActive 
+                                                                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20" 
+                                                                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                                                        )}
+                                                    >
+                                                        <item.icon className="h-5 w-5" />
+                                                        {item.isPro && !isActive && (
+                                                             <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-indigo-500 ring-2 ring-background block" />
+                                                        )}
+                                                         {locked && <Crown className="absolute -bottom-1 -right-1 h-3 w-3 text-amber-500 fill-amber-500" />}
+                                                    </Link>
+                                                </TooltipTrigger>
+                                                <TooltipContent side="right" className="font-medium">
+                                                    {item.name}
+                                                    {item.isPro && <span className="ml-2 text-xs text-indigo-400 font-bold">PRO</span>}
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        )
+                                    }
+
+                                    return (
+                                        <Link
+                                            key={item.href}
+                                            href={item.href}
+                                            className={cn(
+                                                "group flex items-center justify-between rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-200 border border-transparent mx-2",
+                                                isActive
+                                                    ? "bg-primary/5 text-primary border-primary/10 shadow-sm"
+                                                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground hover:translate-x-1"
+                                            )}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <item.icon className={cn(
+                                                    "h-4.5 w-4.5 transition-colors",
+                                                    isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                                                )} />
+                                                <span>{item.name}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                 {item.isPro && (
+                                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-600 border border-indigo-500/20">
+                                                        PRO
+                                                    </span>
+                                                )}
+                                                {locked && <Crown className="h-3.5 w-3.5 text-amber-500 fill-amber-500/20" />}
+                                            </div>
+                                        </Link>
+                                    )
+                                })}
+                            </div>
+                            {/* Add Separator except for last item */}
+                            {!collapsed && groupIndex < navGroups.length - 1 && (
+                                <div className="px-4 py-2">
+                                     <div className="h-px bg-border/50" />
+                                </div>
+                            )}
+                        </div>
+                    ))}
+
+                    {/* Super Admin Link */}
+                    {isSuperAdmin && (
+                        <div className="mt-6 px-2">
+                             {!collapsed && <div className="px-2 mb-2 text-xs font-semibold text-purple-600/70 uppercase tracking-wider">Administration</div>}
                             <Link
-                                key={item.href}
-                                href={item.href}
+                                href="/super-admin"
                                 className={cn(
-                                    'group flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                                    isActive
-                                        ? 'bg-primary/10 text-primary'
-                                        : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                                    "group flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                                    collapsed ? "justify-center" : "justify-between",
+                                    pathname.startsWith('/super-admin')
+                                        ? "bg-purple-500 text-white shadow-md shadow-purple-500/20"
+                                        : "bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-100"
                                 )}
                             >
-                                <div className="flex items-center">
-                                    <item.icon
-                                        className={cn(
-                                            'mr-3 h-5 w-5 flex-shrink-0',
-                                            isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-accent-foreground'
-                                        )}
-                                    />
-                                    {item.name}
-                                    <span className="ml-2 rounded bg-indigo-500/10 px-1.5 py-0.5 text-[10px] font-bold leading-none text-indigo-500 border border-indigo-500/20">
-                                        PRO
-                                    </span>
-                                </div>
+                                {collapsed ? (
+                                    <Lock className="h-5 w-5" />
+                                ) : (
+                                    <>
+                                        <div className="flex items-center gap-3">
+                                            <Lock className="h-4 w-4" />
+                                            <span>Super Admin</span>
+                                        </div>
+                                    </>
+                                )}
                             </Link>
-                        )
-                    }
+                        </div>
+                    )}
+                </nav>
 
-                    return (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={cn(
-                                'group flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                                isActive
-                                    ? 'bg-primary/10 text-primary'
-                                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                            )}
-                        >
-                            <div className="flex items-center">
-                                <item.icon
-                                    className={cn(
-                                        'mr-3 h-5 w-5 flex-shrink-0',
-                                        isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-accent-foreground'
+                {/* Footer User Profile */}
+                <div className="p-4 border-t bg-muted/20">
+                    <DropdownMenu>
+                         <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className={cn(
+                                "w-full p-0 h-auto hover:bg-transparent",
+                                collapsed ? "justify-center" : "justify-start"
+                            )}>
+                                <div className={cn(
+                                    "flex items-center gap-3 w-full",
+                                    collapsed ? "justify-center" : ""
+                                )}>
+                                    <Avatar className="h-9 w-9 border border-border shadow-sm">
+                                        <AvatarImage src="" />
+                                        <AvatarFallback className="bg-primary/10 text-primary font-medium text-xs">
+                                            {userProfile?.full_name?.[0] || 'U'}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    {!collapsed && (
+                                        <div className="flex flex-col items-start text-left flex-1 min-w-0">
+                                            <span className="text-sm font-semibold truncate w-full text-foreground/90">
+                                                {userProfile?.full_name || 'User'}
+                                            </span>
+                                            <span className="text-xs text-muted-foreground truncate w-full">
+                                                {userProfile?.role || 'Member'}
+                                            </span>
+                                        </div>
                                     )}
-                                />
-                                {item.name}
-                            </div>
-                            {isLocked && <Crown className="h-3.5 w-3.5 text-amber-500 fill-amber-500/20" />}
-                        </Link>
-                    )
-                })}
-            </nav>
+                                    {!collapsed && <MoreVertical className="h-4 w-4 text-muted-foreground" />}
+                                </div>
+                            </Button>
+                         </DropdownMenuTrigger>
+                         <DropdownMenuContent align={collapsed ? "center" : "end"} side={collapsed ? "right" : "top"} className="w-56" sideOffset={10}>
+                             <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                             <DropdownMenuSeparator />
+                             <DropdownMenuItem asChild>
+                                 <Link href="/settings/profile" className="cursor-pointer">
+                                     <Settings className="mr-2 h-4 w-4" />
+                                     <span>Settings</span>
+                                 </Link>
+                             </DropdownMenuItem>
+                             <DropdownMenuSeparator />
+                             <DropdownMenuItem className="text-destructive focus:text-destructive cursor-pointer" onClick={async () => {
+                                 await supabase.auth.signOut()
+                                 window.location.href = '/login'
+                             }}>
+                                    <LogOut className="mr-2 h-4 w-4" />
+                                    <span>Log out</span>
+                             </DropdownMenuItem>
+                         </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+            </div>
+        </TooltipProvider>
+    )
+}
 
-        </div>
+function BadgeIcon({ className }: { className?: string }) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={className}
+        >
+            <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+        </svg>
     )
 }

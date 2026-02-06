@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { useEffect, useState } from 'react'
 
 interface StatCardProps {
     title: string
@@ -13,45 +14,65 @@ interface StatCardProps {
         label: string
         positive?: boolean
     }
-    color?: 'blue' | 'green' | 'purple' | 'orange' | 'pink'
+    color?: 'blue' | 'cyan' | 'sky' | 'emerald'
     delay?: number
 }
 
 const colorStyles = {
     blue: {
         text: 'text-blue-400',
-        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(59,130,246,0.5)]',
+        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(59,130,246,0.3)]',
         border: 'group-hover:border-blue-500/30',
         bg: 'group-hover:bg-blue-500/5'
     },
-    green: {
+    cyan: {
+        text: 'text-cyan-400',
+        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(6,182,212,0.3)]',
+        border: 'group-hover:border-cyan-500/30',
+        bg: 'group-hover:bg-cyan-500/5'
+    },
+    sky: {
+        text: 'text-sky-400',
+        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(14,165,233,0.3)]',
+        border: 'group-hover:border-sky-500/30',
+        bg: 'group-hover:bg-sky-500/5'
+    },
+    emerald: {
         text: 'text-emerald-400',
-        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.5)]',
+        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.3)]',
         border: 'group-hover:border-emerald-500/30',
         bg: 'group-hover:bg-emerald-500/5'
-    },
-    purple: {
-        text: 'text-purple-400',
-        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(147,51,234,0.5)]',
-        border: 'group-hover:border-purple-500/30',
-        bg: 'group-hover:bg-purple-500/5'
-    },
-    orange: {
-        text: 'text-orange-400',
-        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(249,115,22,0.5)]',
-        border: 'group-hover:border-orange-500/30',
-        bg: 'group-hover:bg-orange-500/5'
-    },
-    pink: {
-        text: 'text-pink-400',
-        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(236,72,153,0.5)]',
-        border: 'group-hover:border-pink-500/30',
-        bg: 'group-hover:bg-pink-500/5'
     }
 }
 
 export function StatCard({ title, value, icon, description, trend, color = 'blue', delay = 0 }: StatCardProps) {
     const styles = colorStyles[color]
+    const [displayValue, setDisplayValue] = useState(0)
+
+    // Simple counting animation for numbers
+    useEffect(() => {
+        if (typeof value === 'number') {
+            let start = 0
+            const end = value
+            const duration = 1500
+            const increment = end / (duration / 16)
+            
+            const timer = setInterval(() => {
+                start += increment
+                if (start >= end) {
+                    setDisplayValue(end)
+                    clearInterval(timer)
+                } else {
+                    setDisplayValue(Math.floor(start))
+                }
+            }, 16)
+            
+            return () => clearInterval(timer)
+        } else {
+             // If string (e.g. currency), no animation for now or handle differently
+        }
+    }, [value])
+
 
     return (
         <motion.div
@@ -93,7 +114,9 @@ export function StatCard({ title, value, icon, description, trend, color = 'blue
 
                 <div className="space-y-1">
                     <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{title}</p>
-                    <h3 className="text-3xl font-black tracking-tight text-white drop-shadow-sm">{value}</h3>
+                    <h3 className="text-3xl font-black tracking-tight text-white drop-shadow-sm">
+                        {typeof value === 'number' ? displayValue : value}
+                    </h3>
                     {description && (
                         <p className="text-[11px] text-slate-500 font-medium group-hover:text-slate-400 transition-colors">{description}</p>
                     )}
