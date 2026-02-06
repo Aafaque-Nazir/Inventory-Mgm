@@ -14,7 +14,7 @@ interface StatCardProps {
         label: string
         positive?: boolean
     }
-    color?: 'blue' | 'cyan' | 'sky' | 'emerald'
+    color?: 'blue' | 'cyan' | 'sky' | 'emerald' | 'green' | 'purple' | 'orange' | 'pink'
     delay?: number
 }
 
@@ -42,6 +42,30 @@ const colorStyles = {
         glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.3)]',
         border: 'group-hover:border-emerald-500/30',
         bg: 'group-hover:bg-emerald-500/5'
+    },
+    green: {
+        text: 'text-green-400',
+        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(34,197,94,0.3)]',
+        border: 'group-hover:border-green-500/30',
+        bg: 'group-hover:bg-green-500/5'
+    },
+    purple: {
+        text: 'text-purple-400',
+        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(168,85,247,0.3)]',
+        border: 'group-hover:border-purple-500/30',
+        bg: 'group-hover:bg-purple-500/5'
+    },
+    orange: {
+        text: 'text-orange-400',
+        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(249,115,22,0.3)]',
+        border: 'group-hover:border-orange-500/30',
+        bg: 'group-hover:bg-orange-500/5'
+    },
+    pink: {
+        text: 'text-pink-400',
+        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(236,72,153,0.3)]',
+        border: 'group-hover:border-pink-500/30',
+        bg: 'group-hover:bg-pink-500/5'
     }
 }
 
