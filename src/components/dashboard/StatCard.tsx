@@ -46,7 +46,7 @@ const colorStyles = {
 }
 
 export function StatCard({ title, value, icon, description, trend, color = 'blue', delay = 0 }: StatCardProps) {
-    const styles = colorStyles[color]
+    const styles = colorStyles[color] || colorStyles.blue
     const [displayValue, setDisplayValue] = useState(0)
 
     // Simple counting animation for numbers
