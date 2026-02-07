@@ -17,6 +17,7 @@ import {
     SheetContent,
     SheetTrigger,
     SheetTitle,
+    SheetDescription,
 } from '@/components/ui/sheet'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -33,13 +34,15 @@ import {
     Shield,
     CreditCard,
     HelpCircle,
-    Crown
+    Crown,
+    MoreVertical
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { useEffect, useState } from 'react'
 import { Profile } from '@/types'
 import { cn } from '@/lib/utils'
 import { WarehouseSwitcher } from '@/components/warehouses/WarehouseSwitcher'
+import { navGroups, NavItem } from '@/lib/navigation'
 
 export function Topbar() {
     const router = useRouter()
@@ -49,17 +52,7 @@ export function Topbar() {
     const [email, setEmail] = useState<string | null>(null)
     const [open, setOpen] = useState(false)
 
-    const navigation = [
-        { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-        { name: 'Inventory', href: '/items', icon: Package },
-        { name: 'Stock Movements', href: '/stock', icon: ArrowRightLeft },
-        { name: 'Suppliers', href: '/suppliers', icon: Users },
-        { name: 'Purchase Orders', href: '/purchase-orders', icon: ShoppingCart },
-        { name: 'Reports', href: '/reports', icon: BarChart3 },
-        { name: 'Pricing', href: '/pricing', icon: CreditCard },
-        { name: 'Help & Support', href: '/help', icon: HelpCircle },
-        { name: 'Settings', href: '/settings', icon: Settings },
-    ]
+
 
     useEffect(() => {
         async function getProfile() {
@@ -101,123 +94,126 @@ export function Topbar() {
                             <span className="sr-only">Toggle menu</span>
                         </Button>
                     </SheetTrigger>
-                    <SheetContent side="left" className="w-64 p-0">
+                    <SheetContent side="left" className="flex flex-col w-[280px] p-0">
                         <div className="flex h-16 items-center border-b px-6">
                             <SheetTitle className="text-xl font-bold tracking-tight">Inventory <span className="text-primary">Management</span></SheetTitle>
+                            <SheetDescription className="sr-only">Mobile navigation menu</SheetDescription>
                         </div>
-                        <nav className="flex-1 space-y-1 px-3 py-4">
-                            {navigation.map((item) => {
-                                if (item.name === 'Settings') {
-                                    return (
-                                        <div key="settings-mobile-group" className="space-y-1">
-                                            <div className="flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium text-muted-foreground">
-                                                <div className="flex items-center">
-                                                    <Settings className="mr-3 h-5 w-5 flex-shrink-0" />
-                                                    Settings
-                                                </div>
-                                            </div>
-                                            <div className="ml-4 space-y-1 border-l pl-2">
+                        
+                        <nav className="flex-1 space-y-6 overflow-y-auto py-6 px-3 custom-scrollbar">
+                             {navGroups.map((group, groupIndex) => (
+                                <div key={group.title} className="space-y-2">
+                                    <h4 className="px-4 text-xs font-semibold text-muted-foreground/50 uppercase tracking-wider mb-2">
+                                        {group.title}
+                                    </h4>
+                                    <div className="space-y-1">
+                                        {group.items.map((item) => {
+                                             const isActive = pathname.startsWith(item.href)
+                                             const locked = item.name === 'Reports' && (!profile?.organization?.plan_type || profile.organization.plan_type === 'FREE') && !profile?.is_super_admin
+                                             
+                                             return (
                                                 <Link
-                                                    href="/settings/profile"
+                                                    key={item.href}
+                                                    href={item.href}
                                                     onClick={() => setOpen(false)}
                                                     className={cn(
-                                                        'block rounded-md px-3 py-2 text-sm transition-colors',
-                                                        pathname.startsWith('/settings/profile') ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:text-foreground'
+                                                        "group flex items-center justify-between rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-200 border border-transparent mx-2",
+                                                        isActive
+                                                            ? "bg-primary/5 text-primary border-primary/10 shadow-sm"
+                                                            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                                                     )}
                                                 >
-                                                    Profile
+                                                    <div className="flex items-center gap-3">
+                                                        <item.icon className={cn(
+                                                            "h-4.5 w-4.5 transition-colors",
+                                                            isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                                                        )} />
+                                                        <span>{item.name}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                         {item.isPro && (
+                                                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-600 border border-indigo-500/20">
+                                                                PRO
+                                                            </span>
+                                                        )}
+                                                        {locked && <Crown className="h-3.5 w-3.5 text-amber-500 fill-amber-500/20" />}
+                                                    </div>
                                                 </Link>
-                                                <Link
-                                                    href="/settings/organization"
-                                                    onClick={() => setOpen(false)}
-                                                    className={cn(
-                                                        'block rounded-md px-3 py-2 text-sm transition-colors',
-                                                        pathname.startsWith('/settings/organization') ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:text-foreground'
-                                                    )}
-                                                >
-                                                    Organization
-                                                </Link>
-                                                <Link
-                                                    href="/warehouses"
-                                                    onClick={() => setOpen(false)}
-                                                    className={cn(
-                                                        'block rounded-md px-3 py-2 text-sm transition-colors flex items-center justify-between',
-                                                        pathname.startsWith('/warehouses') ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:text-foreground'
-                                                    )}
-                                                >
-                                                    <span>Warehouses</span>
-                                                    <span className="text-[10px] font-bold text-indigo-500 bg-indigo-500/10 px-1 rounded ml-2">PRO</span>
-                                                </Link>
-                                                <Link
-                                                    href="/settings/team"
-                                                    onClick={() => setOpen(false)}
-                                                    className={cn(
-                                                        'block rounded-md px-3 py-2 text-sm transition-colors',
-                                                        pathname.startsWith('/settings/team') ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:text-foreground'
-                                                    )}
-                                                >
-                                                    Team
-                                                </Link>
-                                                <Link
-                                                    href="/settings/billing"
-                                                    onClick={() => setOpen(false)}
-                                                    className={cn(
-                                                        'block rounded-md px-3 py-2 text-sm transition-colors',
-                                                        pathname.startsWith('/settings/billing') ? 'text-primary font-medium bg-primary/5' : 'text-muted-foreground hover:text-foreground'
-                                                    )}
-                                                >
-                                                    Billing
-                                                </Link>
-                                            </div>
+                                             )
+                                        })}
+                                    </div>
+                                    {groupIndex < navGroups.length - 1 && (
+                                        <div className="px-4 py-2">
+                                             <div className="h-px bg-border/50" />
                                         </div>
-                                    )
-                                }
-
-                                const isActive = pathname.startsWith(item.href)
-                                const isLocked = item.name === 'Reports' && (!profile?.organization?.plan_type || profile.organization.plan_type === 'FREE') && !profile?.is_super_admin
-
-                                return (
+                                    )}
+                                </div>
+                             ))}
+                             
+                             {/* Super Admin Link */}
+                             {profile?.is_super_admin && (
+                                <div className="mt-6 px-2">
+                                     <div className="px-2 mb-2 text-xs font-semibold text-purple-600/70 uppercase tracking-wider">Administration</div>
                                     <Link
-                                        key={item.name}
-                                        href={item.href}
+                                        href="/super-admin"
                                         onClick={() => setOpen(false)}
                                         className={cn(
-                                            'group flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                                            isActive
-                                                ? 'bg-primary/10 text-primary'
-                                                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                                            "group flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors mx-2",
+                                            pathname.startsWith('/super-admin')
+                                                ? "bg-purple-500 text-white shadow-md shadow-purple-500/20"
+                                                : "bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-100"
                                         )}
                                     >
-                                        <div className="flex items-center">
-                                            <item.icon
-                                                className={cn(
-                                                    'mr-3 h-5 w-5 flex-shrink-0',
-                                                    isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-accent-foreground'
-                                                )}
-                                            />
-                                            {item.name}
+                                        <div className="flex items-center gap-3">
+                                            <Shield className="h-4 w-4" />
+                                            <span>Super Admin</span>
                                         </div>
-                                        {isLocked && <Crown className="h-4 w-4 text-amber-500 fill-amber-500/20" />}
                                     </Link>
-                                )
-                            })}
-                            {/* Super Admin Link for Super Admins */}
-                            {profile?.is_super_admin && (
-                                <Link
-                                    href="/super-admin"
-                                    onClick={() => setOpen(false)}
-                                    className={cn(
-                                        'group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors mt-4 border-t pt-4',
-                                        pathname.startsWith('/super-admin')
-                                            ? 'bg-purple-500/10 text-purple-500'
-                                            : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                                    )}
-                                >
-                                    <Shield className="mr-3 h-5 w-5 flex-shrink-0 text-purple-500" />
-                                    Super Admin
-                                </Link>
+                                </div>
                             )}
                         </nav>
+                        
+                        {/* Footer User Profile */}
+                        <div className="p-4 border-t bg-muted/20">
+                            <DropdownMenu>
+                                 <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className="w-full p-0 h-auto hover:bg-transparent justify-start">
+                                        <div className="flex items-center gap-3 w-full">
+                                            <Avatar className="h-9 w-9 border border-border shadow-sm">
+                                                <AvatarImage src="" />
+                                                <AvatarFallback className="bg-primary/10 text-primary font-medium text-xs">
+                                                    {profile?.full_name?.[0] || 'U'}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex flex-col items-start text-left flex-1 min-w-0">
+                                                <span className="text-sm font-semibold truncate w-full text-foreground/90">
+                                                    {profile?.full_name || 'User'}
+                                                </span>
+                                                <span className="text-xs text-muted-foreground truncate w-full">
+                                                    {profile?.role || 'Member'}
+                                                </span>
+                                            </div>
+                                            <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                                        </div>
+                                    </Button>
+                                 </DropdownMenuTrigger>
+                                 <DropdownMenuContent align="end" side="top" className="w-56" sideOffset={10}>
+                                     <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                     <DropdownMenuSeparator />
+                                     <DropdownMenuItem asChild>
+                                         <Link href="/settings/profile" className="cursor-pointer" onClick={() => setOpen(false)}>
+                                             <Settings className="mr-2 h-4 w-4" />
+                                             <span>Settings</span>
+                                         </Link>
+                                     </DropdownMenuItem>
+                                     <DropdownMenuSeparator />
+                                     <DropdownMenuItem className="text-destructive focus:text-destructive cursor-pointer" onClick={handleSignOut}>
+                                            <LogOut className="mr-2 h-4 w-4" />
+                                            <span>Log out</span>
+                                     </DropdownMenuItem>
+                                 </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
                     </SheetContent>
                 </Sheet>
                 <div className="flex items-center gap-3">

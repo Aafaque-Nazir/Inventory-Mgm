@@ -117,12 +117,14 @@ export default async function ItemsPage() {
                     <h1 className="text-3xl font-bold tracking-tight text-white/90">Inventory</h1>
                     <p className="text-sm text-slate-400">Manage your stock and items.</p>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-2 gap-2 w-full md:flex md:w-auto">
                     <ScanItemButton isPro={isPro || isSuperAdmin} />
                     <StockScanner isPro={isPro || isSuperAdmin} />
                     <CsvImporter />
                     <ExportButton items={items || []} isPro={isPro || isSuperAdmin} />
-                    <CreateItemDialog />
+                    <div className="col-span-2 md:col-auto">
+                        <CreateItemDialog />
+                    </div>
                 </div>
             </div>
             <ItemsTable items={items || []} />
