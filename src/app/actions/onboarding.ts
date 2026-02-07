@@ -39,7 +39,8 @@ export async function createOrganization(prevState: any, formData: FormData) {
                 slug: validatedFields.data.slug,
                 plan_type: 'FREE', // Default to Free
                 max_users: 1,
-                max_items: 50
+                max_items: 50,
+                created_by: user.id
             })
             .select()
             .single()
