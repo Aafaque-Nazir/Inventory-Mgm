@@ -2,8 +2,8 @@ name: Keep Supabase Alive
 
 on:
   schedule:
-    # Run at 00:00 UTC every 3 days
-    - cron: "0 0 */3 * *"
+    # Run at 00:00 UTC every 2 days to be safe (Supabase pauses after ~7 days of inactivity)
+    - cron: "0 0 */2 * *"
   workflow_dispatch: # Allow manual triggering
 
 jobs:
@@ -12,4 +12,7 @@ jobs:
     steps:
       - name: Ping Keep-Alive Endpoint
         run: |
-          curl -I https://nvntory-mgm.vercel.app/api/keep-alive
+          # Use -L to follow redirects, and a real User-Agent
+          curl -L -v \
+            -A "GitHub-Action-KeepAlive/1.0" \
+            https://nvntory-mgm.vercel.app/api/keep-alive
