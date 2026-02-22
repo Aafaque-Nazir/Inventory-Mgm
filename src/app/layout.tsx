@@ -62,6 +62,7 @@ export const metadata: Metadata = {
     title: "InvMaster",
   },
 };
+import { LenisProvider } from "@/components/lenis-provider";
 
 export default function RootLayout({
   children,
@@ -69,15 +70,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark scroll-smooth" data-scroll-behavior="smooth">
+    <html lang="en" className="dark">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AnnouncementBanner />
-        {children}
-        <Toaster />
-        <Analytics />
-        <SpeedInsights />
+        <LenisProvider>
+          <AnnouncementBanner />
+          {children}
+          <Toaster />
+          <Analytics />
+          <SpeedInsights />
+        </LenisProvider>
       </body>
     </html>
   );

@@ -33,7 +33,7 @@ export function SignupForm() {
                 options: {
                     data: {
                         full_name: fullName,
-                        role: 'STOREKEEPER' 
+                        role: 'STOREKEEPER'
                     },
                     emailRedirectTo: `${location.origin}/auth/callback`
                 }
@@ -51,30 +51,30 @@ export function SignupForm() {
                 toast.success("Account created successfully")
                 router.push("/onboarding")
             } else {
-                 toast.error("Something went wrong")
+                toast.error("Something went wrong")
             }
         })
     }
 
     if (isSuccess) {
-         return (
-             <motion.div 
+        return (
+            <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="text-center space-y-6 p-6 rounded-2xl bg-white/5 border border-white/10"
-             >
-                 <div className="mx-auto h-16 w-16 rounded-full bg-green-500/20 flex items-center justify-center">
-                     <LayoutDashboard className="h-8 w-8 text-green-500" />
-                 </div>
-                 <div className="space-y-2">
-                     <h3 className="text-xl font-bold text-white">Check your email</h3>
-                     <p className="text-slate-400">We've sent a verification link to your inbox.</p>
-                 </div>
-                 <Button variant="outline" className="w-full border-white/10 hover:bg-white/5 hover:text-white" onClick={() => router.push('/login')}>
-                     Back to Login
-                 </Button>
-             </motion.div>
-         )
+            >
+                <div className="mx-auto h-16 w-16 rounded-full bg-green-500/20 flex items-center justify-center">
+                    <LayoutDashboard className="h-8 w-8 text-green-500" />
+                </div>
+                <div className="space-y-2">
+                    <h3 className="text-xl font-bold text-white">Check your email</h3>
+                    <p className="text-slate-400">We've sent a verification link to your inbox.</p>
+                </div>
+                <Button variant="outline" className="w-full border-white/10 hover:bg-white/5 hover:text-white" onClick={() => router.push('/login')}>
+                    Back to Login
+                </Button>
+            </motion.div>
+        )
     }
 
     return (
@@ -82,27 +82,27 @@ export function SignupForm() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="grid gap-6"
+            className="grid gap-4"
         >
             <GoogleSignInButton />
 
             <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-white/10" />
+                    <span className="w-full border-t border-white/5" />
                 </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-transparent px-2 text-slate-500">
+                <div className="relative flex justify-center text-[10px] font-semibold tracking-widest uppercase">
+                    <span className="bg-[#0a0a0a] px-3 text-slate-500">
                         Or click below
                     </span>
                 </div>
             </div>
 
             <form onSubmit={onSubmit}>
-                <div className="grid gap-5">
+                <div className="grid gap-4">
                     <div className="grid gap-2 group">
-                        <Label htmlFor="fullName" className="text-slate-300 group-focus-within:text-cyan-400 transition-colors">Full Name</Label>
+                        <Label htmlFor="fullName" className="text-slate-400 text-xs font-semibold uppercase tracking-wider group-focus-within:text-white transition-colors">Full Name</Label>
                         <div className="relative">
-                            <User className="absolute left-3 top-2.5 h-5 w-5 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+                            <User className="absolute left-3.5 top-3.5 h-5 w-5 text-slate-500 group-focus-within:text-white transition-colors" />
                             <Input
                                 id="fullName"
                                 name="fullName"
@@ -112,15 +112,15 @@ export function SignupForm() {
                                 autoCorrect="off"
                                 disabled={isPending}
                                 required
-                                className="pl-10 h-12 bg-black/40 border-white/10 text-white placeholder:text-slate-600 focus:border-cyan-500 focus:ring-cyan-500/20 transition-all"
+                                className="pl-11 h-14 bg-black/50 border-white/5 text-white placeholder:text-slate-600 focus:bg-black focus:border-white/20 focus:ring-1 focus:ring-white/20 transition-all rounded-xl"
                             />
                         </div>
                     </div>
-                    
+
                     <div className="grid gap-2 group">
-                        <Label htmlFor="email" className="text-slate-300 group-focus-within:text-cyan-400 transition-colors">Email</Label>
+                        <Label htmlFor="email" className="text-slate-400 text-xs font-semibold uppercase tracking-wider group-focus-within:text-white transition-colors">Email</Label>
                         <div className="relative">
-                            <Mail className="absolute left-3 top-2.5 h-5 w-5 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+                            <Mail className="absolute left-3.5 top-3.5 h-5 w-5 text-slate-500 group-focus-within:text-white transition-colors" />
                             <Input
                                 id="email"
                                 name="email"
@@ -131,15 +131,15 @@ export function SignupForm() {
                                 autoCorrect="off"
                                 disabled={isPending}
                                 required
-                                className="pl-10 h-12 bg-black/40 border-white/10 text-white placeholder:text-slate-600 focus:border-cyan-500 focus:ring-cyan-500/20 transition-all"
+                                className="pl-11 h-14 bg-black/50 border-white/5 text-white placeholder:text-slate-600 focus:bg-black focus:border-white/20 focus:ring-1 focus:ring-white/20 transition-all rounded-xl"
                             />
                         </div>
                     </div>
 
                     <div className="grid gap-2 group">
-                        <Label htmlFor="password" className="text-slate-300 group-focus-within:text-cyan-400 transition-colors">Password</Label>
+                        <Label htmlFor="password" className="text-slate-400 text-xs font-semibold uppercase tracking-wider group-focus-within:text-white transition-colors">Password</Label>
                         <div className="relative">
-                            <Lock className="absolute left-3 top-2.5 h-5 w-5 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+                            <Lock className="absolute left-3.5 top-3.5 h-5 w-5 text-slate-500 group-focus-within:text-white transition-colors" />
                             <Input
                                 id="password"
                                 name="password"
@@ -148,12 +148,12 @@ export function SignupForm() {
                                 disabled={isPending}
                                 required
                                 minLength={8}
-                                className="pl-10 h-12 bg-black/40 border-white/10 text-white placeholder:text-slate-600 focus:border-cyan-500 focus:ring-cyan-500/20 transition-all"
+                                className="pl-11 h-14 bg-black/50 border-white/5 text-white placeholder:text-slate-600 focus:bg-black focus:border-white/20 focus:ring-1 focus:ring-white/20 transition-all rounded-xl"
                             />
                         </div>
                     </div>
-                    
-                    <Button disabled={isPending} className="w-full h-12 bg-cyan-600 hover:bg-cyan-500 text-white font-bold shadow-lg shadow-cyan-900/20 hover:shadow-cyan-500/40 transition-all duration-300">
+
+                    <Button disabled={isPending} className="w-full h-14 bg-white hover:bg-slate-200 text-black font-bold shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all duration-300 rounded-xl">
                         {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Create Account <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
