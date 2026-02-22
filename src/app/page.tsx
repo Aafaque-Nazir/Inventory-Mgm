@@ -18,7 +18,10 @@ import {
     Eye,
     TrendingUp,
     LineChart,
-    Settings
+    Settings,
+    ShoppingCart,
+    User,
+    AlertCircle
 } from 'lucide-react'
 import { motion, useScroll, useTransform, Variants } from 'framer-motion'
 import { useRef } from 'react'
@@ -173,31 +176,134 @@ export default function Home() {
                             </div>
                         </div>
 
-                        <div className="relative">
-                            <Image
-                                src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2670&auto=format&fit=crop"
-                                alt="Dashboard Interface"
-                                className="w-full h-auto object-cover opacity-80 mix-blend-luminosity filter contrast-125 hover:mix-blend-normal transition-all duration-1000"
-                                width={1600}
-                                height={900}
-                                priority
-                            />
+                        {/* Unique Dashboard UI Replacement */}
+                        <div className="relative w-full aspect-[16/10] md:aspect-video bg-[#030303] flex font-sans">
+                            {/* Sidebar - Collapsed on Mobile, Expanded on Desktop */}
+                            <div className="hidden md:flex flex-col w-56 border-r border-white/5 bg-black/40 p-5 gap-8 z-10 shrink-0">
+                                <div className="flex items-center gap-3 px-2">
+                                    <div className="h-6 w-6 rounded bg-blue-600 flex items-center justify-center">
+                                        <Box className="w-4 h-4 text-white" />
+                                    </div>
+                                    <span className="text-sm font-bold text-white tracking-wide">InvMaster</span>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    {['Overview', 'Inventory', 'Orders', 'Analytics', 'Settings'].map((item, i) => (
+                                        <div key={item} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${i === 0 ? 'bg-white/10 text-white' : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'}`}>
+                                            {i === 0 && <Activity className="w-4 h-4" />}
+                                            {i === 1 && <Box className="w-4 h-4" />}
+                                            {i === 2 && <ShoppingCart className="w-4 h-4" />}
+                                            {i === 3 && <LineChart className="w-4 h-4" />}
+                                            {i === 4 && <Settings className="w-4 h-4" />}
+                                            {item}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
 
-                            {/* Floating Glass Widgets */}
-                            <motion.div
-                                initial={{ y: 50, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ delay: 0.8, type: "spring", stiffness: 100 }}
-                                className="absolute bottom-10 -right-4 md:bottom-24 md:-right-12 z-20 flex items-center gap-4 p-5 rounded-2xl border border-white/10 bg-black/50 backdrop-blur-2xl shadow-2xl"
-                            >
-                                <div className="h-12 w-12 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
-                                    <TrendingUp className="h-6 w-6 text-emerald-400" />
+                            {/* Main Content Area */}
+                            <div className="flex-1 flex flex-col p-4 md:p-8 z-10 relative">
+                                {/* Background glow in main area */}
+                                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none -translate-y-1/2 translate-x-1/3"></div>
+
+                                {/* Topbar */}
+                                <div className="flex justify-between items-center mb-8 relative z-10">
+                                    <div>
+                                        <h2 className="text-lg md:text-xl font-bold text-white mb-1">Command Center</h2>
+                                        <p className="text-xs text-slate-500">Real-time fulfillment metrics</p>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <div className="hidden md:flex bg-black/50 border border-white/10 rounded-full px-4 py-1.5 items-center gap-2 shadow-sm">
+                                            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.8)]"></div>
+                                            <span className="text-xs font-semibold text-slate-300">System Online</span>
+                                        </div>
+                                        <div className="h-9 w-9 xl:h-10 xl:w-10 rounded-full border border-white/10 bg-gradient-to-br from-slate-800 to-black flex items-center justify-center shadow-inner relative overflow-hidden group cursor-pointer hover:border-white/20 transition-colors">
+                                            <div className="absolute inset-0 bg-blue-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                            <User className="w-4 h-4 text-slate-300 group-hover:text-white transition-colors relative z-10" />
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Restock Alert</p>
-                                    <p className="text-sm font-bold text-white">Demand spike detected</p>
+
+                                {/* Metric Cards */}
+                                <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 mb-8 relative z-10">
+                                    {[
+                                        { label: "Total Revenue", val: "$128,450", sub: "+14.2% this week", color: "text-blue-400", bg: "from-blue-500/10 to-transparent" },
+                                        { label: "Active Orders", val: "1,204", sub: "98 processing", color: "text-emerald-400", bg: "from-emerald-500/10 to-transparent" },
+                                        { label: "Low Stock Items", val: "24", sub: "Requires attention", color: "text-amber-400", bg: "from-amber-500/10 to-transparent" },
+                                        { label: "Fulfillment Rate", val: "99.8%", sub: "+0.2% improvement", color: "text-indigo-400", bg: "from-indigo-500/10 to-transparent" }
+                                    ].map((stat, i) => (
+                                        <div key={i} className="relative bg-black/40 border border-white/5 rounded-2xl p-4 md:p-5 hover:bg-black/60 transition-all group overflow-hidden cursor-default shadow-sm hover:shadow-md hover:border-white/10">
+                                            <div className={`absolute inset-0 bg-gradient-to-br ${stat.bg} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
+                                            <p className="text-xs font-medium text-slate-500 mb-2 relative z-10">{stat.label}</p>
+                                            <p className="text-2xl lg:text-3xl font-black text-white mb-1 tracking-tight relative z-10">{stat.val}</p>
+                                            <p className={`text-[10px] md:text-xs font-medium ${stat.color} group-hover:opacity-100 opacity-80 transition-opacity relative z-10`}>{stat.sub}</p>
+                                        </div>
+                                    ))}
                                 </div>
-                            </motion.div>
+
+                                {/* Charts and Activity */}
+                                <div className="flex-1 flex gap-6 relative z-10 min-h-0">
+                                    {/* Main Chart */}
+                                    <div className="flex-[2] bg-black/40 border border-white/5 rounded-2xl p-5 md:p-6 flex flex-col relative overflow-hidden group">
+                                        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-blue-900/10 to-transparent pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity"></div>
+
+                                        <div className="flex justify-between items-center mb-6">
+                                            <h3 className="text-sm font-semibold text-white">Order Volume <span className="text-slate-500 font-normal ml-2 hidden sm:inline">(7 Days)</span></h3>
+                                            <div className="flex gap-1 items-center bg-white/5 rounded-md p-1 border border-white/5">
+                                                <div className="px-2 py-1 bg-white/10 rounded text-[10px] text-white font-medium cursor-pointer shadow-sm">Week</div>
+                                                <div className="px-2 py-1 text-[10px] text-slate-500 font-medium hover:text-white cursor-pointer transition-colors">Month</div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex-1 flex items-end justify-between gap-1 sm:gap-2 pt-4 relative z-10 border-b border-white/5 pb-2 min-h-[120px]">
+                                            {[40, 60, 45, 80, 55, 90, 75].map((height, i) => (
+                                                <div key={i} className="relative w-full flex justify-center group/bar h-full items-end">
+                                                    <motion.div
+                                                        initial={{ height: 0 }}
+                                                        whileInView={{ height: `${height}%` }}
+                                                        transition={{ duration: 1.5, delay: 0.1 + (i * 0.1), type: "spring", bounce: 0.4 }}
+                                                        viewport={{ once: true, margin: "-100px" }}
+                                                        className="w-full max-w-[40px] bg-blue-500/20 rounded-t border-t-2 border-blue-500 relative cursor-pointer group-hover/bar:bg-blue-500/40 transition-colors"
+                                                    >
+                                                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] font-bold py-1 px-2 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity pointer-events-none shadow-lg whitespace-nowrap z-20">
+                                                            ★ {height * 12}
+                                                        </div>
+                                                    </motion.div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className="flex justify-between mt-3 text-[10px] font-medium text-slate-500 px-1">
+                                            <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Recent Activity */}
+                                    <div className="flex-1 border border-white/5 bg-black/40 rounded-2xl p-5 md:p-6 hidden lg:flex flex-col">
+                                        <div className="flex items-center justify-between mb-6">
+                                            <h3 className="text-sm font-semibold text-white">Live Activity</h3>
+                                            <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse"></div>
+                                        </div>
+                                        <div className="flex flex-col gap-6 flex-1 overflow-hidden relative">
+                                            <div className="absolute left-[11px] top-6 bottom-4 w-px bg-gradient-to-b from-white/10 to-transparent"></div>
+                                            {[
+                                                { icon: <Box className="w-3 h-3 text-emerald-400" />, text: "Shipment #8920 dispatched", time: "Just now" },
+                                                { icon: <AlertCircle className="w-3 h-3 text-amber-400" />, text: "Low stock: Earbuds", time: "2m ago" },
+                                                { icon: <TrendingUp className="w-3 h-3 text-blue-400" />, text: "New B2B order", time: "15m ago" },
+                                                { icon: <Settings className="w-3 h-3 text-slate-400" />, text: "Auto reorder trig", time: "1h ago" },
+                                            ].map((log, i) => (
+                                                <div key={i} className="flex gap-4 items-start relative z-10 group cursor-pointer">
+                                                    <div className="w-6 h-6 rounded-full bg-[#0a0a0a] border border-white/10 flex items-center justify-center shrink-0 shadow bg-gradient-to-b from-white/5 to-transparent group-hover:border-white/20 transition-colors">
+                                                        {log.icon}
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs text-slate-200 font-medium group-hover:text-white transition-colors">{log.text}</p>
+                                                        <p className="text-[10px] text-slate-500 mt-1">{log.time}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </motion.div>
 
@@ -343,65 +449,65 @@ export default function Home() {
                             <p className="text-xl text-slate-400">Stop paying for bloated ERP systems. Get enterprise power with startup agility.</p>
                         </div>
 
-                        <div className="grid lg:grid-cols-2 gap-8 max-w-5xl">
-                            {/* Scale Plan */}
-                            <div className="rounded-[40px] border border-white/10 bg-black p-10 md:p-14 flex flex-col hover:border-white/20 transition-all flex-1">
-                                <h3 className="text-xl font-bold text-white mb-2">Starter</h3>
-                                <p className="text-slate-400 mb-8 h-12">Perfect for hobbyists and side projects.</p>
+                        <div className="grid lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                            {/* Starter Plan */}
+                            <div className="rounded-[32px] border border-white/10 bg-[#080808] p-8 md:p-10 flex flex-col hover:border-white/20 transition-all flex-1 shadow-lg">
+                                <h3 className="text-xl font-bold text-white mb-1">Starter</h3>
+                                *<p className="text-sm text-slate-400 mb-6 h-10">Perfect for hobbyists and side projects.</p>
 
-                                <div className="mb-10">
-                                    <span className="text-6xl font-black text-white">₹0</span>
-                                    <span className="text-slate-500 font-medium"> / mo</span>
+                                <div className="mb-8">
+                                    <span className="text-5xl font-black text-white">₹0</span>
+                                    <span className="text-sm text-slate-500 font-medium"> / mo</span>
                                 </div>
 
-                                <ul className="space-y-5 mb-12 flex-1">
+                                <ul className="space-y-4 mb-8 flex-1">
                                     {['1 Admin User', 'Up to 50 Items', 'Basic Reporting', 'Mobile App Access'].map((feat, i) => (
-                                        <li key={i} className="flex items-center gap-4 text-slate-300 font-medium tracking-wide">
-                                            <CheckCircle2 className="h-5 w-5 text-slate-500" /> {feat}
+                                        <li key={i} className="flex items-center gap-3 text-sm text-slate-300 font-medium tracking-wide">
+                                            <CheckCircle2 className="h-4 w-4 text-slate-500" /> {feat}
                                         </li>
                                     ))}
                                 </ul>
 
-                                <Button variant="outline" className="w-full rounded-full h-14 border-white/20 bg-transparent text-white font-bold hover:bg-white hover:text-black transition-all">Get Started</Button>
+                                <Button variant="outline" className="w-full rounded-2xl h-12 border-white/20 bg-transparent text-white font-bold hover:bg-white hover:text-black transition-all">Get Started</Button>
                             </div>
 
                             {/* Enterprise Plan (Glowing) */}
-                            <div className="relative rounded-[40px] border border-blue-500/50 bg-[#050914] p-10 md:p-14 flex flex-col shadow-[0_0_50px_rgba(37,99,235,0.15)] flex-1 overflow-hidden group">
+                            <div className="relative rounded-[32px] border border-blue-500/50 bg-[#050914] p-8 md:p-10 flex flex-col shadow-[0_0_40px_rgba(37,99,235,0.1)] flex-1 overflow-hidden group">
                                 {/* Subtle animated gradient background */}
                                 <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-indigo-600/10 opacity-50 group-hover:opacity-100 transition-opacity"></div>
 
-                                <div className="relative z-10 flex justify-between items-start mb-2">
+                                <div className="relative z-10 flex justify-between items-start mb-1">
                                     <h3 className="text-xl font-bold text-white">Pro</h3>
-                                    <div className="inline-flex items-center rounded-full bg-blue-500/20 px-3 py-1 text-xs font-bold text-blue-400 border border-blue-500/20">
+                                    <div className="inline-flex items-center rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] uppercase font-bold text-blue-400 border border-blue-500/20 tracking-wider">
                                         MOST POPULAR
                                     </div>
                                 </div>
-                                <p className="text-slate-400 mb-8 relative z-10 h-12">For growing businesses that need power.</p>
+                                <p className="text-sm text-slate-400 mb-6 relative z-10 h-10">For growing businesses that need power.</p>
 
-                                <div className="mb-10 relative z-10">
-                                    <span className="text-6xl font-black text-white">₹399</span>
-                                    <span className="text-blue-400/80 font-medium"> / mo</span>
+                                <div className="mb-8 relative z-10 flex items-end gap-1">
+                                    <span className="text-5xl font-black text-white">₹399</span>
+                                    <span className="text-sm text-blue-400/80 font-medium mb-1"> / mo</span>
                                 </div>
 
-                                <ul className="space-y-5 mb-12 flex-1 relative z-10">
+                                <ul className="space-y-4 mb-8 flex-1 relative z-10">
                                     {[
-                                        'Unlimited Users',
-                                        'Multi-Warehouse Support',
-                                        'Advanced Analytics & P&L',
+                                        'Unlimited Users & Roles',
+                                        'Multi-Warehouse Tracking',
+                                        'Advanced Profit & Loss',
                                         'AI Stock Predictions',
-                                        'Priority Email Support',
-                                        'Bulk Data Export'
+                                        'Priority 24/7 Support',
+                                        'Export/Import Suite'
                                     ].map((feat, i) => (
-                                        <li key={i} className="flex items-center gap-4 text-white font-medium tracking-wide">
-                                            <div className="h-6 w-6 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
-                                                <CheckCircle2 className="h-4 w-4 text-white" />
+                                        <li key={i} className="flex items-center gap-3 text-sm text-white font-medium tracking-wide">
+                                            <div className="h-5 w-5 rounded-full bg-blue-600/80 flex items-center justify-center shrink-0">
+                                                <CheckCircle2 className="h-3 w-3 text-white" />
                                             </div>
                                             {feat}
                                         </li>
                                     ))}
                                 </ul>
 
-                                <Button className="w-full rounded-full h-14 bg-blue-600 hover:bg-blue-500 text-white font-bold shadow-lg shadow-blue-500/25 transition-all relative z-10">Start 14-Day Free Trial</Button>
+                                <Button className="w-full rounded-2xl h-12 bg-blue-600 hover:bg-blue-500 text-white font-bold shadow-lg shadow-blue-500/20 transition-all relative z-10">Start 14-Day Free Trial</Button>
                             </div>
                         </div>
                     </div>
