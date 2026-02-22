@@ -85,7 +85,7 @@ export function Topbar() {
     }
 
     return (
-        <header className="flex h-16 items-center justify-between border-b bg-card px-6">
+        <header className="flex h-16 items-center justify-between px-6 bg-transparent">
             <div className="flex items-center gap-4">
                 <Sheet open={open} onOpenChange={setOpen}>
                     <SheetTrigger asChild>
@@ -99,19 +99,19 @@ export function Topbar() {
                             <SheetTitle className="text-xl font-bold tracking-tight">Inventory <span className="text-primary">Management</span></SheetTitle>
                             <SheetDescription className="sr-only">Mobile navigation menu</SheetDescription>
                         </div>
-                        
+
                         <nav className="flex-1 space-y-6 overflow-y-auto py-6 px-3 custom-scrollbar">
-                             {navGroups.map((group, groupIndex) => (
+                            {navGroups.map((group, groupIndex) => (
                                 <div key={group.title} className="space-y-2">
                                     <h4 className="px-4 text-xs font-semibold text-muted-foreground/50 uppercase tracking-wider mb-2">
                                         {group.title}
                                     </h4>
                                     <div className="space-y-1">
                                         {group.items.map((item) => {
-                                             const isActive = pathname.startsWith(item.href)
-                                             const locked = item.name === 'Reports' && (!profile?.organization?.plan_type || profile.organization.plan_type === 'FREE') && !profile?.is_super_admin
-                                             
-                                             return (
+                                            const isActive = pathname.startsWith(item.href)
+                                            const locked = item.name === 'Reports' && (!profile?.organization?.plan_type || profile.organization.plan_type === 'FREE') && !profile?.is_super_admin
+
+                                            return (
                                                 <Link
                                                     key={item.href}
                                                     href={item.href}
@@ -131,7 +131,7 @@ export function Topbar() {
                                                         <span>{item.name}</span>
                                                     </div>
                                                     <div className="flex items-center gap-2">
-                                                         {item.isPro && (
+                                                        {item.isPro && (
                                                             <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-600 border border-indigo-500/20">
                                                                 PRO
                                                             </span>
@@ -139,21 +139,21 @@ export function Topbar() {
                                                         {locked && <Crown className="h-3.5 w-3.5 text-amber-500 fill-amber-500/20" />}
                                                     </div>
                                                 </Link>
-                                             )
+                                            )
                                         })}
                                     </div>
                                     {groupIndex < navGroups.length - 1 && (
                                         <div className="px-4 py-2">
-                                             <div className="h-px bg-border/50" />
+                                            <div className="h-px bg-border/50" />
                                         </div>
                                     )}
                                 </div>
-                             ))}
-                             
-                             {/* Super Admin Link */}
-                             {profile?.is_super_admin && (
+                            ))}
+
+                            {/* Super Admin Link */}
+                            {profile?.is_super_admin && (
                                 <div className="mt-6 px-2">
-                                     <div className="px-2 mb-2 text-xs font-semibold text-purple-600/70 uppercase tracking-wider">Administration</div>
+                                    <div className="px-2 mb-2 text-xs font-semibold text-purple-600/70 uppercase tracking-wider">Administration</div>
                                     <Link
                                         href="/super-admin"
                                         onClick={() => setOpen(false)}
@@ -172,11 +172,11 @@ export function Topbar() {
                                 </div>
                             )}
                         </nav>
-                        
+
                         {/* Footer User Profile */}
                         <div className="p-4 border-t bg-muted/20">
                             <DropdownMenu>
-                                 <DropdownMenuTrigger asChild>
+                                <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" className="w-full p-0 h-auto hover:bg-transparent justify-start">
                                         <div className="flex items-center gap-3 w-full">
                                             <Avatar className="h-9 w-9 border border-border shadow-sm">
@@ -196,22 +196,22 @@ export function Topbar() {
                                             <MoreVertical className="h-4 w-4 text-muted-foreground" />
                                         </div>
                                     </Button>
-                                 </DropdownMenuTrigger>
-                                 <DropdownMenuContent align="end" side="top" className="w-56" sideOffset={10}>
-                                     <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                                     <DropdownMenuSeparator />
-                                     <DropdownMenuItem asChild>
-                                         <Link href="/settings/profile" className="cursor-pointer" onClick={() => setOpen(false)}>
-                                             <Settings className="mr-2 h-4 w-4" />
-                                             <span>Settings</span>
-                                         </Link>
-                                     </DropdownMenuItem>
-                                     <DropdownMenuSeparator />
-                                     <DropdownMenuItem className="text-destructive focus:text-destructive cursor-pointer" onClick={handleSignOut}>
-                                            <LogOut className="mr-2 h-4 w-4" />
-                                            <span>Log out</span>
-                                     </DropdownMenuItem>
-                                 </DropdownMenuContent>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" side="top" className="w-56" sideOffset={10}>
+                                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/settings/profile" className="cursor-pointer" onClick={() => setOpen(false)}>
+                                            <Settings className="mr-2 h-4 w-4" />
+                                            <span>Settings</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem className="text-destructive focus:text-destructive cursor-pointer" onClick={handleSignOut}>
+                                        <LogOut className="mr-2 h-4 w-4" />
+                                        <span>Log out</span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
                     </SheetContent>

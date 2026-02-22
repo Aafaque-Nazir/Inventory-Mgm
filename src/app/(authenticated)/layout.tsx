@@ -32,10 +32,6 @@ export default async function AuthenticatedLayout({
     }
 
     return (
-        <div className="flex h-screen flex-col overflow-hidden">
-            <div className="flex-1 overflow-hidden">
-                <AppLayout>{children}</AppLayout>
-            </div>
-        </div>
+        <AppLayout>{children}</AppLayout>
     )
 }

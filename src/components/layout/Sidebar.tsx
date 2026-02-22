@@ -93,7 +93,7 @@ export function Sidebar() {
                                 setTrialDays(days >= 0 ? days + 1 : 0)
                             }
                             if (expiry < new Date()) {
-                                effectivePlan = 'FREE' 
+                                effectivePlan = 'FREE'
                             }
                         }
                     }
@@ -116,15 +116,15 @@ export function Sidebar() {
 
     return (
         <TooltipProvider delayDuration={0}>
-            <div 
+            <div
                 className={cn(
-                    "hidden border-r bg-card md:flex flex-col transition-all duration-300 ease-in-out relative z-10",
+                    "hidden border-r bg-card md:flex flex-col transition-all duration-300 ease-in-out sticky top-0 h-screen shrink-0 z-40 shadow-sm",
                     collapsed ? "w-[80px]" : "w-[280px]"
                 )}
             >
                 {/* Toggle Button */}
                 <Button
-                    variant="ghost" 
+                    variant="ghost"
                     size="icon"
                     className="absolute -right-3 top-6 h-6 w-6 rounded-full border bg-background shadow-sm hover:bg-accent z-50 hidden md:flex"
                     onClick={toggleCollapse}
@@ -152,7 +152,7 @@ export function Sidebar() {
 
                 {/* Navigation */}
                 <nav className="flex-1 space-y-6 overflow-y-auto py-6 px-3 custom-scrollbar">
-                    
+
                     {/* Trial Banner - Only show when expanded */}
                     {!collapsed && trialDays !== null && trialDays > 0 && (
                         <div className="mx-2 mb-6 rounded-xl bg-gradient-to-br from-orange-500/10 via-orange-500/5 to-transparent p-4 border border-orange-500/10 shadow-sm relative overflow-hidden group">
@@ -174,7 +174,7 @@ export function Sidebar() {
 
                     {navGroups.map((group, groupIndex) => (
                         <div key={group.title} className="space-y-2">
-                             {!collapsed && (
+                            {!collapsed && (
                                 <h4 className="px-4 text-xs font-semibold text-muted-foreground/50 uppercase tracking-wider mb-2">
                                     {group.title}
                                 </h4>
@@ -192,16 +192,16 @@ export function Sidebar() {
                                                         href={item.href}
                                                         className={cn(
                                                             "flex h-10 w-10 items-center justify-center rounded-lg transition-all mx-auto relative group",
-                                                            isActive 
-                                                                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20" 
+                                                            isActive
+                                                                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
                                                                 : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                                                         )}
                                                     >
                                                         <item.icon className="h-5 w-5" />
                                                         {item.isPro && !isActive && (
-                                                             <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-indigo-500 ring-2 ring-background block" />
+                                                            <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-indigo-500 ring-2 ring-background block" />
                                                         )}
-                                                         {locked && <Crown className="absolute -bottom-1 -right-1 h-3 w-3 text-amber-500 fill-amber-500" />}
+                                                        {locked && <Crown className="absolute -bottom-1 -right-1 h-3 w-3 text-amber-500 fill-amber-500" />}
                                                     </Link>
                                                 </TooltipTrigger>
                                                 <TooltipContent side="right" className="font-medium">
@@ -231,7 +231,7 @@ export function Sidebar() {
                                                 <span>{item.name}</span>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                 {item.isPro && (
+                                                {item.isPro && (
                                                     <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-600 border border-indigo-500/20">
                                                         PRO
                                                     </span>
@@ -245,7 +245,7 @@ export function Sidebar() {
                             {/* Add Separator except for last item */}
                             {!collapsed && groupIndex < navGroups.length - 1 && (
                                 <div className="px-4 py-2">
-                                     <div className="h-px bg-border/50" />
+                                    <div className="h-px bg-border/50" />
                                 </div>
                             )}
                         </div>
@@ -254,7 +254,7 @@ export function Sidebar() {
                     {/* Super Admin Link */}
                     {isSuperAdmin && (
                         <div className="mt-6 px-2">
-                             {!collapsed && <div className="px-2 mb-2 text-xs font-semibold text-purple-600/70 uppercase tracking-wider">Administration</div>}
+                            {!collapsed && <div className="px-2 mb-2 text-xs font-semibold text-purple-600/70 uppercase tracking-wider">Administration</div>}
                             <Link
                                 href="/super-admin"
                                 className={cn(
@@ -283,7 +283,7 @@ export function Sidebar() {
                 {/* Footer User Profile */}
                 <div className="p-4 border-t bg-muted/20">
                     <DropdownMenu>
-                         <DropdownMenuTrigger asChild>
+                        <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className={cn(
                                 "w-full p-0 h-auto hover:bg-transparent",
                                 collapsed ? "justify-center" : "justify-start"
@@ -311,25 +311,25 @@ export function Sidebar() {
                                     {!collapsed && <MoreVertical className="h-4 w-4 text-muted-foreground" />}
                                 </div>
                             </Button>
-                         </DropdownMenuTrigger>
-                         <DropdownMenuContent align={collapsed ? "center" : "end"} side={collapsed ? "right" : "top"} className="w-56" sideOffset={10}>
-                             <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                             <DropdownMenuSeparator />
-                             <DropdownMenuItem asChild>
-                                 <Link href="/settings/profile" className="cursor-pointer">
-                                     <Settings className="mr-2 h-4 w-4" />
-                                     <span>Settings</span>
-                                 </Link>
-                             </DropdownMenuItem>
-                             <DropdownMenuSeparator />
-                             <DropdownMenuItem className="text-destructive focus:text-destructive cursor-pointer" onClick={async () => {
-                                 await supabase.auth.signOut()
-                                 window.location.href = '/login'
-                             }}>
-                                    <LogOut className="mr-2 h-4 w-4" />
-                                    <span>Log out</span>
-                             </DropdownMenuItem>
-                         </DropdownMenuContent>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align={collapsed ? "center" : "end"} side={collapsed ? "right" : "top"} className="w-56" sideOffset={10}>
+                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                                <Link href="/settings/profile" className="cursor-pointer">
+                                    <Settings className="mr-2 h-4 w-4" />
+                                    <span>Settings</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-destructive focus:text-destructive cursor-pointer" onClick={async () => {
+                                await supabase.auth.signOut()
+                                window.location.href = '/login'
+                            }}>
+                                <LogOut className="mr-2 h-4 w-4" />
+                                <span>Log out</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
             </div>

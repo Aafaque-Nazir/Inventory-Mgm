@@ -88,11 +88,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
     return (
         <WarehouseProvider>
-            <div className="flex h-screen overflow-hidden bg-background">
+            <div className="flex min-h-screen bg-background">
                 <Sidebar />
-                <div className="flex flex-1 flex-col overflow-hidden">
-                    <Topbar />
-                    <main className="flex-1 overflow-y-auto p-4 md:p-6">
+                <div className="flex flex-1 flex-col min-w-0 min-h-screen relative">
+                    <div className="sticky top-0 z-20 w-full backdrop-blur-xl bg-background/90 border-b shadow-sm">
+                        <Topbar />
+                    </div>
+                    <main className="flex-1 p-4 md:p-6 w-full max-w-full">
                         {children}
                     </main>
                 </div>

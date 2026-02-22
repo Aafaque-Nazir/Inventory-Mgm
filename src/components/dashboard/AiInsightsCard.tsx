@@ -6,15 +6,18 @@ import { motion } from 'framer-motion'
 
 const iconMap = {
     RISK: AlertOctagon,
+    WARNING: AlertOctagon,
     SEASONAL: TrendingUp,
-    OPPORTUNITY: PackageX
+    OPPORTUNITY: Sparkles,
+    ACHIEVEMENT: PackageX
 }
 
 const colorMap = {
     red: 'bg-red-500/10 text-red-300 border-red-500/20 hover:bg-red-500/20',
     blue: 'bg-blue-500/10 text-blue-300 border-blue-500/20 hover:bg-blue-500/20',
     green: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20 hover:bg-emerald-500/20',
-    yellow: 'bg-amber-500/10 text-amber-300 border-amber-500/20 hover:bg-amber-500/20'
+    yellow: 'bg-amber-500/10 text-amber-300 border-amber-500/20 hover:bg-amber-500/20',
+    purple: 'bg-purple-500/10 text-purple-300 border-purple-500/20 hover:bg-purple-500/20'
 }
 
 export function AiInsightsCard({ insights }: { insights: AiInsight[] }) {
@@ -54,22 +57,30 @@ export function AiInsightsCard({ insights }: { insights: AiInsight[] }) {
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.1 * idx }}
-                                className={`group relative p-4 rounded-xl border ${colorClass} transition-all duration-300`}
+                                className={`group relative p-4 rounded-xl border ${colorClass} transition-all duration-300 flex flex-col justify-between`}
                             >
-                                <div className="flex items-start justify-between mb-3">
-                                    <div className="flex items-center gap-2 font-semibold">
-                                        <Icon className="h-5 w-5" />
-                                        <span className="text-sm tracking-wide">{insight.title}</span>
+                                <div>
+                                    <div className="flex items-start justify-between mb-3">
+                                        <div className="flex items-center gap-2 font-semibold">
+                                            <Icon className="h-5 w-5" />
+                                            <span className="text-sm tracking-wide">{insight.title}</span>
+                                        </div>
+                                        {insight.metric && (
+                                            <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-white/5 uppercase tracking-wider backdrop-blur-sm border border-white/5 group-hover:bg-white/10 transition-colors">
+                                                {insight.metric}
+                                            </span>
+                                        )}
                                     </div>
-                                    {insight.metric && (
-                                        <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-white/5 uppercase tracking-wider backdrop-blur-sm border border-white/5 group-hover:bg-white/10 transition-colors">
-                                            {insight.metric}
-                                        </span>
-                                    )}
+                                    <p className="text-sm text-slate-400 leading-relaxed font-light mb-4 text-left">
+                                        {insight.description}
+                                    </p>
                                 </div>
-                                <p className="text-sm text-slate-400 leading-relaxed font-light">
-                                    {insight.description}
-                                </p>
+                                {insight.action && (
+                                    <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-white/50 group-hover:text-white transition-colors cursor-pointer">
+                                        <span>{insight.action}</span>
+                                        <TrendingUp className="h-3 w-3 transition-transform group-hover:translate-x-1" />
+                                    </div>
+                                )}
                             </motion.div>
                         )
                     })}

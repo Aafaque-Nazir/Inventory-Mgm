@@ -3,11 +3,13 @@
 import { createClient } from '@/lib/supabase/server'
 
 export interface AiInsight {
-    type: 'RISK' | 'OPPORTUNITY' | 'SEASONAL'
+    type: 'RISK' | 'OPPORTUNITY' | 'SEASONAL' | 'WARNING' | 'ACHIEVEMENT'
     title: string
     description: string
     metric?: string
-    color: 'red' | 'green' | 'blue' | 'yellow'
+    action?: string
+    color: 'red' | 'green' | 'blue' | 'yellow' | 'purple'
+    priority: number
 }
 
 export async function getAiInsights(): Promise<AiInsight[]> {
@@ -28,14 +30,14 @@ export async function getAiInsights(): Promise<AiInsight[]> {
 
     const { data: items } = await supabase
         .from('items')
-        .select('id, name, quantity, low_stock_threshold, category')
+        .select('id, name, quantity, low_stock_threshold, category, cost_price, selling_price')
         .eq('organization_id', orgId)
 
     const { data: movements } = await supabase
         .from('stock_movements')
-        .select('item_id, quantity, type, created_at, items(category)')
+        .select('item_id, quantity, type, created_at, items:item_id(category)')
         .eq('organization_id', orgId)
-        .eq('type', 'STOCK_OUT')
+        .in('type', ['OUT', 'SALE'])
         .gte('created_at', thirtyDaysAgo.toISOString())
 
     if (!items || !movements) return []
@@ -48,37 +50,101 @@ export async function getAiInsights(): Promise<AiInsight[]> {
     })
 
     const atRiskItems = []
+    const overstockedItems = []
+    let deadStockValue = 0
+    const deadStockItems = []
+    const highMarginRisks = []
 
     for (const item of items) {
         const totalUsed30Days = itemUsage[item.id] || 0
         const dailyVelocity = totalUsed30Days / 30
+        const profitMargin = item.selling_price && item.selling_price > 0
+            ? ((item.selling_price - (item.cost_price || 0)) / item.selling_price)
+            : 0
 
         if (dailyVelocity > 0) {
             const daysRemaining = item.quantity / dailyVelocity
 
-            // If stock will last less than 7 days (Lead Time), it's Critical
+            // Risk: Less than 7 days left
             if (daysRemaining < 7) {
-                atRiskItems.push({
-                    name: item.name,
-                    days: Math.ceil(daysRemaining)
-                })
+                atRiskItems.push({ name: item.name, days: Math.ceil(daysRemaining) })
             }
+
+            // High Margin Risk: Margin > 40% and running out in < 14 days
+            if (profitMargin > 0.4 && daysRemaining < 14 && daysRemaining >= 7) {
+                highMarginRisks.push({ name: item.name, margin: Math.round(profitMargin * 100), days: Math.ceil(daysRemaining) })
+            }
+
+            // Overstock: Stock lasting more than 90 days
+            if (daysRemaining > 90 && item.quantity > 50) {
+                const excessValue = (item.quantity - (dailyVelocity * 30)) * (item.cost_price || 0)
+                overstockedItems.push({ name: item.name, excessValue })
+            }
+        } else if (item.quantity > 0) {
+            // Dead stock
+            deadStockValue += (item.quantity * (item.cost_price || 0))
+            deadStockItems.push(item.name)
         }
     }
 
+    // Push Stockout Risk
     if (atRiskItems.length > 0) {
-        const topRisk = atRiskItems.sort((a, b) => a.days - b.days)[0] // Item running out soonest
+        const topRisk = atRiskItems.sort((a, b) => a.days - b.days)[0]
         insights.push({
             type: 'RISK',
-            title: 'Stockout Risk Alert',
-            description: `Based on current velocity, '${topRisk.name}' will run out in ${topRisk.days} days. Restock immediately.`,
-            metric: `${atRiskItems.length} Items at risk`,
-            color: 'red'
+            title: 'Critical Stockout Predicted',
+            description: `'${topRisk.name}' is depleting fast and will run out in approx. ${topRisk.days} days.`,
+            metric: `High Urgency`,
+            action: 'Reorder Now',
+            color: 'red',
+            priority: 1
+        })
+    }
+
+    // Push High Margin
+    if (highMarginRisks.length > 0) {
+        const topMarginRisk = highMarginRisks.sort((a, b) => a.days - b.days)[0]
+        insights.push({
+            type: 'OPPORTUNITY',
+            title: 'Protect High-Margin Revenue',
+            description: `'${topMarginRisk.name}' ( ${topMarginRisk.margin}% margin ) is selling fast but has only ${topMarginRisk.days} days of stock left.`,
+            metric: `Revenue Risk`,
+            action: 'Prioritize Restock',
+            color: 'green',
+            priority: 2
+        })
+    }
+
+    // Push Overstock
+    if (overstockedItems.length > 0) {
+        const topOverstock = overstockedItems.sort((a, b) => b.excessValue - a.excessValue)[0]
+        if (topOverstock.excessValue > 0) {
+            insights.push({
+                type: 'WARNING',
+                title: 'Capital Tied in Overstock',
+                description: `'${topOverstock.name}' is heavily overstocked. Reducing inventory to 30-day levels could free up ₹${Math.round(topOverstock.excessValue).toLocaleString()}.`,
+                metric: 'Overstocked',
+                action: 'Launch Flash Sale',
+                color: 'purple',
+                priority: 3
+            })
+        }
+    }
+
+    // Push Dead Stock
+    if (deadStockItems.length > 0 && deadStockValue > 0) {
+        insights.push({
+            type: 'WARNING',
+            title: 'Dead Stock Detected',
+            description: `${deadStockItems.length} items haven't moved in 30 days, locking up ₹${Math.round(deadStockValue).toLocaleString()} in capital.`,
+            metric: 'Capital Locked',
+            action: 'Liquidate Inventory',
+            color: 'yellow',
+            priority: 4
         })
     }
 
     // --- ALGORITHM 2: Seasonal & Category Trends ---
-    // Group movements by Category
     const categoryVelocity: Record<string, number> = {}
     movements.forEach(m => {
         // @ts-ignore
@@ -86,40 +152,22 @@ export async function getAiInsights(): Promise<AiInsight[]> {
         categoryVelocity[cat] = (categoryVelocity[cat] || 0) + m.quantity
     })
 
-    // Find Top Category
     const topCategory = Object.entries(categoryVelocity).sort(([, a], [, b]) => b - a)[0]
 
-    // Determine Season
-    const month = new Date().getMonth() // 0-11
-    let season = "Regular"
-    if (month >= 11 || month <= 1) season = "Winter"
-    else if (month >= 2 && month <= 5) season = "Summer"
-    else if (month >= 6 && month <= 8) season = "Monsoon"
-    else season = "Autumn"
+    const month = new Date().getMonth()
+    const seasons = ['Winter', 'Winter', 'Spring', 'Spring', 'Summer', 'Summer', 'Monsoon', 'Monsoon', 'Autumn', 'Autumn', 'Winter', 'Winter']
+    const currentSeason = seasons[month]
 
     if (topCategory && topCategory[1] > 0) {
         insights.push({
             type: 'SEASONAL',
-            title: `${season} Trend Detected`,
-            description: `It's ${season}, and '${topCategory[0]}' is your highest performing category. Consider increasing stock for similar items.`,
-            metric: `${topCategory[0]} Trending`,
-            color: 'blue'
+            title: `${currentSeason} Demand Surge`,
+            description: `'${topCategory[0]}' category is driving the most volume this season. Ensure adequate safety stock across this category.`,
+            metric: `Top Category`,
+            color: 'blue',
+            priority: 5
         })
     }
 
-    // --- ALGORITHM 3: Dead Stock ---
-    // Items with stock > 0 but NO output in 30 days
-    const deadStockCount = items.filter(i => i.quantity > 0 && !itemUsage[i.id]).length
-
-    if (deadStockCount > 0) {
-        insights.push({
-            type: 'OPPORTUNITY',
-            title: 'Dead Stock Detected',
-            description: `${deadStockCount} items haven't moved in 30 days. Consider running a discount/sale to free up capital.`,
-            metric: 'Free up Cash',
-            color: 'yellow'
-        })
-    }
-
-    return insights
+    return insights.sort((a, b) => a.priority - b.priority).slice(0, 3) // Return top 3 most important
 }
