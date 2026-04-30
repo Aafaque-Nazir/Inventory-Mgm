@@ -242,11 +242,11 @@ export function Topbar() {
                     </div>
                 </div>
             </div>
-            <div className="flex items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 shrink-0">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                            <Avatar className="h-10 w-10 border-2 border-primary/10">
+                        <Button variant="ghost" className="relative h-10 w-10 rounded-full shrink-0">
+                            <Avatar className="h-10 w-10 border-2 border-primary/10 shrink-0">
                                 <AvatarImage src="" alt={profile?.full_name || ''} />
                                 <AvatarFallback className="bg-primary/5 text-primary font-medium">
                                     {profile?.full_name?.[0] || 'U'}
