@@ -42,21 +42,21 @@ export function WarehouseSwitcher() {
 
     return (
         <Select value={selectedWarehouseId || ''} onValueChange={handleSelect}>
-            <SelectTrigger className="w-[200px] h-9 border-dashed">
-                <div className="flex items-center gap-2">
-                    <Store className="h-4 w-4 text-muted-foreground" />
-                    <SelectValue placeholder="Select Warehouse" />
+            <SelectTrigger className="w-[120px] sm:w-[160px] md:w-[200px] h-9 border-dashed overflow-hidden">
+                <div className="flex items-center gap-2 overflow-hidden w-full">
+                    <Store className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="truncate text-left text-sm flex-1"><SelectValue placeholder="Select Warehouse" /></span>
                 </div>
             </SelectTrigger>
             <SelectContent>
                 {locations.map((loc) => (
                     <SelectItem key={loc.id} value={loc.id}>
-                        <span className="flex items-center gap-2">
-                            {loc.name}
+                        <div className="flex items-center justify-between w-full gap-2">
+                            <span className="truncate">{loc.name}</span>
                             {loc.is_default && (
-                                <span className="ml-1 text-[10px] text-muted-foreground uppercase border px-1 rounded">Default</span>
+                                <span className="text-[10px] shrink-0 text-muted-foreground uppercase border px-1 rounded hidden sm:inline-block">Default</span>
                             )}
-                        </span>
+                        </div>
                     </SelectItem>
                 ))}
             </SelectContent>

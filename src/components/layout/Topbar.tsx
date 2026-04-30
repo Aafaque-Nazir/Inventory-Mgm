@@ -85,11 +85,11 @@ export function Topbar() {
     }
 
     return (
-        <header className="flex h-16 items-center justify-between px-6 bg-transparent">
-            <div className="flex items-center gap-4">
+        <header className="flex h-16 items-center justify-between px-3 sm:px-6 bg-transparent">
+            <div className="flex items-center gap-2 sm:gap-4">
                 <Sheet open={open} onOpenChange={setOpen}>
                     <SheetTrigger asChild>
-                        <Button variant="ghost" size="icon" className="md:hidden">
+                        <Button variant="ghost" size="icon" className="md:hidden shrink-0">
                             <Menu className="h-5 w-5" />
                             <span className="sr-only">Toggle menu</span>
                         </Button>
@@ -216,11 +216,11 @@ export function Topbar() {
                         </div>
                     </SheetContent>
                 </Sheet>
-                <div className="flex items-center gap-3">
-                    <h2 className="text-lg font-semibold hidden md:block">Dashboard</h2>
+                <div className="flex items-center gap-2 sm:gap-3">
+                    <h2 className="text-lg font-semibold hidden md:block shrink-0">Dashboard</h2>
                     {profile?.is_super_admin ? (
                         <Badge
-                            className="bg-purple-600 hover:bg-purple-700 text-[10px] px-2 h-5 font-semibold tracking-wide uppercase border-purple-500/20"
+                            className="bg-purple-600 hover:bg-purple-700 text-[10px] px-2 h-5 font-semibold tracking-wide uppercase border-purple-500/20 hidden sm:inline-flex"
                         >
                             SUPER ADMIN
                         </Badge>
@@ -228,7 +228,7 @@ export function Topbar() {
                         <Badge
                             variant="secondary"
                             className={cn(
-                                "text-[10px] px-2 h-5 font-semibold tracking-wide uppercase",
+                                "text-[10px] px-2 h-5 font-semibold tracking-wide uppercase hidden sm:inline-flex",
                                 profile.organization.plan_type === 'FREE' && "bg-blue-500/10 text-blue-500 border-blue-500/20",
                                 profile.organization.plan_type === 'PRO' && "bg-amber-500/10 text-amber-500 border-amber-500/20",
                                 profile.organization.plan_type === 'ENTERPRISE' && "bg-purple-500/10 text-purple-500 border-purple-500/20",
@@ -237,12 +237,12 @@ export function Topbar() {
                             {profile.organization.plan_type} PLAN
                         </Badge>
                     )}
-                    <div className="ml-2">
+                    <div className="ml-0 sm:ml-2">
                         <WarehouseSwitcher />
                     </div>
                 </div>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
