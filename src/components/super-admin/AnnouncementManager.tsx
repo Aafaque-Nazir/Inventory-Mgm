@@ -66,12 +66,12 @@ export function AnnouncementManager() {
 
     return (
         <div className="space-y-10">
-            <div className="flex items-center justify-between">
+            <div className="flex items-start justify-between gap-4">
                 <div>
                     <h2 className="text-2xl font-bold text-white tracking-tight">Global Announcements</h2>
                     <p className="text-sm text-slate-400">Broadcast mission-critical messages to all organization terminals.</p>
                 </div>
-                <div className="p-3 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+                <div className="p-3 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 shrink-0 hidden sm:block">
                     <Megaphone className="h-6 w-6" />
                 </div>
             </div>
@@ -132,14 +132,14 @@ export function AnnouncementManager() {
                                 item.type === 'WARNING' ? 'bg-amber-500' :
                                     'bg-indigo-500'
                                 }`} />
-                            <div className="flex flex-col sm:flex-row items-center p-6 gap-6">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center p-5 sm:p-6 gap-4 sm:gap-6">
                                 <div className={`p-3 rounded-2xl shrink-0 ${item.type === 'CRITICAL' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' :
                                     item.type === 'WARNING' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
                                         'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20'
                                     }`}>
                                     <Megaphone className="h-6 w-6" />
                                 </div>
-                                <div className="flex-1 min-w-0">
+                                <div className="flex-1 min-w-0 w-full text-left">
                                     <p className="text-lg font-bold text-white group-hover:text-indigo-400 transition-colors leading-tight mb-1">{item.message}</p>
                                     <div className="flex items-center gap-3 text-xs text-slate-500 font-medium">
                                         <span className="uppercase tracking-widest">{item.type}</span>
@@ -147,7 +147,7 @@ export function AnnouncementManager() {
                                         <span>{new Date(item.created_at).toLocaleString()}</span>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-6 pl-6 sm:border-l border-white/5">
+                                <div className="flex items-center justify-between w-full sm:w-auto gap-4 pt-4 sm:pt-0 border-t sm:border-t-0 sm:border-l border-white/5 sm:pl-6">
                                     <div className="flex items-center gap-3">
                                         <span className={`text-[10px] font-black uppercase tracking-widest transition-colors ${item.is_active ? 'text-emerald-400' : 'text-slate-600'}`}>
                                             {item.is_active ? 'Online' : 'Offline'}
@@ -162,7 +162,7 @@ export function AnnouncementManager() {
                                         variant="ghost"
                                         size="icon"
                                         onClick={() => handleDelete(item.id)}
-                                        className="h-10 w-10 rounded-xl bg-white/5 hover:bg-rose-500/20 text-slate-500 hover:text-rose-400 transition-all active:scale-90"
+                                        className="h-10 w-10 rounded-xl bg-white/5 hover:bg-rose-500/20 text-slate-500 hover:text-rose-400 transition-all active:scale-90 shrink-0"
                                     >
                                         <Trash2 className="h-5 w-5" />
                                     </Button>

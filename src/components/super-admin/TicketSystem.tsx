@@ -59,9 +59,9 @@ export function TicketSystem() {
                     <h2 className="text-2xl font-bold text-white tracking-tight">Support Tickets</h2>
                     <p className="text-sm text-slate-400">Manage incoming support requests and system bugs.</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center justify-between sm:justify-start w-full sm:w-auto gap-3">
                     <Select value={filter} onValueChange={setFilter}>
-                        <SelectTrigger className="w-[160px] bg-white/5 border-white/10 text-white rounded-xl h-10">
+                        <SelectTrigger className="w-[160px] sm:w-[150px] bg-white/5 border-white/10 text-white rounded-xl h-10">
                             <SelectValue placeholder="Filter Status" />
                         </SelectTrigger>
                         <SelectContent className="bg-slate-900 border-white/10 text-white">
@@ -154,14 +154,14 @@ export function TicketSystem() {
                                 <div className="bg-black/30 p-5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap font-mono text-slate-300 border border-white/5 mb-6">
                                     {ticket.message}
                                 </div>
-                                <div className="flex justify-end items-center gap-4">
+                                <div className="flex flex-col sm:flex-row sm:justify-end items-start sm:items-center gap-2 sm:gap-4 w-full">
                                     <span className="text-xs text-slate-500 font-medium italic">Update status to:</span>
                                     <Select
                                         defaultValue={ticket.status}
                                         onValueChange={(val) => handleStatusUpdate(ticket.id, val)}
                                         disabled={isPending}
                                     >
-                                        <SelectTrigger className="w-[160px] bg-white/5 border-white/10 text-white rounded-xl h-10 shadow-xl">
+                                        <SelectTrigger className="w-full sm:w-[160px] bg-white/5 border-white/10 text-white rounded-xl h-10 shadow-xl">
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent className="bg-slate-900 border-white/10 text-white">

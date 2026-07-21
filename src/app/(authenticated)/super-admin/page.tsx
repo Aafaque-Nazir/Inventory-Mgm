@@ -77,7 +77,7 @@ export default function SuperAdminPage() {
 
                 <TabsContent value="overview" className="space-y-10 outline-none">
                     {/* Stats Cards - Sleek Overhaul */}
-                    <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+                    <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                         <StatCard
                             title="Revenue"
                             value={loading ? '...' : `₹${stats?.mrr || 0}`}
@@ -125,7 +125,7 @@ export default function SuperAdminPage() {
 
                         {/* System Health Section - Sleek & Modern */}
                         <div className="md:col-span-2 lg:col-span-3">
-                            <div className="h-full rounded-[2rem] border border-white/[0.08] bg-white/[0.02] p-8 flex flex-col backdrop-blur-sm">
+                            <div className="h-full rounded-[2rem] border border-white/[0.08] bg-white/[0.02] p-6 sm:p-8 flex flex-col backdrop-blur-sm">
                                 <div className="flex items-center justify-between mb-8">
                                     <div>
                                         <h3 className="text-xl font-black text-white tracking-tight">System Health</h3>
@@ -184,14 +184,14 @@ export default function SuperAdminPage() {
 
                     {/* Recent Organizations */}
                     <div className="rounded-3xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-xl">
-                        <div className="p-8 border-b border-white/5 bg-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="p-6 sm:p-8 border-b border-white/5 bg-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div>
                                 <h3 className="text-xl font-bold text-white">Recent Organizations</h3>
                                 <p className="text-sm text-slate-400">New companies that joined the platform recently</p>
                             </div>
                             <button className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sm font-semibold text-white hover:bg-white/10 transition-all">View All</button>
                         </div>
-                        <div className="p-6">
+                        <div className="p-5 sm:p-6">
                             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                 {loading ? (
                                     <div className="col-span-full py-12 text-center text-slate-500 animate-pulse">Loading amazing new companies...</div>

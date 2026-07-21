@@ -12,7 +12,7 @@ type RevenueChartProps = {
 
 export function RevenueChart({ data }: RevenueChartProps) {
     return (
-        <div className="rounded-3xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-xl p-8 h-full">
+        <div className="rounded-3xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-xl p-5 sm:p-8 h-full">
             <div className="mb-8">
                 <h3 className="text-xl font-bold text-white">Revenue History</h3>
                 <p className="text-sm text-slate-400">

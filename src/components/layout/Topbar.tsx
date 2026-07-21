@@ -217,7 +217,31 @@ export function Topbar() {
                     </SheetContent>
                 </Sheet>
                 <div className="flex items-center gap-2 sm:gap-3">
-                    <h2 className="text-lg font-semibold hidden md:block shrink-0">Dashboard</h2>
+                    <h2 className="text-lg font-semibold hidden md:block shrink-0">
+                        {pathname.startsWith('/super-admin')
+                            ? 'Super Admin'
+                            : pathname.startsWith('/items')
+                            ? 'Items'
+                            : pathname.startsWith('/stock')
+                            ? 'Stock'
+                            : pathname.startsWith('/warehouses')
+                            ? 'Warehouses'
+                            : pathname.startsWith('/purchase-orders')
+                            ? 'Purchase Orders'
+                            : pathname.startsWith('/sales')
+                            ? 'Sales'
+                            : pathname.startsWith('/reports')
+                            ? 'Reports'
+                            : pathname.startsWith('/settings')
+                            ? 'Settings'
+                            : pathname.startsWith('/guide')
+                            ? 'User Guide'
+                            : pathname.startsWith('/help')
+                            ? 'Help & Support'
+                            : pathname.startsWith('/suppliers')
+                            ? 'Suppliers'
+                            : 'Dashboard'}
+                    </h2>
                     {profile?.is_super_admin ? (
                         <Badge
                             className="bg-purple-600 hover:bg-purple-700 text-[10px] px-2 h-5 font-semibold tracking-wide uppercase border-purple-500/20 hidden sm:inline-flex"
@@ -237,9 +261,11 @@ export function Topbar() {
                             {profile.organization.plan_type} PLAN
                         </Badge>
                     )}
-                    <div className="ml-0 sm:ml-2">
-                        <WarehouseSwitcher />
-                    </div>
+                    {!pathname.startsWith('/super-admin') && (
+                        <div className="ml-0 sm:ml-2">
+                            <WarehouseSwitcher />
+                        </div>
+                    )}
                 </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-4 shrink-0">
