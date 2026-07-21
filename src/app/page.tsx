@@ -64,7 +64,7 @@ export default function Home() {
             {/* 1. ANTIGRAVITY BACKGROUND */}
             <div className="fixed inset-0 z-0 pointer-events-none">
                 {/* Subtle Grid */}
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f10_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f10_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]"></div>
+                <div className="absolute inset-0 bg-[#0a0a0a]"></div>
                 {/* Dynamic Glowing Orbs */}
                 <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-600/10 rounded-full blur-[150px]" />
                 <div className="absolute top-[30%] right-[-10%] w-[40%] h-[60%] bg-indigo-600/10 rounded-full blur-[150px]" />
@@ -77,7 +77,7 @@ export default function Home() {
             <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-[#050505]/60 backdrop-blur-2xl supports-[backdrop-filter]:bg-[#050505]/40 transition-all duration-300">
                 <div className="container mx-auto flex h-16 md:h-20 items-center justify-between px-6 md:px-12">
                     <Link href="/" className="flex items-center gap-3 group">
-                        <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-b from-slate-800 to-black border border-white/10 shadow-2xl group-hover:border-blue-500/50 transition-all duration-500 overflow-hidden">
+                        <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 border border-white/10 shadow-2xl group-hover:border-blue-500/50 transition-all duration-500 overflow-hidden">
                             <div className="absolute inset-0 bg-blue-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                             <Box className="h-5 w-5 text-white relative z-10" />
                         </div>
@@ -91,13 +91,12 @@ export default function Home() {
                         <Link href="#pricing" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Pricing</Link>
                         <Link href="/contact" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Contact</Link>
                     </div>
-                    <div className="flex items-center gap-5">           </div>
                     <div className="flex items-center gap-5">
                         <Link href="/login" className="hidden sm:block text-sm font-medium text-slate-400 hover:text-white transition-colors">Log in</Link>
                         <Link href="/signup">
                             <Button size="sm" className="rounded-full h-10 px-6 bg-white text-black hover:bg-slate-200 font-semibold shadow-[0_0_20px_-5px_rgba(255,255,255,0.4)] transition-all hover:scale-105 active:scale-95 border border-white/10 relative overflow-hidden group">
                                 <span className="relative z-10 flex items-center gap-2">Get Access <ChevronRight className="h-4 w-4" /></span>
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full group-hover:animate-shimmer" />
+                                <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover:animate-shimmer" />
                             </Button>
                         </Link>
                     </div>
@@ -128,11 +127,11 @@ export default function Home() {
                             variants={fadeUp}
                             className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-8 relative"
                         >
-                            <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-slate-200 to-slate-500">
+                            <span className="text-white">
                                 Inventory
                             </span>
                             <br />
-                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-400 to-sky-400">
+                            <span className="text-blue-400">
                                 perfected.
                             </span>
                         </motion.h1>
@@ -165,7 +164,7 @@ export default function Home() {
                         style={{ rotateX, scale: scaleDashboard, opacity: opacityDashboard }}
                         className="mt-24 relative w-full max-w-6xl mx-auto rounded-3xl md:rounded-[40px] border border-white/10 bg-[#0a0a0a] shadow-[0_0_100px_rgba(37,99,235,0.15)] origin-top transform-style-3d overflow-hidden"
                     >
-                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#050505] z-10 block pointer-events-none h-full w-full opacity-90"></div>
+                        <div className="absolute inset-0 bg-black/50 z-10 block pointer-events-none h-full w-full opacity-90"></div>
 
                         {/* Mockup Top Bar */}
                         <div className="h-12 border-b border-white/5 bg-white/[0.02] flex items-center px-6 gap-3 backdrop-blur-sm">
@@ -216,7 +215,7 @@ export default function Home() {
                                             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.8)]"></div>
                                             <span className="text-xs font-semibold text-slate-300">System Online</span>
                                         </div>
-                                        <div className="h-9 w-9 xl:h-10 xl:w-10 rounded-full border border-white/10 bg-gradient-to-br from-slate-800 to-black flex items-center justify-center shadow-inner relative overflow-hidden group cursor-pointer hover:border-white/20 transition-colors">
+                                        <div className="h-9 w-9 xl:h-10 xl:w-10 rounded-full border border-white/10 bg-slate-800 flex items-center justify-center shadow-inner relative overflow-hidden group cursor-pointer hover:border-white/20 transition-colors">
                                             <div className="absolute inset-0 bg-blue-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                             <User className="w-4 h-4 text-slate-300 group-hover:text-white transition-colors relative z-10" />
                                         </div>
@@ -226,13 +225,13 @@ export default function Home() {
                                 {/* Metric Cards */}
                                 <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 mb-8 relative z-10">
                                     {[
-                                        { label: "Total Revenue", val: "$128,450", sub: "+14.2% this week", color: "text-blue-400", bg: "from-blue-500/10 to-transparent" },
-                                        { label: "Active Orders", val: "1,204", sub: "98 processing", color: "text-emerald-400", bg: "from-emerald-500/10 to-transparent" },
-                                        { label: "Low Stock Items", val: "24", sub: "Requires attention", color: "text-amber-400", bg: "from-amber-500/10 to-transparent" },
-                                        { label: "Fulfillment Rate", val: "99.8%", sub: "+0.2% improvement", color: "text-indigo-400", bg: "from-indigo-500/10 to-transparent" }
+                                        { label: "Total Revenue", val: "$128,450", sub: "+14.2% this week", color: "text-blue-400", bg: "bg-blue-500/10" },
+                                        { label: "Active Orders", val: "1,204", sub: "98 processing", color: "text-emerald-400", bg: "bg-emerald-500/10" },
+                                        { label: "Low Stock Items", val: "24", sub: "Requires attention", color: "text-amber-400", bg: "bg-amber-500/10" },
+                                        { label: "Fulfillment Rate", val: "99.8%", sub: "+0.2% improvement", color: "text-indigo-400", bg: "bg-indigo-500/10" }
                                     ].map((stat, i) => (
                                         <div key={i} className="relative bg-black/40 border border-white/5 rounded-2xl p-4 md:p-5 hover:bg-black/60 transition-all group overflow-hidden cursor-default shadow-sm hover:shadow-md hover:border-white/10">
-                                            <div className={`absolute inset-0 bg-gradient-to-br ${stat.bg} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
+                                            <div className={`absolute inset-0 ${stat.bg} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
                                             <p className="text-xs font-medium text-slate-500 mb-2 relative z-10">{stat.label}</p>
                                             <p className="text-2xl lg:text-3xl font-black text-white mb-1 tracking-tight relative z-10">{stat.val}</p>
                                             <p className={`text-[10px] md:text-xs font-medium ${stat.color} group-hover:opacity-100 opacity-80 transition-opacity relative z-10`}>{stat.sub}</p>
@@ -244,7 +243,7 @@ export default function Home() {
                                 <div className="flex-1 flex gap-6 relative z-10 min-h-0">
                                     {/* Main Chart */}
                                     <div className="flex-[2] bg-black/40 border border-white/5 rounded-2xl p-5 md:p-6 flex flex-col relative overflow-hidden group">
-                                        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-blue-900/10 to-transparent pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                                        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-blue-900/10 pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity"></div>
 
                                         <div className="flex justify-between items-center mb-6">
                                             <h3 className="text-sm font-semibold text-white">Order Volume <span className="text-slate-500 font-normal ml-2 hidden sm:inline">(7 Days)</span></h3>
@@ -283,7 +282,7 @@ export default function Home() {
                                             <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse"></div>
                                         </div>
                                         <div className="flex flex-col gap-6 flex-1 overflow-hidden relative">
-                                            <div className="absolute left-[11px] top-6 bottom-4 w-px bg-gradient-to-b from-white/10 to-transparent"></div>
+                                            <div className="absolute left-[11px] top-6 bottom-4 w-px bg-white/10"></div>
                                             {[
                                                 { icon: <Box className="w-3 h-3 text-emerald-400" />, text: "Shipment #8920 dispatched", time: "Just now" },
                                                 { icon: <AlertCircle className="w-3 h-3 text-amber-400" />, text: "Low stock: Earbuds", time: "2m ago" },
@@ -291,7 +290,7 @@ export default function Home() {
                                                 { icon: <Settings className="w-3 h-3 text-slate-400" />, text: "Auto reorder trig", time: "1h ago" },
                                             ].map((log, i) => (
                                                 <div key={i} className="flex gap-4 items-start relative z-10 group cursor-pointer">
-                                                    <div className="w-6 h-6 rounded-full bg-[#0a0a0a] border border-white/10 flex items-center justify-center shrink-0 shadow bg-gradient-to-b from-white/5 to-transparent group-hover:border-white/20 transition-colors">
+                                                    <div className="w-6 h-6 rounded-full bg-[#0a0a0a] border border-white/10 flex items-center justify-center shrink-0 shadow group-hover:border-white/20 transition-colors">
                                                         {log.icon}
                                                     </div>
                                                     <div>
@@ -308,7 +307,7 @@ export default function Home() {
                     </motion.div>
 
                     {/* Soft Gradient Fade into next section */}
-                    <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-[#050505] to-transparent pointer-events-none z-20"></div>
+                    <div className="absolute bottom-0 left-0 right-0 h-64 bg-black/50 pointer-events-none z-20"></div>
                 </section>
 
                 {/* 4. SOCIAL PROOF */}
@@ -339,7 +338,7 @@ export default function Home() {
                         <div className="grid md:grid-cols-3 gap-6 md:gap-8 auto-rows-[400px]">
                             {/* BENTO ITEM 1: Large Feature */}
                             <div className="col-span-1 md:col-span-2 row-span-1 md:row-span-2 relative group overflow-hidden rounded-[32px] border border-white/10 bg-[#0a0a0a] transition-all hover:border-white/20 flex flex-col justify-between">
-                                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                                <div className="absolute inset-0 bg-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                                 <div className="p-10 relative z-10">
                                     <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center mb-6 border border-white/10">
                                         <Activity className="h-6 w-6 text-blue-400" />
@@ -348,7 +347,7 @@ export default function Home() {
                                     <p className="text-slate-400 text-lg max-w-md">Absolute truth across all warehouses. See stock movements, reservations, and dispatch statuses the millisecond they happen.</p>
                                 </div>
                                 <div className="relative mt-auto h-[40%] md:h-[50%] overflow-hidden border-t border-white/5 bg-black">
-                                    <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,#091629)] z-10"></div>
+                                    <div className="absolute inset-0 bg-[#091629] opacity-50 z-10"></div>
                                     <div className="absolute bottom-0 w-full px-10 pb-10 flex items-end gap-2 isolate">
                                         {[30, 45, 20, 60, 80, 50, 90, 100, 70, 85].map((h, i) => (
                                             <motion.div
@@ -425,7 +424,7 @@ export default function Home() {
                                             {step.icon}
                                         </div>
                                         {/* Connecting Line (except last) */}
-                                        {idx !== 2 && <div className="hidden md:block absolute top-[100%] left-1/2 -translate-x-1/2 w-[1px] h-24 bg-gradient-to-b from-white/20 to-transparent"></div>}
+                                        {idx !== 2 && <div className="hidden md:block absolute top-[100%] left-1/2 -translate-x-1/2 w-[1px] h-24 bg-white/20"></div>}
                                     </div>
                                     <div>
                                         <span className="text-blue-500 font-mono text-sm font-bold mb-2 block">STEP 0{idx + 1}</span>
@@ -474,7 +473,7 @@ export default function Home() {
                             {/* Enterprise Plan (Glowing) */}
                             <div className="relative rounded-[32px] border border-blue-500/50 bg-[#050914] p-8 md:p-10 flex flex-col shadow-[0_0_40px_rgba(37,99,235,0.1)] flex-1 overflow-hidden group">
                                 {/* Subtle animated gradient background */}
-                                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-indigo-600/10 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                                <div className="absolute inset-0 bg-blue-600/10 opacity-50 group-hover:opacity-100 transition-opacity"></div>
 
                                 <div className="relative z-10 flex justify-between items-start mb-1">
                                     <h3 className="text-xl font-bold text-white">Pro</h3>

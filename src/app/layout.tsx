@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { LenisProvider } from "@/components/lenis-provider";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { AnnouncementBanner } from "@/components/layout/AnnouncementBanner";
@@ -62,8 +63,6 @@ export const metadata: Metadata = {
     title: "InvMaster",
   },
 };
-import { LenisProvider } from "@/components/lenis-provider";
-
 export default function RootLayout({
   children,
 }: Readonly<{

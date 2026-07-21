@@ -31,7 +31,7 @@ export default function LoginPage() {
 
             <div className="relative flex w-full max-w-[450px] items-center justify-center z-10 animate-in fade-in zoom-in duration-700">
                 {/* Liquid Glow Behind Card */}
-                <div className="absolute -inset-1 bg-gradient-to-tr from-blue-500/30 via-purple-500/20 to-cyan-500/30 blur-2xl rounded-[32px] pointer-events-none opacity-50" />
+                <div className="absolute -inset-1 bg-blue-500/10 blur-2xl rounded-[32px] pointer-events-none opacity-50" />
 
                 {/* Glassmorphic Card */}
                 <div className="mx-auto flex w-full flex-col justify-center space-y-6 relative z-10 p-6 sm:p-10 rounded-[32px] border border-white/10 bg-white/[0.02] backdrop-blur-[40px] shadow-[0_8px_32px_0_rgba(0,0,0,0.5),inset_0_1px_1px_0_rgba(255,255,255,0.15)] overflow-hidden">
@@ -40,7 +40,7 @@ export default function LoginPage() {
                     <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] mix-blend-overlay pointer-events-none rounded-[32px]"></div>
 
                     <div className="flex flex-col space-y-2 text-center md:text-left relative z-10">
-                        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/70">
+                        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2">
                             Welcome back
                         </h1>
                         <p className="text-sm text-slate-400 font-medium">

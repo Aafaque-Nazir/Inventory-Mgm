@@ -35,7 +35,6 @@ export async function sendLowStockAlert(
             console.error('Resend error:', error)
             return { success: false, error }
         } else {
-            console.log('Low stock alert sent:', data)
             return { success: true }
         }
     } catch (err) {

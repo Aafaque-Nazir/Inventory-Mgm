@@ -106,7 +106,7 @@ export function AnnouncementManager() {
                         <Button
                             onClick={handleCreate}
                             disabled={isPending || !message}
-                            className="h-12 px-8 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold shadow-xl shadow-indigo-500/20 transition-all active:scale-95 flex items-center gap-2"
+                            className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-xl shadow-indigo-500/20 transition-all active:scale-95 flex items-center gap-2"
                         >
                             {isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Megaphone className="h-5 w-5" />}
                             Transmit

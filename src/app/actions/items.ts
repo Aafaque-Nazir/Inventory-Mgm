@@ -20,6 +20,8 @@ const itemSchema = z.object({
     gst_rate: z.coerce.number().min(0).max(100).optional().default(0),
 })
 
+const bulkItemSchema = z.array(itemSchema)
+
 import { getWarehouseCookie } from './warehouse-cookie'
 
 export async function createItem(prevState: any, formData: FormData) {
@@ -180,7 +182,14 @@ export async function createItem(prevState: any, formData: FormData) {
     }
 }
 
-export async function bulkCreateItems(items: any[]) {
+export async function bulkCreateItems(rawItems: any[]) {
+    let items: z.infer<typeof bulkItemSchema>
+    try {
+        items = bulkItemSchema.parse(rawItems)
+    } catch (e) {
+        return { error: 'Invalid items format in bulk import' }
+    }
+
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { error: 'Unauthorized' }

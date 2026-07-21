@@ -169,9 +169,9 @@ export function OrgManager() {
                                 {/* Plan Section */}
                                 <div className="md:col-span-2 flex items-center justify-between md:block">
                                     <span className="text-[10px] font-bold uppercase text-slate-500 md:hidden">Plan</span>
-                                    <div className={`w-fit px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter shadow-md ${org.plan_type === 'PRO' ? 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-500 border border-amber-500/20 shadow-amber-500/5' :
-                                        org.plan_type === 'ENTERPRISE' ? 'bg-gradient-to-r from-purple-500/20 to-indigo-500/20 text-purple-400 border border-purple-500/20 shadow-indigo-500/5' :
-                                            'bg-white/5 text-slate-400 border border-white/10'
+                                    <div className={`w-fit px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter ${org.plan_type === 'PRO' ? 'bg-amber-500/20 text-amber-500 border border-amber-500/20' :
+                                        org.plan_type === 'ENTERPRISE' ? 'bg-purple-500/20 text-purple-400 border border-purple-500/20' :
+                                            'bg-slate-500/20 text-slate-400 border border-slate-500/20'
                                         }`}>
                                         {org.plan_type}
                                     </div>
@@ -276,7 +276,7 @@ export function OrgManager() {
                         <Button
                             onClick={handleSave}
                             disabled={isPending}
-                            className="flex-1 h-12 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold shadow-xl shadow-indigo-500/20"
+                            className="flex-1 h-12 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-xl shadow-indigo-500/20"
                         >
                             {isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <CheckCircle className="h-5 w-5 mr-2" />}
                             Sync Config

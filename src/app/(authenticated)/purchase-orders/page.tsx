@@ -44,13 +44,11 @@ export default async function PurchaseOrdersPage() {
         }
     }
 
-    console.log('Fetching purchase orders...')
+
     const { data: orders, error } = await ordersQuery
 
     if (error) {
         console.error('Error fetching orders:', JSON.stringify(error, null, 2))
-    } else {
-        console.log(`Fetched ${orders?.length || 0} orders`)
     }
 
     const statusColors: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {

@@ -69,7 +69,7 @@ export async function inviteMember(prevState: any, formData: FormData) {
         }
 
         // 3. Create Invitation
-        const token = Math.random().toString(36).substring(2, 15) // Simple token for now
+        const token = crypto.randomUUID()
         const { error: inviteError } = await supabase.from('invitations').insert({
             organization_id: orgId,
             email,
@@ -92,7 +92,7 @@ export async function inviteMember(prevState: any, formData: FormData) {
                 html: `<p>You have been invited to join <strong>Inventory App</strong>. <a href="${process.env.NEXT_PUBLIC_APP_URL}/invite/accept?token=${token}">Click here to join</a></p>`
             })
         } else {
-            console.log('Skipping email (No API Key). Token:', token)
+            // Email skipped — no API key configured
         }
 
         revalidatePath('/settings')
@@ -142,6 +142,29 @@ export async function cancelInvitation(formData: FormData) {
     const supabase = await createClient()
     const inviteId = formData.get('inviteId') as string
 
-    await supabase.from('invitations').delete().eq('id', inviteId)
-    revalidatePath('/settings')
+    try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return { error: 'Unauthorized' }
+
+        const { data: adminProfile } = await supabase
+            .from('profiles')
+            .select('organization_id, role')
+            .eq('id', user.id)
+            .single()
+
+        if (adminProfile?.role !== 'ADMIN') return { error: 'Unauthorized' }
+
+        const { error } = await supabase
+            .from('invitations')
+            .delete()
+            .eq('id', inviteId)
+            .eq('organization_id', adminProfile.organization_id)
+
+        if (error) throw error
+
+        revalidatePath('/settings')
+        return { message: 'Invitation cancelled' }
+    } catch (error: any) {
+        return { error: 'Failed to cancel invitation' }
+    }
 }

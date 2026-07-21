@@ -102,7 +102,7 @@ export function WarehouseList({ locations, organizationId, isPro }: WarehouseLis
                 <p className="text-slate-400 mb-8 max-w-md mx-auto">
                     Track inventory across multiple physical locations, shops, or godowns.
                 </p>
-                <Button asChild className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white border-0 shadow-lg shadow-indigo-500/25 rounded-xl px-8">
+                <Button asChild className="bg-indigo-600 hover:bg-indigo-700 text-white border-0 shadow-lg rounded-xl px-8">
                     <a href="/pricing">Upgrade to Pro</a>
                 </Button>
             </div>

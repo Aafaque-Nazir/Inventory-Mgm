@@ -140,7 +140,7 @@ export default function PricingPage() {
             />
 
             <div className="flex flex-col items-center justify-center text-center gap-4 mb-16">
-                <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-white/70">
+                <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white">
                     Simple, Transparent Pricing
                 </h2>
                 <p className="text-lg text-slate-400 max-w-2xl">
@@ -203,7 +203,7 @@ export default function PricingPage() {
                     "relative flex flex-col rounded-3xl border border-indigo-500/30 bg-indigo-900/10 backdrop-blur-md p-8 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-indigo-500/20 ring-1 ring-indigo-500/50 scale-105 z-10",
                     currentPlan === 'PRO' ? "ring-indigo-500" : ""
                 )}>
-                    <div className="absolute -top-4 left-0 right-0 mx-auto w-fit rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 px-4 py-1 text-xs font-medium text-white shadow-lg shadow-indigo-500/40 flex items-center gap-1">
+                    <div className="absolute -top-4 left-0 right-0 mx-auto w-fit rounded-full bg-indigo-600 px-4 py-1 text-xs font-medium text-white shadow-lg shadow-indigo-500/40 flex items-center gap-1">
                         MOST POPULAR
                     </div>
 
@@ -267,10 +267,9 @@ export default function PricingPage() {
 
                                 {currentPlan === 'FREE' && !trialUsed && (
                                     <Button
-                                        className="w-full bg-gradient-to-r from-orange-500 to-pink-600 hover:from-orange-600 hover:to-pink-700 text-white border-0 rounded-xl shadow-lg shadow-orange-500/25 transition-all duration-300 font-bold"
+                                        className="w-full bg-orange-600 hover:bg-orange-700 text-white border-0 rounded-xl shadow-lg shadow-orange-500/25 transition-all duration-300 font-bold"
                                         onClick={() => {
                                             toast.info("Loading offer details...")
-                                            console.log("Opening trial dialog for org:", orgId)
                                             setShowTrialDialog(true)
                                         }}
                                     >
@@ -282,7 +281,7 @@ export default function PricingPage() {
                                 <Button
                                     onClick={handlePayment}
                                     disabled={loading}
-                                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 rounded-xl shadow-lg shadow-blue-500/25 transition-all duration-300"
+                                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white border-0 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300"
                                 >
                                     {loading ? (
                                         <>

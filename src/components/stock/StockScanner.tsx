@@ -135,40 +135,7 @@ export function StockScanner({ isPro = false }: StockScannerProps) {
                 />
             )}
 
-            {/* The RecordSaleDialog is rendered conditionally but 'open' is controlled internally by default? 
-                Wait, RecordSaleDialog manages its own 'open' state via a Trigger pattern usually OR we can't control it easily? 
-                Actually, RecordSaleDialog has internal state. 
-                I need to modify RecordSaleDialog to accept 'open' control OR 
-                Use a trick: render it only when we want it to open, but it typically starts closed.
-                
-                Actually, RecordSaleDialog as written has `const [open, setOpen] = useState(false)`.
-                It doesn't accept a controlled `open` prop.
-                
-                To fix this, I can:
-                1. Modify RecordSaleDialog to accept `open` and `onOpenChange` props (controlled mode).
-                OR
-                2. Use a distinct version? No.
-                
-                Let's QUICKLY modify RecordSaleDialog one more time to accept `defaultOpen`.
-                Or better, `open` prop.
-                
-                Let's check RecordSaleDialog modification in previous step.
-                I only added `initialItem` and `trigger`.
-                I didn't make it controlled.
-                
-                Workaround: Pass a Ref? No.
-                Best way: Make `RecordSaleDialog` accept `open` prop.
-                
-                Let's modify `RecordSaleDialog` in a separate step to be controlled or accept `defaultOpen`.
-                Actually, if I render it with `trigger={null}` and `open={true}`... no I can't force it open easily if state is internal.
-                
-                WAIT: I'll simulate a click? No that's hacky.
-                I will modify `RecordSaleDialog` to accept `isOpen` prop.
-                
-                For this step, I will leave the `RecordSaleDialog` usage commented or incomplete until I fix the component.
-                Actually, I'll assume I can pass `open={showSaleDialog}`. 
-                I will fix `RecordSaleDialog` in next step.
-            */}
+            {/* RecordSaleDialog — controlled mode */}
             {selectedItem && showSaleDialog && (
                 <RecordSaleDialog
                     initialItem={selectedItem}

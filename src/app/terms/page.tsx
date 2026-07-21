@@ -21,7 +21,7 @@ export default function TermsPage() {
       </nav>
 
       <div className="container mx-auto px-6 py-20 max-w-4xl relative z-10">
-        <h1 className="text-4xl md:text-5xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-sky-400">Terms of Service</h1>
+        <h1 className="text-4xl md:text-5xl font-bold mb-8 text-blue-400">Terms of Service</h1>
         <p className="text-slate-400 mb-12 text-lg">Last updated: February 6, 2025</p>
 
         <div className="prose prose-invert prose-blue max-w-none">

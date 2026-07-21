@@ -97,7 +97,7 @@ export default function HelpPage() {
 
                     <Button
                         type="submit"
-                        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold h-12 rounded-xl shadow-lg shadow-indigo-500/20 transition-all duration-300"
+                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold h-12 rounded-xl shadow-lg shadow-indigo-500/20 transition-all duration-300"
                         disabled={state.submitting}
                     >
                         <Send className="mr-2 h-4 w-4" />

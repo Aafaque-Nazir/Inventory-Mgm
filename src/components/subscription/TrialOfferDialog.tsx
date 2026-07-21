@@ -86,7 +86,7 @@ export function TrialOfferDialog({ open, onOpenChange, organizationId, trialUsed
                     <Button
                         onClick={handleStartTrial}
                         disabled={loading}
-                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-lg py-6 shadow-lg shadow-blue-500/20"
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg py-6 shadow-lg shadow-blue-500/20"
                     >
                         {loading ? 'Activating...' : 'Start My 5-Day Free Trial'}
                     </Button>

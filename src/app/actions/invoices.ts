@@ -3,6 +3,13 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { getWarehouseCookie } from './warehouse-cookie'
+import { z } from 'zod'
+
+const invoiceItemSchema = z.array(z.object({
+    item_id: z.string(),
+    quantity: z.union([z.string(), z.number()]),
+    unit_price: z.number().optional()
+}))
 
 export async function createInvoice(prevState: any, formData: FormData) {
     const supabase = await createClient()
@@ -21,7 +28,13 @@ export async function createInvoice(prevState: any, formData: FormData) {
             return { error: 'Invalid invoice data' }
         }
 
-        const items = JSON.parse(itemsJson)
+        let items: z.infer<typeof invoiceItemSchema>
+        try {
+            items = invoiceItemSchema.parse(JSON.parse(itemsJson))
+        } catch (e) {
+            return { error: 'Invalid invoice items format' }
+        }
+
 
         // 1. Get Organization ID
         const { data: profile } = await supabase
@@ -70,7 +83,7 @@ export async function createInvoice(prevState: any, formData: FormData) {
             // A. Insert Movement Log
             await supabase.from('stock_movements').insert({
                 item_id,
-                quantity: parseFloat(quantity),
+                quantity: Number(quantity),
                 type: 'OUT',
                 reason: `Invoice #${invoice.id.slice(0, 8)}`, // Link to invoice
                 organization_id: profile.organization_id,
@@ -88,7 +101,7 @@ export async function createInvoice(prevState: any, formData: FormData) {
                     .eq('location_id', warehouseId)
                     .single()
 
-                const newQty = (currentStock?.quantity || 0) - parseFloat(quantity)
+                const newQty = (currentStock?.quantity || 0) - Number(quantity)
 
                 await supabase.from('item_stock').upsert({
                     item_id,
@@ -102,7 +115,7 @@ export async function createInvoice(prevState: any, formData: FormData) {
             // Ideally we use RPC, but to ensure it works without DB migrations right now:
             const { data: globalItem } = await supabase.from('items').select('current_stock').eq('id', item_id).single()
             if (globalItem) {
-                const newGlobalStock = (globalItem.current_stock || 0) - parseFloat(quantity)
+                const newGlobalStock = (globalItem.current_stock || 0) - Number(quantity)
                 await supabase.from('items').update({ current_stock: newGlobalStock }).eq('id', item_id)
             }
         }

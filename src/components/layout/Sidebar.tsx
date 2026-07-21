@@ -155,7 +155,7 @@ export function Sidebar() {
 
                     {/* Trial Banner - Only show when expanded */}
                     {!collapsed && trialDays !== null && trialDays > 0 && (
-                        <div className="mx-2 mb-6 rounded-xl bg-gradient-to-br from-orange-500/10 via-orange-500/5 to-transparent p-4 border border-orange-500/10 shadow-sm relative overflow-hidden group">
+                        <div className="mx-2 mb-6 rounded-xl bg-orange-500/10 p-4 border border-orange-500/10 shadow-sm relative overflow-hidden group">
                             <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
                                 <Sparkles className="h-12 w-12" />
                             </div>

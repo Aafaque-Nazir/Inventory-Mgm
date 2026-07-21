@@ -70,7 +70,7 @@ export default async function StockPage() {
                     <StockScanner isPro={isPro || isSuperAdmin} />
                     <RecordSaleDialog
                         trigger={
-                            <Button size="sm" className="sm:size-default bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white border-0 rounded-xl shadow-lg shadow-red-500/25 hover:shadow-red-500/40 transition-all duration-300">
+                            <Button size="sm" className="sm:size-default bg-pink-600 hover:bg-pink-700 text-white border-0 rounded-xl shadow-lg shadow-pink-500/25 transition-all duration-300">
                                 <TrendingDown className="mr-1 sm:mr-2 h-4 w-4" />
                                 <span className="hidden xs:inline">Record</span> Sale
                             </Button>
@@ -80,7 +80,7 @@ export default async function StockPage() {
                         defaultType="IN"
                         title="Add Stock"
                         trigger={
-                            <Button size="sm" className="sm:size-default bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300">
+                            <Button size="sm" className="sm:size-default bg-indigo-600 hover:bg-indigo-700 text-white border-0 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300">
                                 <TrendingUp className="mr-1 sm:mr-2 h-4 w-4" />
                                 <span className="hidden xs:inline">Add</span> Stock
                             </Button>

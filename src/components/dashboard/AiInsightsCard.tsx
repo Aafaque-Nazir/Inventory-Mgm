@@ -28,7 +28,7 @@ export function AiInsightsCard({ insights }: { insights: AiInsight[] }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="col-span-full relative overflow-hidden rounded-2xl border border-blue-500/20 bg-gradient-to-br from-slate-950 via-slate-900 to-black p-6 shadow-2xl backdrop-blur-md"
+            className="col-span-full relative overflow-hidden rounded-2xl border border-blue-500/20 bg-slate-950 p-6 shadow-2xl backdrop-blur-md"
         >
             {/* Glowing orb effect - BLUE/CYAN */}
             <div className="absolute -top-32 -left-32 h-64 w-64 rounded-full bg-blue-600/10 blur-[100px]" />

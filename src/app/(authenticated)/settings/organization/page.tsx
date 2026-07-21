@@ -58,7 +58,7 @@ export default async function OrganizationSettingsPage() {
                         <span className="text-sm font-medium text-slate-400">Current Plan</span>
                         <div>
                             <span className={org.plan_type === 'PRO'
-                                ? "inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-gradient-to-r from-indigo-500/20 to-purple-500/20 text-indigo-300 border border-indigo-500/30"
+                                ? "inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"
                                 : "inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-white/10 text-slate-300 border border-white/10"
                             }>
                                 {org.plan_type}

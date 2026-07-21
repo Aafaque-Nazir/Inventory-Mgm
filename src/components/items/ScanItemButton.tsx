@@ -34,7 +34,6 @@ export function ScanItemButton({ isPro = false }: ScanItemButtonProps) {
 
     const handleScanSuccess = async (code: string) => {
         setIsScanning(false)
-        console.log("Scanned code:", code)
 
         // 1. Check if item already exists
         toast.info('Checking inventory...')

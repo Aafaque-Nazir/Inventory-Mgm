@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
     } catch (error: any) {
         console.error('Cashfree Verification Error:', error)
         return NextResponse.json(
-            { error: error.message || 'Internal Server Error' },
+            { error: 'Internal Server Error' },
             { status: 500 }
         )
     }

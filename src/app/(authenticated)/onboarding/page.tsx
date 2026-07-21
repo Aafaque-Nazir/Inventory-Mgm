@@ -36,7 +36,7 @@ export default function OnboardingPage() {
                         alt="Onboarding Background"
                         className="h-full w-full object-cover opacity-30 mix-blend-overlay"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-stone-900/90 to-transparent" />
+                    <div className="absolute inset-0 bg-stone-900/90" />
                 </div>
                 <div className="relative z-20 flex items-center text-2xl font-bold tracking-tight">
                     <LayoutDashboard className="mr-2 h-8 w-8 text-orange-500" />

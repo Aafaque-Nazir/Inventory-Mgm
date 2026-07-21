@@ -112,7 +112,7 @@ export function StatCard({ title, value, icon, description, trend, color = 'blue
             )}
         >
             {/* Inner Glow Gradient */}
-            <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+            <div className="absolute inset-0 rounded-[2rem] bg-white/[0.03] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
             <div className="relative z-10 space-y-4">
                 <div className="flex items-center justify-between">

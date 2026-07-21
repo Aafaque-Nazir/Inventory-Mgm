@@ -60,6 +60,6 @@ export async function POST(req: NextRequest) {
 
     } catch (error: any) {
         console.error('Cashfree Error:', error)
-        return NextResponse.json({ error: error.message }, { status: 500 })
+        return NextResponse.json({ error: 'Failed to create payment order' }, { status: 500 })
     }
 }

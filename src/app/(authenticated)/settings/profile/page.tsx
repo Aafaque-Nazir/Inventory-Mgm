@@ -36,7 +36,7 @@ export default async function ProfileSettingsPage() {
                     <div className="flex flex-col md:flex-row md:items-center gap-6">
                         <Avatar className="h-24 w-24 border-4 border-white/10 shadow-xl">
                             <AvatarImage src="" />
-                            <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-600 text-3xl font-bold text-white">
+                            <AvatarFallback className="bg-indigo-600 text-3xl font-bold text-white">
                                 {profile.full_name?.[0] || 'U'}
                             </AvatarFallback>
                         </Avatar>

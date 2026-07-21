@@ -83,24 +83,7 @@ export function AddStockMovementDialog({ defaultType = 'IN', defaultReason = '',
 
                 if (!allItems) return
 
-                // 2. Fetch Warehouse Stock logic
-                // We need to get the warehouse cookie here. 
-                // Since this is a client component, we use the server action or assume it's passed?
-                // Using the server action 'getWarehouseCookie' is possible if imported.
-                // Let's dynamically import it or use a simpler client-side approach?
-                // Actually, standard pattern now is importing the action.
-                // But we need to add the import first.
-
-                // For now, let's assume we can import getWarehouseCookie. 
-                // Wait, I need to add the import at the top of the file first.
-                // To avoid multiple replaces, I'll include the import in a separate step or just assume I can add it?
-                // I will add the import in a subsequent step or try to do it all now. 
-                // Wait, I can't add import easily in this replace block as it targets the useEffect.
-
-                // HACK: I will just use the server action if I can... 
-                // Actually, I'll do a MultiReplace or two steps. 
-                // Let's just do the logic assuming we have the ID, wait.
-                // I'll use the same pattern as RecordSaleDialog.
+                // Fetch warehouse cookie dynamically using server action
 
                 const { getWarehouseCookie } = await import('@/app/actions/warehouse-cookie')
                 const warehouseId = await getWarehouseCookie()

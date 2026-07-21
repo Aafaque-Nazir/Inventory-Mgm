@@ -55,7 +55,7 @@ export default async function BillingSettingsPage() {
                         </div>
 
                         {org.plan_type === 'FREE' ? (
-                            <div className="w-full mt-4 p-4 rounded-xl bg-gradient-to-r from-indigo-900/40 to-purple-900/40 border border-indigo-500/20">
+                            <div className="w-full mt-4 p-4 rounded-xl bg-indigo-900/40 border border-indigo-500/20">
                                 <p className="text-sm text-indigo-200 mb-4 font-medium">
                                     Unlock advanced features like team members, unlimited items, and priority support.
                                 </p>

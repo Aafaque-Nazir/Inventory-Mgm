@@ -39,7 +39,7 @@ export default function SuperAdminPage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2">
-                        Super Admin <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Dashboard</span>
+                        Super Admin <span className="text-indigo-400">Dashboard</span>
                     </h2>
                     <p className="text-slate-400 text-sm md:text-lg">System performance, growth, and organizational health.</p>
                 </div>
@@ -198,16 +198,16 @@ export default function SuperAdminPage() {
                                 ) : stats?.recentOrgs?.map((org: any) => (
                                     <div key={org.id} className="group p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-indigo-500/30 hover:bg-indigo-500/5 transition-all duration-300">
                                         <div className="flex items-center gap-4">
-                                            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-white/10 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
+                                            <div className="h-12 w-12 rounded-xl bg-indigo-500/20 border border-white/10 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
                                                 <Building2 className="h-6 w-6" />
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-bold text-white truncate">{org.name}</p>
                                                 <p className="text-xs text-slate-400 truncate">/{org.slug}</p>
                                             </div>
-                                            <div className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-wider shadow-lg ${org.plan_type === 'PRO' ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-orange-500/20' :
-                                                org.plan_type === 'ENTERPRISE' ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-indigo-500/20' :
-                                                    'bg-white/10 text-slate-400 border border-white/10'
+                                            <div className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-wider shadow-lg ${org.plan_type === 'PRO' ? 'bg-amber-500 text-white shadow-amber-500/20' :
+                                                org.plan_type === 'ENTERPRISE' ? 'bg-purple-500 text-white shadow-purple-500/20' :
+                                                    'bg-slate-700 text-slate-300'
                                                 }`}>
                                                 {org.plan_type}
                                             </div>
