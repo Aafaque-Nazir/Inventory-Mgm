@@ -57,7 +57,11 @@ export function TeamTab({
         if (!confirm('Cancel this invitation?')) return
         const formData = new FormData()
         formData.append('inviteId', inviteId)
-        startTransition(() => cancelInvitation(formData))
+        startTransition(async () => {
+            const result = await cancelInvitation(formData)
+            if (result?.error) toast.error(result.error)
+            else toast.success(result?.message || 'Invitation cancelled')
+        })
     }
 
     const onRemove = (userId: string) => {
