@@ -8,6 +8,7 @@ import { Loader2, AlertCircle, Phone, Mail } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { WarehouseProvider } from '@/context/WarehouseContext'
+import { AiChatWidget } from '@/components/chat/AiChatWidget'
 
 import { usePathname } from 'next/navigation'
 
@@ -99,6 +100,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                     </main>
                 </div>
             </div>
+            <AiChatWidget />
         </WarehouseProvider>
     )
 }

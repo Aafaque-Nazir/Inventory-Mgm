@@ -3,13 +3,24 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 
-export async function getLocations(organizationId: string) {
+export async function getLocations(organizationId?: string) {
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return []
+
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single()
+
+    if (!profile?.organization_id) return []
+    const targetOrgId = profile.organization_id
 
     const { data: locations, error } = await supabase
         .from('locations')
         .select('*')
-        .eq('organization_id', organizationId)
+        .eq('organization_id', targetOrgId)
         .order('is_default', { ascending: false })
         .order('created_at', { ascending: true })
 
@@ -21,14 +32,29 @@ export async function getLocations(organizationId: string) {
     return locations
 }
 
-export async function createLocation(data: { name: string; address?: string; organizationId: string }) {
+export async function createLocation(data: { name: string; address?: string; organizationId?: string }) {
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: 'Unauthorized' }
+
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('organization_id, role, is_super_admin')
+        .eq('id', user.id)
+        .single()
+
+    if (!profile?.organization_id) return { error: 'No organization found' }
+    if (profile.role !== 'ADMIN' && !profile.is_super_admin) {
+        return { error: 'Only Admins can create warehouses' }
+    }
+
+    const orgId = profile.organization_id
 
     // 1. Get current plan & limit
     const { data: org, error: orgError } = await supabase
         .from('organizations')
         .select('plan_type, subscription_status')
-        .eq('id', data.organizationId)
+        .eq('id', orgId)
         .single()
 
     if (orgError) return { error: "Failed to fetch organization details" }
@@ -37,14 +63,12 @@ export async function createLocation(data: { name: string; address?: string; org
     const { count, error: countError } = await supabase
         .from('locations')
         .select('*', { count: 'exact', head: true })
-        .eq('organization_id', data.organizationId)
+        .eq('organization_id', orgId)
 
     if (countError) return { error: "Failed to count locations" }
 
     // 3. Enforce Limit (Pro = 2) 
     const MAX_LOCATIONS = 2
-    // Allow Enterprise to have unlimited (implied check bypass)
-    // If not enterprise, check limit
     if (org.plan_type !== 'ENTERPRISE' && (count || 0) >= MAX_LOCATIONS) {
         return { error: `Pro Plan is limited to ${MAX_LOCATIONS} Warehouses. Upgrade to Enterprise for unlimited.` }
     }
@@ -54,7 +78,7 @@ export async function createLocation(data: { name: string; address?: string; org
         .insert({
             name: data.name,
             address: data.address,
-            organization_id: data.organizationId
+            organization_id: orgId
         })
 
     if (error) return { error: error.message }
@@ -66,11 +90,25 @@ export async function createLocation(data: { name: string; address?: string; org
 
 export async function updateLocation(locationId: string, data: { name?: string; address?: string }) {
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: 'Unauthorized' }
+
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('organization_id, role, is_super_admin')
+        .eq('id', user.id)
+        .single()
+
+    if (!profile?.organization_id) return { error: 'Unauthorized' }
+    if (profile.role !== 'ADMIN' && !profile.is_super_admin) {
+        return { error: 'Only Admins can update warehouses' }
+    }
 
     const { error } = await supabase
         .from('locations')
         .update(data)
         .eq('id', locationId)
+        .eq('organization_id', profile.organization_id)
 
     if (error) return { error: error.message }
 
@@ -81,13 +119,31 @@ export async function updateLocation(locationId: string, data: { name?: string; 
 
 export async function deleteLocation(locationId: string) {
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: 'Unauthorized' }
+
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('organization_id, role, is_super_admin')
+        .eq('id', user.id)
+        .single()
+
+    if (!profile?.organization_id) return { error: 'Unauthorized' }
+    if (profile.role !== 'ADMIN' && !profile.is_super_admin) {
+        return { error: 'Only Admins can delete warehouses' }
+    }
 
     // Prevent deleting default location
     const { data: location } = await supabase
         .from('locations')
         .select('is_default')
         .eq('id', locationId)
+        .eq('organization_id', profile.organization_id)
         .single()
+
+    if (!location) {
+        return { error: "Warehouse not found" }
+    }
 
     if (location?.is_default) {
         return { error: "Cannot delete the Default Warehouse." }
@@ -97,6 +153,7 @@ export async function deleteLocation(locationId: string) {
         .from('locations')
         .delete()
         .eq('id', locationId)
+        .eq('organization_id', profile.organization_id)
 
     if (error) return { error: error.message }
 

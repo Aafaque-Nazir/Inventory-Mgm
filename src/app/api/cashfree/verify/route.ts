@@ -3,41 +3,12 @@ import { Cashfree } from 'cashfree-pg'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseAdmin } from '@supabase/supabase-js'
 
-// Initialize Cashfree
-Cashfree.XClientId = process.env.CASHFREE_APP_ID!
-Cashfree.XClientSecret = process.env.CASHFREE_SECRET_KEY!
-Cashfree.XEnvironment = process.env.CASHFREE_ENV === 'PRODUCTION'
-    ? Cashfree.Environment.PRODUCTION
-    : Cashfree.Environment.SANDBOX
-
 export async function POST(req: NextRequest) {
     try {
-        const body = await req.json()
-        const { orderId } = body
-
-        if (!orderId) {
-            return NextResponse.json({ error: 'Order ID required' }, { status: 400 })
-        }
-
-        // 1. Fetch Order Status from Cashfree
-        const response = await Cashfree.PGOrderFetchPayments('2023-08-01', orderId)
-        const payments = response.data
-
-        // Check if any payment is successful
-        // @ts-ignore
-        const successfulPayment = payments.find(p => p.payment_status === 'SUCCESS')
-
-        if (!successfulPayment) {
-            return NextResponse.json({ error: 'Payment not successful' }, { status: 400 })
-        }
-
-        // 2. Upgrade User Logic (Same as before)
+        // 1. Auth check first
         const supabase = await createClient()
         const { data: { user } } = await supabase.auth.getUser()
 
-        // Fallback: If verifying via webhook/server where session might be missing, 
-        // rely on customer_id from order details if needed. 
-        // For now, assume client-side verification triggers this with active session.
         if (!user) {
             return NextResponse.json({ error: 'Unauthorized Session' }, { status: 401 })
         }
@@ -52,7 +23,48 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'No organization found' }, { status: 400 })
         }
 
-        // Upgrade Organization
+        const body = await req.json()
+        const { orderId } = body
+
+        if (!orderId) {
+            return NextResponse.json({ error: 'Order ID required' }, { status: 400 })
+        }
+
+        // 2. Initialize Cashfree inside handler
+        const appId = process.env.CASHFREE_APP_ID
+        const secretKey = process.env.CASHFREE_SECRET_KEY
+
+        if (!appId || !secretKey) {
+            return NextResponse.json({ error: 'Server payment configuration missing' }, { status: 500 })
+        }
+
+        Cashfree.XClientId = appId
+        Cashfree.XClientSecret = secretKey
+        Cashfree.XEnvironment = process.env.CASHFREE_ENV === 'PRODUCTION'
+            ? Cashfree.Environment.PRODUCTION
+            : Cashfree.Environment.SANDBOX
+
+        // 3. Verify Order Details & Customer Ownership (Prevents Order ID spoofing)
+        const orderResponse = await Cashfree.PGFetchOrder('2023-08-01', orderId)
+        const orderData = orderResponse.data
+
+        if (orderData?.customer_details?.customer_id !== user.id) {
+            return NextResponse.json({ error: 'Order does not belong to this account' }, { status: 403 })
+        }
+
+        // 4. Fetch Order Payments Status
+        const response = await Cashfree.PGOrderFetchPayments('2023-08-01', orderId)
+        const payments = response.data
+
+        // Check if any payment is successful
+        // @ts-ignore
+        const successfulPayment = payments?.find((p: any) => p.payment_status === 'SUCCESS')
+
+        if (!successfulPayment) {
+            return NextResponse.json({ error: 'Payment not successful' }, { status: 400 })
+        }
+
+        // 5. Upgrade Organization using Admin Client
         const supabaseAdmin = createSupabaseAdmin(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -91,3 +103,4 @@ export async function POST(req: NextRequest) {
         )
     }
 }
+

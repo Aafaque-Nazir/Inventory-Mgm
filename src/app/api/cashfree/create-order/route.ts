@@ -37,6 +37,8 @@ export async function POST(req: NextRequest) {
 
         const orderId = 'order_' + Date.now() + '_' + user.id.slice(0, 5)
 
+        const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || req.nextUrl.origin).replace(/\/$/, '')
+
         const request = {
             order_amount: 399,
             order_currency: 'INR',
@@ -48,7 +50,7 @@ export async function POST(req: NextRequest) {
                 customer_name: profile?.full_name || 'Inventory User'
             },
             order_meta: {
-                return_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?order_id={order_id}`
+                return_url: `${baseUrl}/pricing?order_id={order_id}`
             }
         }
 
