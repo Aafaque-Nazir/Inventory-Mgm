@@ -93,11 +93,17 @@ export async function POST(req: Request) {
                     const messagesToInsert = []
 
                     if (userMessage && userMessage.role === 'user') {
+                        let userText = userMessage.content || ''
+                        if (!userText && userMessage.parts) {
+                            // @ts-ignore
+                            userText = userMessage.parts.map(p => p.text || '').join('')
+                        }
+
                         messagesToInsert.push({
                             user_id: user.id,
                             organization_id: organizationId,
                             role: 'user' as const,
-                            content: userMessage.content,
+                            content: userText,
                         })
                     }
 
