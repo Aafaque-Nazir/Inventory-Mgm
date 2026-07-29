@@ -20,7 +20,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
                 </p>
             </div>
             <div className="h-[350px] w-full pr-4">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={1}>
                     <LineChart data={data}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                         <XAxis

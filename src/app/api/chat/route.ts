@@ -78,16 +78,13 @@ export async function POST(req: Request) {
 
         // 4. Create org-scoped tools
         const tools = createChatTools(organizationId, supabase)
-
-        const { stepCountIs } = await import('ai')
         
         // 5. Stream response from Gemini
         const result = streamText({
-            model: google('gemini-3.5-flash-lite'),
+            model: google('gemini-1.5-flash'),
             system: SYSTEM_PROMPT,
             messages,
             tools,
-            stopWhen: stepCountIs(5), // Replaces maxSteps: 5
             onFinish: async ({ text }) => {
                 // 6. Persist messages (user's last message + assistant response)
                 if (text) {

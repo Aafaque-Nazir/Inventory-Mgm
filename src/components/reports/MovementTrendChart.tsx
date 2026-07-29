@@ -20,7 +20,7 @@ export function MovementTrendChart({ data }: MovementTrendChartProps) {
                 <p className="text-sm text-slate-400">Stock In vs Stock Out (Last 7 Days)</p>
             </div>
             <div className="h-[300px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={1}>
                     <BarChart
                         data={data}
                         margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
