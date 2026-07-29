@@ -178,6 +178,9 @@ export async function createItem(prevState: any, formData: FormData) {
 
     } catch (error: any) {
         console.error('Create Item Error:', error)
+        if (error.message?.includes('duplicate key value violates unique constraint "items_sku_key"')) {
+            return { error: 'An item with this SKU already exists.' }
+        }
         return { error: error.message || 'Failed to create item' }
     }
 }
@@ -280,6 +283,9 @@ export async function bulkCreateItems(rawItems: any[]) {
 
     } catch (error: any) {
         console.error('Bulk Import Error:', error)
+        if (error.message?.includes('duplicate key value violates unique constraint "items_sku_key"')) {
+            return { error: 'One or more items have a SKU that already exists.' }
+        }
         return { error: error.message || 'Failed to import items' }
     }
 }
