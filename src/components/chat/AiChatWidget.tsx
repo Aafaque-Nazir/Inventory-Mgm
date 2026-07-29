@@ -1,21 +1,20 @@
 'use client'
 
-import { useChat } from 'ai/react'
+import { useChat } from '@ai-sdk/react'
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-    Sparkles,
     X,
     Send,
     Trash2,
     Loader2,
-    MessageSquare,
     Package,
     TrendingDown,
     BarChart3,
     Truck,
 } from 'lucide-react'
 import { ChatMessage } from './ChatMessage'
+import { PremiumAiLogo } from './PremiumAiLogo'
 import { getChatHistory, clearChatHistory } from '@/app/actions/chat'
 import type { ChatMessage as ChatMessageType } from '@/app/actions/chat'
 
@@ -33,17 +32,27 @@ export function AiChatWidget() {
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null)
 
+    const [input, setInput] = useState('')
     const {
         messages,
-        input,
-        handleInputChange,
-        handleSubmit,
-        isLoading,
+        status,
         setMessages,
         error,
-    } = useChat({
-        api: '/api/chat',
-    })
+        sendMessage,
+    } = useChat()
+    
+    const isLoading = status === 'streaming' || status === 'submitted'
+    
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInput(e.target.value)
+    }
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!input.trim() || isLoading) return
+        sendMessage({ role: 'user', parts: [{ type: 'text', text: input }] })
+        setInput('')
+    }
 
     // Load chat history on first open
     useEffect(() => {
@@ -52,17 +61,28 @@ export function AiChatWidget() {
         }
     }, [isOpen, historyLoaded])
 
-    // Auto-scroll to bottom on new messages
+    // Auto-scroll to bottom on new messages or loading state
     useEffect(() => {
-        if (messagesEndRef.current) {
+        if (isOpen && messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
         }
-    }, [messages])
+    }, [messages, isLoading, isOpen])
+
+    // Scroll to bottom immediately when chat opens or history finishes loading
+    useEffect(() => {
+        if (isOpen && historyLoaded && messagesEndRef.current) {
+            const timer = setTimeout(() => {
+                messagesEndRef.current?.scrollIntoView({ behavior: 'auto' })
+            }, 100)
+            return () => clearTimeout(timer)
+        }
+    }, [isOpen, historyLoaded])
 
     // Focus input when chat opens
     useEffect(() => {
         if (isOpen && inputRef.current) {
-            setTimeout(() => inputRef.current?.focus(), 300)
+            const timer = setTimeout(() => inputRef.current?.focus(), 300)
+            return () => clearTimeout(timer)
         }
     }, [isOpen])
 
@@ -73,8 +93,9 @@ export function AiChatWidget() {
                 setMessages(
                     history.map((msg) => ({
                         id: msg.id,
-                        role: msg.role,
+                        role: msg.role as 'user' | 'assistant',
                         content: msg.content,
+                        parts: [{ type: 'text', text: msg.content }],
                     }))
                 )
             }
@@ -100,50 +121,40 @@ export function AiChatWidget() {
     }
 
     function handleSuggestedPrompt(prompt: string) {
-        // Programmatically set input and submit
-        const syntheticEvent = {
-            preventDefault: () => {},
-        } as React.FormEvent<HTMLFormElement>
+        if (isLoading) return
+        sendMessage({ role: 'user', parts: [{ type: 'text', text: prompt }] })
 
-        // Use the setMessages + append pattern
-        handleInputChange({
-            target: { value: prompt },
-        } as React.ChangeEvent<HTMLInputElement>)
-
-        // Submit on next tick after input is set
-        setTimeout(() => {
-            const form = document.getElementById(
-                'chat-form'
-            ) as HTMLFormElement
-            if (form) {
-                form.requestSubmit()
-            }
-        }, 50)
     }
 
     const hasMessages = messages.length > 0
 
     return (
         <>
-            {/* Floating trigger button */}
+            {/* Floating trigger button - ALWAYS FIXED ON BOTTOM RIGHT */}
             <AnimatePresence>
                 {!isOpen && (
                     <motion.button
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0, opacity: 0 }}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        whileHover={{ scale: 1.06, y: -2 }}
+                        whileTap={{ scale: 0.94 }}
                         onClick={() => setIsOpen(true)}
-                        className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 flex items-center justify-center hover:shadow-blue-500/40 transition-shadow duration-300 border border-blue-500/20"
-                        aria-label="Open AI Chat"
+                        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex items-center justify-center h-14 w-14 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white shadow-xl shadow-blue-600/30 border border-blue-400/30 transition-all duration-200"
+                        aria-label="Open AI Assistant"
                     >
-                        <Sparkles className="h-6 w-6" />
+                        <PremiumAiLogo size={28} className="h-7 w-7 text-white" />
+                        
+                        {/* Live AI Dot indicator */}
+                        <span className="absolute top-2.5 right-2.5 flex h-2.5 w-2.5">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-300 opacity-75" />
+                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-300" />
+                        </span>
                     </motion.button>
                 )}
             </AnimatePresence>
 
-            {/* Chat panel */}
+            {/* Chat panel - FULLY RESPONSIVE FIXED BOTTOM RIGHT */}
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
@@ -151,19 +162,25 @@ export function AiChatWidget() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className="fixed bottom-6 right-6 z-50 flex flex-col w-[calc(100vw-3rem)] sm:w-[400px] h-[min(600px,calc(100vh-6rem))] rounded-2xl border border-white/10 bg-slate-950/95 backdrop-blur-xl shadow-2xl shadow-black/40 overflow-hidden"
+                        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col w-[calc(100vw-2rem)] max-w-[400px] h-[calc(100vh-5rem)] max-h-[580px] rounded-2xl border border-white/10 bg-slate-950/95 backdrop-blur-xl shadow-2xl shadow-black/80 overflow-hidden"
                     >
-                        {/* Header */}
-                        <div className="flex items-center justify-between px-5 py-4 border-b border-white/5 bg-slate-950/80">
+                        {/* Header - Single Blue Solid Color Theme */}
+                        <div className="flex items-center justify-between px-4 sm:px-5 py-3.5 border-b border-white/10 bg-slate-900/80">
                             <div className="flex items-center gap-3">
-                                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border border-blue-500/20 flex items-center justify-center">
-                                    <Sparkles className="h-5 w-5 text-blue-400" />
+                                <div className="h-9 w-9 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center">
+                                    <PremiumAiLogo size={22} className="h-5.5 w-5.5 text-blue-400" />
                                 </div>
                                 <div>
-                                    <h3 className="text-sm font-semibold text-white">
-                                        InvMaster AI
-                                    </h3>
-                                    <p className="text-[11px] text-slate-500">
+                                    <div className="flex items-center gap-2">
+                                        <h3 className="text-sm font-bold text-white tracking-wide">
+                                            InvMaster AI
+                                        </h3>
+                                        <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                                            PRO
+                                        </span>
+                                    </div>
+                                    <p className="text-[11px] text-slate-400 font-medium flex items-center gap-1.5">
+                                        <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
                                         Inventory Assistant
                                     </p>
                                 </div>
@@ -173,7 +190,7 @@ export function AiChatWidget() {
                                     <button
                                         onClick={handleClear}
                                         disabled={isClearing}
-                                        className="h-8 w-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                                        className="h-8 w-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                                         title="Clear chat history"
                                     >
                                         {isClearing ? (
@@ -185,7 +202,7 @@ export function AiChatWidget() {
                                 )}
                                 <button
                                     onClick={() => setIsOpen(false)}
-                                    className="h-8 w-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-white hover:bg-white/10 transition-colors"
+                                    className="h-8 w-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
                                     title="Close chat"
                                 >
                                     <X className="h-4 w-4" />
@@ -193,28 +210,28 @@ export function AiChatWidget() {
                             </div>
                         </div>
 
-                        {/* Messages area */}
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
+                        {/* Messages area with explicit min-h-0 & visible chat-scrollbar */}
+                        <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 chat-scrollbar">
                             {!historyLoaded ? (
-                                <div className="flex items-center justify-center h-full">
-                                    <Loader2 className="h-6 w-6 animate-spin text-slate-500" />
+                                <div className="flex flex-col items-center justify-center h-full gap-3">
+                                    <Loader2 className="h-6 w-6 animate-spin text-blue-400" />
+                                    <p className="text-xs text-slate-400">Loading chat history...</p>
                                 </div>
                             ) : !hasMessages ? (
                                 // Empty state with suggestions
-                                <div className="flex flex-col items-center justify-center h-full space-y-6">
+                                <div className="flex flex-col items-center justify-center h-full space-y-5 py-4">
                                     <div className="text-center space-y-2">
-                                        <div className="h-14 w-14 mx-auto rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-4">
-                                            <MessageSquare className="h-7 w-7 text-blue-400" />
+                                        <div className="mx-auto w-14 h-14 rounded-2xl bg-blue-600/15 border border-blue-500/30 flex items-center justify-center mb-3">
+                                            <PremiumAiLogo size={32} className="h-8 w-8 text-blue-400" />
                                         </div>
-                                        <h4 className="text-base font-semibold text-white">
-                                            Ask me anything
+                                        <h4 className="text-base font-bold text-white tracking-tight">
+                                            How can I help you today?
                                         </h4>
-                                        <p className="text-xs text-slate-500 max-w-[250px]">
-                                            I can check stock levels, sales
-                                            data, suppliers, and more.
+                                        <p className="text-xs text-slate-400 max-w-[250px] leading-relaxed">
+                                            Ask about stock levels, revenue, suppliers, or low stock warnings.
                                         </p>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-2 w-full px-2">
+                                    <div className="grid grid-cols-2 gap-2 w-full px-1">
                                         {SUGGESTED_PROMPTS.map((prompt) => (
                                             <button
                                                 key={prompt.text}
@@ -223,18 +240,18 @@ export function AiChatWidget() {
                                                         prompt.text
                                                     )
                                                 }
-                                                className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/5 border border-white/5 text-xs text-slate-400 hover:text-white hover:bg-white/10 hover:border-blue-500/20 transition-all duration-200 text-left"
+                                                className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-300 hover:text-white hover:bg-blue-600/20 hover:border-blue-500/40 transition-all duration-200 text-left"
                                             >
-                                                <prompt.icon className="h-3.5 w-3.5 flex-shrink-0 text-blue-400/60" />
-                                                <span>{prompt.text}</span>
+                                                <prompt.icon className="h-3.5 w-3.5 flex-shrink-0 text-blue-400" />
+                                                <span className="line-clamp-2">{prompt.text}</span>
                                             </button>
                                         ))}
                                     </div>
                                 </div>
                             ) : (
                                 // Message list
-                                <>
-                                    {messages.map((message) => (
+                                <div className="space-y-4">
+                                    {messages.map((message: any) => (
                                         <ChatMessage
                                             key={message.id}
                                             role={
@@ -251,35 +268,38 @@ export function AiChatWidget() {
                                         messages[messages.length - 1]?.role ===
                                             'user' && (
                                             <motion.div
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: 1 }}
+                                                initial={{ opacity: 0, y: 5 }}
+                                                animate={{ opacity: 1, y: 0 }}
                                                 className="flex gap-3 items-start"
                                             >
-                                                <div className="h-7 w-7 rounded-lg bg-blue-500/15 border border-blue-500/20 flex items-center justify-center">
-                                                    <Sparkles className="h-4 w-4 text-blue-400 animate-pulse" />
+                                                <div className="h-7 w-7 rounded-lg bg-blue-600/20 border border-blue-500/30 flex items-center justify-center flex-shrink-0 mt-1">
+                                                    <PremiumAiLogo size={16} className="h-4 w-4 text-blue-400" />
                                                 </div>
-                                                <div className="bg-white/5 border border-white/5 rounded-2xl px-4 py-3 flex gap-1.5">
-                                                    <span className="h-2 w-2 rounded-full bg-blue-400/60 animate-bounce [animation-delay:0ms]" />
-                                                    <span className="h-2 w-2 rounded-full bg-blue-400/60 animate-bounce [animation-delay:150ms]" />
-                                                    <span className="h-2 w-2 rounded-full bg-blue-400/60 animate-bounce [animation-delay:300ms]" />
+                                                <div className="bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 flex items-center gap-1.5 shadow-md">
+                                                    <span className="h-2 w-2 rounded-full bg-blue-400 animate-bounce [animation-delay:0ms]" />
+                                                    <span className="h-2 w-2 rounded-full bg-blue-400 animate-bounce [animation-delay:150ms]" />
+                                                    <span className="h-2 w-2 rounded-full bg-blue-400 animate-bounce [animation-delay:300ms]" />
                                                 </div>
                                             </motion.div>
                                         )}
-                                </>
+                                </div>
                             )}
 
                             {/* Error message */}
                             {error && (
-                                <div className="text-center text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
-                                    Something went wrong. Please try again.
+                                <div className="text-center text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 leading-relaxed">
+                                    {error.message?.includes('429') || error.message?.includes('Quota')
+                                        ? 'API rate limit reached. Please wait 15 seconds before asking again.'
+                                        : `Error: ${error.message || 'Something went wrong. Please try again.'}`}
                                 </div>
                             )}
 
-                            <div ref={messagesEndRef} />
+
+                            <div ref={messagesEndRef} className="h-2" />
                         </div>
 
                         {/* Input area */}
-                        <div className="border-t border-white/5 px-4 py-3 bg-slate-950/80">
+                        <div className="border-t border-white/10 px-3.5 sm:px-4 py-3 bg-slate-900/80">
                             <form
                                 id="chat-form"
                                 onSubmit={handleSubmit}
@@ -292,12 +312,12 @@ export function AiChatWidget() {
                                     onChange={handleInputChange}
                                     placeholder="Ask about your inventory..."
                                     disabled={isLoading}
-                                    className="flex-1 h-10 rounded-xl bg-white/5 border border-white/10 px-4 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20 disabled:opacity-50 transition-colors"
+                                    className="flex-1 h-10 rounded-xl bg-slate-950 border border-white/15 px-3.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 disabled:opacity-50 transition-all"
                                 />
                                 <button
                                     type="submit"
                                     disabled={isLoading || !input.trim()}
-                                    className="h-10 w-10 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:bg-white/5 disabled:text-slate-600 text-white flex items-center justify-center transition-colors disabled:cursor-not-allowed"
+                                    className="h-10 w-10 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 disabled:text-slate-600 text-white flex items-center justify-center transition-all shadow-md shadow-blue-600/20 disabled:cursor-not-allowed flex-shrink-0"
                                     aria-label="Send message"
                                 >
                                     {isLoading ? (

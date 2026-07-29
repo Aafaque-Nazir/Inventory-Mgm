@@ -1,7 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Bot, User } from 'lucide-react'
+import { User } from 'lucide-react'
+import { PremiumAiLogo } from './PremiumAiLogo'
 
 interface ChatMessageProps {
     role: 'user' | 'assistant'
@@ -20,8 +21,8 @@ export function ChatMessage({ role, content }: ChatMessageProps) {
         >
             {isAssistant && (
                 <div className="flex-shrink-0 mt-1">
-                    <div className="h-7 w-7 rounded-lg bg-blue-500/15 border border-blue-500/20 flex items-center justify-center">
-                        <Bot className="h-4 w-4 text-blue-400" />
+                    <div className="h-7 w-7 rounded-lg bg-blue-600/20 border border-blue-500/30 flex items-center justify-center">
+                        <PremiumAiLogo size={18} className="h-4.5 w-4.5 text-blue-400" />
                     </div>
                 </div>
             )}
@@ -29,8 +30,8 @@ export function ChatMessage({ role, content }: ChatMessageProps) {
             <div
                 className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                     isAssistant
-                        ? 'bg-white/5 border border-white/5 text-slate-200'
-                        : 'bg-blue-600 text-white'
+                        ? 'bg-slate-900 border border-white/10 text-slate-100 shadow-sm'
+                        : 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
                 }`}
             >
                 {isAssistant ? (
@@ -42,8 +43,8 @@ export function ChatMessage({ role, content }: ChatMessageProps) {
 
             {!isAssistant && (
                 <div className="flex-shrink-0 mt-1">
-                    <div className="h-7 w-7 rounded-lg bg-blue-600/20 border border-blue-500/20 flex items-center justify-center">
-                        <User className="h-4 w-4 text-blue-300" />
+                    <div className="h-7 w-7 rounded-lg bg-blue-600 border border-blue-500/30 flex items-center justify-center shadow-sm">
+                        <User className="h-4 w-4 text-white" />
                     </div>
                 </div>
             )}
@@ -86,7 +87,7 @@ function AssistantContent({ content }: { content: string }) {
                 if (numberedMatch) {
                     return (
                         <div key={i} className="flex gap-2 items-start">
-                            <span className="text-blue-400 font-medium min-w-[1.25rem] text-right">
+                            <span className="text-blue-400 font-semibold min-w-[1.25rem] text-right">
                                 {numberedMatch[1]}.
                             </span>
                             <span className="flex-1">
@@ -116,7 +117,7 @@ function FormattedText({ text }: { text: string }) {
             {parts.map((part, i) => {
                 if (part.startsWith('**') && part.endsWith('**')) {
                     return (
-                        <strong key={i} className="font-semibold text-white">
+                        <strong key={i} className="font-semibold text-blue-300">
                             {part.slice(2, -2)}
                         </strong>
                     )

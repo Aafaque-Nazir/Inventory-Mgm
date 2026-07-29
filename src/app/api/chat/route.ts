@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { google } from '@ai-sdk/google'
+import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { streamText } from 'ai'
 import { createChatTools } from './tools'
 
@@ -38,6 +38,18 @@ PERSONALITY:
 
 export async function POST(req: Request) {
     try {
+        const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY
+        if (!apiKey) {
+            console.error('Chat API Error: Missing GOOGLE_GENERATIVE_AI_API_KEY in environment variables.')
+            return new Response(
+                'Missing GOOGLE_GENERATIVE_AI_API_KEY in environment variables. Please restart your dev server after setting it in .env.local.',
+                { status: 500 }
+            )
+        }
+
+        const google = createGoogleGenerativeAI({ apiKey })
+
+
         // 1. Auth check
         const supabase = await createClient()
         const {
@@ -65,15 +77,17 @@ export async function POST(req: Request) {
         const { messages } = await req.json()
 
         // 4. Create org-scoped tools
-        const tools = createChatTools(organizationId)
+        const tools = createChatTools(organizationId, supabase)
 
+        const { stepCountIs } = await import('ai')
+        
         // 5. Stream response from Gemini
-        const result = await streamText({
-            model: google('gemini-1.5-flash'),
+        const result = streamText({
+            model: google('gemini-3.5-flash-lite'),
             system: SYSTEM_PROMPT,
             messages,
             tools,
-            maxSteps: 5, // Allow up to 5 sequential tool calls per response
+            stopWhen: stepCountIs(5), // Replaces maxSteps: 5
             onFinish: async ({ text }) => {
                 // 6. Persist messages (user's last message + assistant response)
                 if (text) {
@@ -121,11 +135,12 @@ export async function POST(req: Request) {
             },
         })
 
-        return result.toDataStreamResponse()
+        return result.toUIMessageStreamResponse()
     } catch (error: unknown) {
-        console.error('Chat API Error:', error)
+        console.error('Chat API Error Trace:', error)
         const message =
             error instanceof Error ? error.message : 'Internal server error'
         return new Response(message, { status: 500 })
     }
 }
+
