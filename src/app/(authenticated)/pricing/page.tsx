@@ -12,7 +12,7 @@ import { createClient } from '@/lib/supabase/client'
 
 declare global {
     interface Window {
-        Cashfree: unknown;
+        Cashfree: new (options: { mode: string }) => { checkout: (options: { paymentSessionId: string; returnUrl: string }) => void };
     }
 }
 
@@ -76,13 +76,13 @@ export default function PricingPage() {
                     .eq('id', user.id)
                     .single()
 
-                // @ts-expect-error
+                // @ts-expect-error -- Supabase dynamic types
                 if (profile?.organizations?.plan_type) {
-                    // @ts-expect-error
+                    // @ts-expect-error -- Supabase dynamic types
                     setCurrentPlan(profile.organizations.plan_type)
-                    // @ts-expect-error
+                    // @ts-expect-error -- Supabase dynamic types
                     setTrialUsed(profile.organizations.trial_used || false)
-                    // @ts-expect-error
+                    // @ts-expect-error -- Supabase dynamic types
                     setSubStatus(profile.organizations.subscription_status || '')
                 }
                 if (profile?.organization_id) setOrgId(profile.organization_id)
