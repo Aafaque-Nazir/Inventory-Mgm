@@ -1,7 +1,6 @@
 import { format } from 'date-fns'
 
 interface InvoiceTemplateProps {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     invoice: any // Using any loosely here to accept the partial object from Checkout, but ideally Invoice
 }
 
@@ -37,7 +36,6 @@ export function InvoiceTemplate({ invoice }: InvoiceTemplateProps) {
                     </tr>
                 </thead>
                 <tbody>
-                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                     {invoice.items.map((item: any, i: number) => (
                         <tr key={i}>
                             <td className="pt-1">{item.name}</td>

@@ -44,7 +44,6 @@ export function Sidebar() {
     const [trialDays, setTrialDays] = useState<number | null>(null)
     const [collapsed, setCollapsed] = useState(false)
     const [mounted, setMounted] = useState(false)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [userProfile, setUserProfile] = useState<any>(null)
 
     useEffect(() => {
