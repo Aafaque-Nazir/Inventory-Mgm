@@ -15,8 +15,8 @@ export default async function BillingSettingsPage() {
         .eq('id', user.id)
         .single()
 
-    // @ts-ignore
-    const org = Array.isArray(profile?.organization) ? profile?.organization[0] : profile?.organization as any
+    // @ts-expect-error -- third-party type mismatch
+    const org = Array.isArray(profile?.organization) ? profile?.organization[0] : profile?.organization as unknown
 
     return (
         <div className="space-y-8 max-w-4xl">

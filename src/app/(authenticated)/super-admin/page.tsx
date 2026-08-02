@@ -6,14 +6,13 @@ import { getAdminOverviewStats } from './actions'
 import { TicketSystem } from '@/components/super-admin/TicketSystem'
 import { OrgManager } from '@/components/super-admin/OrgManager'
 import { AnnouncementManager } from '@/components/super-admin/AnnouncementManager'
-import { Building2, Users, CreditCard, TrendingUp, Activity, DollarSign } from 'lucide-react'
-import { format } from 'date-fns'
+import { Building2, Users, CreditCard, TrendingUp, DollarSign } from 'lucide-react'
 import { RevenueChart } from '@/components/super-admin/RevenueChart'
 
 import { StatCard } from '@/components/dashboard/StatCard'
 
 export default function SuperAdminPage() {
-    const [stats, setStats] = useState<any>(null)
+    const [stats, setStats] = useState<unknown>(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -195,7 +194,7 @@ export default function SuperAdminPage() {
                             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                 {loading ? (
                                     <div className="col-span-full py-12 text-center text-slate-500 animate-pulse">Loading amazing new companies...</div>
-                                ) : stats?.recentOrgs?.map((org: any) => (
+                                ) : stats?.recentOrgs?.map((org: unknown) => (
                                     <div key={org.id} className="group p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-indigo-500/30 hover:bg-indigo-500/5 transition-all duration-300">
                                         <div className="flex items-center gap-4">
                                             <div className="h-12 w-12 rounded-xl bg-indigo-500/20 border border-white/10 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">

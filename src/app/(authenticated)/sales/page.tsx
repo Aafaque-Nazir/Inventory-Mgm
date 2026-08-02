@@ -66,7 +66,7 @@ export default async function SalesPage() {
                                         </TableCell>
                                     </TableRow>
                                 )}
-                                {invoices.map((inv: any) => (
+                                {invoices.map((inv: unknown) => (
                                     <TableRow key={inv.id} className="border-white/5 hover:bg-blue-500/5 transition-colors group">
                                         <TableCell className="font-mono text-sm pl-6">
                                             <span className="text-blue-400 group-hover:text-blue-300 bg-blue-500/10 px-2 py-1 rounded-md border border-blue-500/10 transition-colors">

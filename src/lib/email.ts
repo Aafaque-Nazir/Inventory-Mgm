@@ -15,7 +15,7 @@ export async function sendLowStockAlert(
     }
 
     try {
-        const { data, error } = await resend.emails.send({
+        const { error } = await resend.emails.send({
             from: 'InvMaster Alerts <onboarding@resend.dev>', // Default Resend test domain
             to: [email],
             subject: `⚠️ Low Stock Alert: ${itemName}`,

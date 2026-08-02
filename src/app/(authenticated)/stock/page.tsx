@@ -31,9 +31,9 @@ export default async function StockPage() {
         isSuperAdmin = profile?.is_super_admin || false
 
         // Check Pro Status
-        // @ts-ignore
+        // @ts-expect-error -- third-party type mismatch
         if (profile?.organizations?.plan_type === 'PRO') {
-            // @ts-ignore
+            // @ts-expect-error -- third-party type mismatch
             const endDate = profile.organizations.subscription_end_date
             if (endDate && new Date(endDate) > new Date()) {
                 isPro = true

@@ -15,8 +15,8 @@ export default async function OrganizationSettingsPage() {
         .eq('id', user.id)
         .single()
 
-    // @ts-ignore
-    const org = Array.isArray(profile?.organization) ? profile?.organization[0] : profile?.organization as any
+    // @ts-expect-error -- third-party type mismatch
+    const org = Array.isArray(profile?.organization) ? profile?.organization[0] : profile?.organization as unknown
 
     if (!org) redirect('/onboarding')
 
@@ -33,7 +33,7 @@ export default async function OrganizationSettingsPage() {
                 <div className="p-8 border-b border-white/5 bg-white/5">
                     <h2 className="text-xl font-semibold text-white">Organization Details</h2>
                     <p className="text-sm text-slate-400 mt-1">
-                        View and manage your organization's information.
+                        View and manage your organization&apos;s information.
                     </p>
                 </div>
 

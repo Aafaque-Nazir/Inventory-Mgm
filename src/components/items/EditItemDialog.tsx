@@ -50,7 +50,7 @@ export function EditItemDialog({ item, open, onOpenChange }: EditItemDialogProps
     const router = useRouter()
     const supabase = createClient()
 
-    const form = useForm<any>({
+    const form = useForm<unknown>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: item.name,
@@ -80,7 +80,7 @@ export function EditItemDialog({ item, open, onOpenChange }: EditItemDialogProps
             onOpenChange(false)
             form.reset()
             router.refresh()
-        } catch (error: any) {
+        } catch (error: unknown) {
             toast.error(error.message || 'Failed to update item')
         }
     }

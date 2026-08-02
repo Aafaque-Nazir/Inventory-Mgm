@@ -28,7 +28,7 @@ export default function ContactPage() {
             
             {/* Left Content */}
             <div>
-                 <h1 className="text-5xl font-bold mb-6 text-white">Let's Talk</h1>
+                 <h1 className="text-5xl font-bold mb-6 text-white">Let&apos;s Talk</h1>
                  <p className="text-xl text-slate-400 mb-12">
                      Have questions about pricing, enterprise plans, or just want to say hello? using the form below.
                  </p>

@@ -6,26 +6,14 @@ import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import {
-    LayoutDashboard,
-    Package,
-    ArrowRightLeft,
-    Users,
-    ShoppingCart,
-    BarChart3,
-    CreditCard,
     Lock,
-    HelpCircle,
     Settings,
     Crown,
     Sparkles,
-    Clock,
     Store,
-    Book,
-    FileText,
     ChevronLeft,
     ChevronRight,
     LogOut,
-    ChevronDown,
     MoreVertical
 } from 'lucide-react'
 import { differenceInDays } from 'date-fns'
@@ -56,7 +44,7 @@ export function Sidebar() {
     const [trialDays, setTrialDays] = useState<number | null>(null)
     const [collapsed, setCollapsed] = useState(false)
     const [mounted, setMounted] = useState(false)
-    const [userProfile, setUserProfile] = useState<any>(null)
+    const [userProfile, setUserProfile] = useState<unknown>(null)
 
     useEffect(() => {
         setMounted(true)
@@ -79,15 +67,15 @@ export function Sidebar() {
                     if (profile.is_super_admin) setIsSuperAdmin(true)
 
                     let effectivePlan = 'FREE'
-                    // @ts-ignore
+                    // @ts-expect-error -- Supabase join typing
                     if (profile.organizations?.plan_type) {
-                        // @ts-ignore
+                        // @ts-expect-error -- Supabase join typing
                         effectivePlan = profile.organizations.plan_type
-                        // @ts-ignore
+                        // @ts-expect-error -- Supabase join typing
                         if (profile.organizations?.subscription_end_date) {
-                            // @ts-ignore
+                            // @ts-expect-error -- Supabase join typing
                             const expiry = new Date(profile.organizations.subscription_end_date)
-                            // @ts-ignore
+                            // @ts-expect-error -- Supabase join typing
                             if (profile.organizations.subscription_status === 'TRIALING') {
                                 const days = differenceInDays(expiry, new Date())
                                 setTrialDays(days >= 0 ? days + 1 : 0)
@@ -102,6 +90,7 @@ export function Sidebar() {
             }
         }
         checkRole()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const toggleCollapse = () => {

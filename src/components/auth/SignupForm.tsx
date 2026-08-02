@@ -68,7 +68,7 @@ export function SignupForm() {
                 </div>
                 <div className="space-y-2">
                     <h3 className="text-xl font-bold text-white">Check your email</h3>
-                    <p className="text-slate-400">We've sent a verification link to your inbox.</p>
+                    <p className="text-slate-400">We&apos;ve sent a verification link to your inbox.</p>
                 </div>
                 <Button variant="outline" className="w-full border-white/10 hover:bg-white/5 hover:text-white" onClick={() => router.push('/login')}>
                     Back to Login

@@ -49,7 +49,7 @@ export default async function SuppliersPage() {
         // 2. Extract unique Supplier IDs from those items
         // Note: item_stock -> item -> supplier_id
         const relevantSupplierIds = new Set(
-            stockItems?.map((s: any) => s.item?.supplier_id).filter(Boolean)
+            stockItems?.map((s: unknown) => s.item?.supplier_id).filter(Boolean)
         )
 
         // 3. Filter the main suppliers list

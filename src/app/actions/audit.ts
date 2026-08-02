@@ -7,7 +7,7 @@ export async function logAction(
     action: string,
     entityType: string,
     entityId: string | null = null,
-    details: any = null
+    details: unknown = null
 ) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -55,7 +55,7 @@ export async function getAuditLogs(page: number = 1, limit: number = 20) {
     if (!profile?.organization_id) return { logs: [], total: 0 }
 
     // Pro Check (Optional: enforce here or in UI. Enforcing here is safer)
-    // @ts-ignore
+    // @ts-expect-error -- third-party type mismatch
     // if (profile.organizations?.plan_type !== 'PRO') {
     //     return { logs: [], total: 0, error: 'Pro feature required' }
     // }

@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+# Cancel in-progress runs for the same branch/PR — saves Actions minutes
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npx eslint .
+
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run TypeScript compiler
+        run: npx tsc --noEmit
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    env:
+      # Dummy env vars — just enough for `next build` to succeed.
+      # Real secrets live in Vercel's dashboard, never here.
+      NEXT_PUBLIC_SUPABASE_URL: "https://placeholder.supabase.co"
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: "placeholder-anon-key"
+      NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+      SUPABASE_SERVICE_ROLE_KEY: "placeholder"
+      RESEND_API_KEY: "placeholder"
+      CASHFREE_APP_ID: "placeholder"
+      CASHFREE_SECRET_KEY: "placeholder"
+      CASHFREE_ENV: "TEST"
+      NEXT_PUBLIC_CASHFREE_ENV: "TEST"
+      GOOGLE_GENERATIVE_AI_API_KEY: "placeholder"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js
+        run: npm run build
+
+      - name: Report build size
+        if: success()
+        run: |
+          echo "### 📦 Build Output" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -d ".next" ]; then
+            BUILD_SIZE=$(du -sh .next | cut -f1)
+            echo "Total \`.next\` size: **${BUILD_SIZE}**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            # Show page sizes if the manifest exists
+            if [ -f ".next/routes-manifest.json" ]; then
+              STATIC_COUNT=$(cat .next/routes-manifest.json | python3 -c "import json,sys; d=json.load(sys.stdin); print(len(d.get('staticRoutes',[])))" 2>/dev/null || echo "?")
+              DYNAMIC_COUNT=$(cat .next/routes-manifest.json | python3 -c "import json,sys; d=json.load(sys.stdin); print(len(d.get('dynamicRoutes',[])))" 2>/dev/null || echo "?")
+              echo "| Metric | Count |" >> $GITHUB_STEP_SUMMARY
+              echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+              echo "| Static routes | ${STATIC_COUNT} |" >> $GITHUB_STEP_SUMMARY
+              echo "| Dynamic routes | ${DYNAMIC_COUNT} |" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi

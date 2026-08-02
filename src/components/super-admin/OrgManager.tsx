@@ -44,6 +44,7 @@ export function OrgManager() {
     }, [])
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetching in effect is intentional
         performSearch('')
     }, [performSearch])
 

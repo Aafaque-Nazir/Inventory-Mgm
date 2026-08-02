@@ -24,7 +24,7 @@ const bulkItemSchema = z.array(itemSchema)
 
 import { getWarehouseCookie } from './warehouse-cookie'
 
-export async function createItem(prevState: any, formData: FormData) {
+export async function createItem(prevState: unknown, formData: FormData) {
     const supabase = await createClient()
 
     // Parse fields
@@ -64,7 +64,7 @@ export async function createItem(prevState: any, formData: FormData) {
 
         const orgId = profile.organization_id
         // TypeScript workaround for nested join
-        const org = profile.organizations as any
+        const org = profile.organizations as unknown
         let plan = org?.plan_type || 'FREE'
         const maxItems = org?.max_items || 50
         const isSuperAdmin = profile.is_super_admin
@@ -107,7 +107,7 @@ export async function createItem(prevState: any, formData: FormData) {
         if (insertError) throw insertError
 
         // 4. Initial Stock Movement & Item Stock Entry
-        const postCreationPromises: any[] = []
+        const postCreationPromises: unknown[] = []
 
         if (initial_stock && initial_stock > 0) {
 
@@ -176,7 +176,7 @@ export async function createItem(prevState: any, formData: FormData) {
 
         return { message: 'Item created successfully' }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Create Item Error:', error)
         if (error.message?.includes('duplicate key value violates unique constraint "items_sku_key"')) {
             return { error: 'An item with this SKU already exists.' }
@@ -185,11 +185,11 @@ export async function createItem(prevState: any, formData: FormData) {
     }
 }
 
-export async function bulkCreateItems(rawItems: any[]) {
+export async function bulkCreateItems(rawItems: unknown[]) {
     let items: z.infer<typeof bulkItemSchema>
     try {
         items = bulkItemSchema.parse(rawItems)
-    } catch (e) {
+    } catch (_e) {
         return { error: 'Invalid items format in bulk import' }
     }
 
@@ -208,7 +208,7 @@ export async function bulkCreateItems(rawItems: any[]) {
         if (!profile?.organization_id) return { error: 'Organization not found' }
 
         const orgId = profile.organization_id
-        const org = profile.organizations as any
+        const org = profile.organizations as unknown
         let plan = org?.plan_type || 'FREE'
         const maxItems = org?.max_items || 50
         const isSuperAdmin = profile.is_super_admin
@@ -281,7 +281,7 @@ export async function bulkCreateItems(rawItems: any[]) {
 
         return { message: `Successfully imported ${items.length} items` }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Bulk Import Error:', error)
         if (error.message?.includes('duplicate key value violates unique constraint "items_sku_key"')) {
             return { error: 'One or more items have a SKU that already exists.' }
@@ -319,7 +319,7 @@ export async function getItemBySku(sku: string) {
         }
 
         return { item }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Get Item By SKU Error:', error)
         return { error: error.message || 'Failed to fetch item' }
     }

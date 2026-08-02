@@ -1,6 +1,5 @@
 import { SignupForm } from '@/components/auth/SignupForm'
-import { LayoutDashboard, Rocket } from 'lucide-react'
-import Link from 'next/link'
+import { LayoutDashboard } from 'lucide-react'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {

@@ -4,12 +4,10 @@ import {
     Book,
     Package,
     ArrowRightLeft,
-    Users,
     ShoppingCart,
     BarChart3,
     Store,
     Settings,
-    CreditCard
 } from 'lucide-react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 
@@ -46,20 +44,20 @@ export default function GuidePage() {
                             <AccordionItem value="item-1" className="border-white/10">
                                 <AccordionTrigger className="text-slate-200 hover:text-white">Adding Items</AccordionTrigger>
                                 <AccordionContent className="text-slate-400">
-                                    Go to the <strong className="text-white">Inventory</strong> page and click "Add Item". Fill in details like Name, SKU, and Base Price.
+                                    Go to the <strong className="text-white">Inventory</strong> page and click &quot;Add Item&quot;. Fill in details like Name, SKU, and Base Price.
                                     You can also scan a barcode to quickly add a pre-existing item if configured.
                                 </AccordionContent>
                             </AccordionItem>
                             <AccordionItem value="item-2" className="border-white/10">
                                 <AccordionTrigger className="text-slate-200 hover:text-white">Bulk Import</AccordionTrigger>
                                 <AccordionContent className="text-slate-400">
-                                    Use the "Import CSV" button to add hundreds of items at once. Download the sample CSV first to ensure your format is correct.
+                                    Use the &quot;Import CSV&quot; button to add hundreds of items at once. Download the sample CSV first to ensure your format is correct.
                                 </AccordionContent>
                             </AccordionItem>
                             <AccordionItem value="item-3" className="border-none">
                                 <AccordionTrigger className="text-slate-200 hover:text-white">Exporting Data</AccordionTrigger>
                                 <AccordionContent className="text-slate-400">
-                                    Click "Export CSV" to download your catalog. You can filter by date range (Last 30 days, 60 days, or Lifetime) to get specific insights.
+                                    Click &quot;Export CSV&quot; to download your catalog. You can filter by date range (Last 30 days, 60 days, or Lifetime) to get specific insights.
                                 </AccordionContent>
                             </AccordionItem>
                         </Accordion>
@@ -83,7 +81,7 @@ export default function GuidePage() {
                             <AccordionItem value="stock-1" className="border-white/10">
                                 <AccordionTrigger className="text-slate-200 hover:text-white">Stock In/Out</AccordionTrigger>
                                 <AccordionContent className="text-slate-400">
-                                    Navigate to <strong className="text-white">Stock Movements</strong>. Use "Stock In" when receiving goods and "Stock Out" when selling or consuming them.
+                                    Navigate to <strong className="text-white">Stock Movements</strong>. Use &quot;Stock In&quot; when receiving goods and &quot;Stock Out&quot; when selling or consuming them.
                                     You can use the built-in Barcode Scanner for faster entry.
                                 </AccordionContent>
                             </AccordionItem>
@@ -112,7 +110,7 @@ export default function GuidePage() {
                     </div>
                     <div className="p-6">
                         <p className="text-sm text-slate-400 mb-4">
-                            Organize your stock across different physical locations like "Main Store", "Warehouse A", etc.
+                            Organize your stock across different physical locations like &quot;Main Store&quot;, &quot;Warehouse A&quot;, etc.
                         </p>
                         <Accordion type="single" collapsible className="w-full">
                             <AccordionItem value="wh-1" className="border-none">
@@ -144,7 +142,7 @@ export default function GuidePage() {
                                 <AccordionTrigger className="text-slate-200 hover:text-white">Creating Purchase Orders</AccordionTrigger>
                                 <AccordionContent className="text-slate-400">
                                     Go to <strong className="text-white">Purchase Orders</strong>. Create a new PO for a supplier.
-                                    Once the goods arrive, you can mark the PO as "Received" to automatically increase your stock levels.
+                                    Once the goods arrive, you can mark the PO as &quot;Received&quot; to automatically increase your stock levels.
                                 </AccordionContent>
                             </AccordionItem>
                             <AccordionItem value="po-2" className="border-none">

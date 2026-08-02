@@ -48,7 +48,7 @@ export function AiInsightsCard({ insights }: { insights: AiInsight[] }) {
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {insights.map((insight, idx) => {
                         const Icon = iconMap[insight.type] || Sparkles
-                        // @ts-ignore
+                        // @ts-expect-error -- third-party type mismatch
                         const colorClass = colorMap[insight.color] || colorMap.blue
 
                         return (

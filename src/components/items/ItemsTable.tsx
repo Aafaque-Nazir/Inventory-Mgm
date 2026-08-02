@@ -65,7 +65,7 @@ export function ItemsTable({ items }: ItemsTableProps) {
             toast.success('Item deleted successfully')
             setDeleteId(null)
             router.refresh()
-        } catch (error) {
+        } catch (_error) {
             toast.error('Failed to delete item')
         }
     }
@@ -110,7 +110,7 @@ export function ItemsTable({ items }: ItemsTableProps) {
                                  </TableCell>
                              </TableRow>
                         )}
-                        {filteredItems.map((item, index) => (
+                        {filteredItems.map((item, _index) => (
                             <TableRow key={item.id} className="border-white/5 hover:bg-blue-500/5 transition-all duration-200 group">
                                 <TableCell className="font-medium pl-6">
                                     <div className="flex flex-col">

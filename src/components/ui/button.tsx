@@ -49,7 +49,7 @@ function Button({
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean
   }) {
-  const Comp = asChild ? Slot : motion.button
+  const _Comp = asChild ? Slot : motion.button
 
   // If it's a Slot (asChild), we can't easily adhere to motion props without complexity, 
   // so we might lose the animation for asChild=true unless we wrap the child.
@@ -66,13 +66,13 @@ function Button({
   }
 
   return (
-    // @ts-ignore
+    // @ts-expect-error -- third-party type mismatch
     <motion.button
       data-slot="button"
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.95 }}
       className={cn(buttonVariants({ variant, size, className }))}
-      {...props as any}
+      {...props as unknown}
     />
   )
 }

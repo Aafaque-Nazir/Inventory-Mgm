@@ -35,7 +35,7 @@ export default function RefundPage() {
                         In case of receipt of damaged or defective items please report the same to our Customer Service team. The request will, however, be entertained once the merchant has checked and determined the same at his own end. This should be reported within 2 Days days of receipt of the products. In case you feel that the product received is not as shown on the site or as per your expectations, you must bring it to the notice of our customer service within 2 Days days of receiving the product. The Customer Service Team after looking into your complaint will take an appropriate decision.
                     </li>
                     <li>
-                        In case of complaints regarding products that come with a warranty from manufacturers, please refer the issue to them. In case of any Refunds approved by the AAFAQUE SUFIYAN NAZIR, it'll take 1-2 Days days for the refund to be processed to the end customer.
+                        In case of complaints regarding products that come with a warranty from manufacturers, please refer the issue to them. In case of any Refunds approved by the AAFAQUE SUFIYAN NAZIR, it&apos;ll take 1-2 Days days for the refund to be processed to the end customer.
                     </li>
                 </ul>
             </main>

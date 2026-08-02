@@ -1,7 +1,6 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
 const ticketSchema = z.object({
@@ -10,7 +9,7 @@ const ticketSchema = z.object({
     message: z.string().min(10),
 })
 
-export async function submitSupportTicket(prevState: any, formData: FormData) {
+export async function submitSupportTicket(prevState: unknown, formData: FormData) {
     const supabase = await createClient()
 
     const type = formData.get('type')
@@ -73,7 +72,7 @@ export async function submitSupportTicket(prevState: any, formData: FormData) {
         }
 
         return { message: 'Ticket submitted successfully!' }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Ticket submission error:', error)
         return { error: 'Failed to submit ticket. Please try again.' }
     }

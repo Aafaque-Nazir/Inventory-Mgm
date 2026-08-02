@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 
-export async function getLocations(organizationId?: string) {
+export async function getLocations(_organizationId?: string) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return []
@@ -32,7 +32,7 @@ export async function getLocations(organizationId?: string) {
     return locations
 }
 
-export async function createLocation(data: { name: string; address?: string; organizationId?: string }) {
+export async function createLocation(data: { name: string; address?: string; _organizationId?: string }) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { error: 'Unauthorized' }

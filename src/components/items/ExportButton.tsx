@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Download, Crown, Calendar } from 'lucide-react'
+import { Download, Crown } from 'lucide-react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -24,7 +24,7 @@ import {
 import { Label } from '@/components/ui/label'
 
 interface ExportButtonProps {
-    items: any[]
+    items: unknown[]
     isPro: boolean
 }
 

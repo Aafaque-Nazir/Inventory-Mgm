@@ -1,10 +1,9 @@
 'use client'
 
-import { useState, useTransition, useEffect } from 'react'
+import { useTransition, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import {
@@ -47,7 +46,7 @@ interface QuickStockDialogProps {
 export function QuickStockDialog({ item, open, onOpenChange, defaultType = 'IN' }: QuickStockDialogProps) {
     const [isPending, startTransition] = useTransition()
 
-    const form = useForm<any>({
+    const form = useForm<unknown>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             quantity: 0,

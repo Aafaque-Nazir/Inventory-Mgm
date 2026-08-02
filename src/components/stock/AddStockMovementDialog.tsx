@@ -49,10 +49,10 @@ export function AddStockMovementDialog({ defaultType = 'IN', defaultReason = '',
     const [open, setOpen] = useState(false)
     const [items, setItems] = useState<Item[]>([])
     const [isPending, startTransition] = useTransition()
-    const router = useRouter()
+    const _router = useRouter()
     const supabase = createClient()
 
-    const form = useForm<any>({
+    const form = useForm<unknown>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             item_id: '',

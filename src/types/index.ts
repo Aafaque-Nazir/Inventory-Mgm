@@ -89,7 +89,7 @@ export interface AuditLog {
     action: string
     entity_type: string
     entity_id: string | null
-    details: any
+    details: Record<string, unknown>
     created_at: string
     profile?: Profile // Joined
 }

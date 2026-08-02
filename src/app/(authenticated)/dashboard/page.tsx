@@ -1,6 +1,6 @@
 
 import { createClient } from '@/lib/supabase/server'
-import { Package, Users, AlertTriangle, ArrowRightLeft, DollarSign } from 'lucide-react'
+import { Package, AlertTriangle, ArrowRightLeft, DollarSign } from 'lucide-react'
 import { StatCard } from '@/components/dashboard/StatCard'
 import { AiInsightsCard } from '@/components/dashboard/AiInsightsCard'
 import { RevenueChart } from '@/components/dashboard/RevenueChart'
@@ -38,7 +38,7 @@ export default async function DashboardPage() {
     const chartData = await getRevenueChartData('7d')
 
     // 3. Recent Activity (Movements)
-    let recentMovements: any[] = []
+    let recentMovements: unknown[] = []
     
     if (organizationId) {
         let query = supabase

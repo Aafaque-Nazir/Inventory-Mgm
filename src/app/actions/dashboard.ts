@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { getWarehouseCookie } from './warehouse-cookie'
-import { addDays, format, subDays, startOfDay, endOfDay } from 'date-fns'
+import { addDays, format, subDays, _startOfDay, _endOfDay } from 'date-fns'
 
 export interface DashboardMetric {
     label: string
@@ -47,9 +47,9 @@ export async function getDashboardMetrics() {
         
         if (stockItems) {
             itemsCount = stockItems.length
-            // @ts-ignore
+            // @ts-expect-error -- third-party type mismatch
             lowStockCount = stockItems.filter(i => i.quantity < (i.item?.min_stock || 0)).length
-            // @ts-ignore
+            // @ts-expect-error -- third-party type mismatch
             totalStockValue = stockItems.reduce((acc, curr) => acc + (curr.quantity * (curr.item?.price || 0)), 0)
         }
 

@@ -69,6 +69,7 @@ export function WarehouseProvider({ children }: { children: React.ReactNode }) {
             setIsLoading(false)
         }
         loadLocations()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const selectWarehouse = async (id: string | null) => {

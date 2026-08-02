@@ -46,8 +46,8 @@ export function RecordSaleDialog({ trigger, initialItem, open: controlledOpen, o
     const [cart, setCart] = useState<InvoiceItem[]>([])
     const [searchTerm, setSearchTerm] = useState('')
     const [isPending, startTransition] = useTransition()
-    const [lastInvoiceId, setLastInvoiceId] = useState<string | null>(null)
-    const [lastInvoiceData, setLastInvoiceData] = useState<any>(null)
+    const [_lastInvoiceId, setLastInvoiceId] = useState<string | null>(null)
+    const [lastInvoiceData, setLastInvoiceData] = useState<unknown>(null)
 
     // Customer Details
     const [customerName, setCustomerName] = useState('')
@@ -130,6 +130,7 @@ export function RecordSaleDialog({ trigger, initialItem, open: controlledOpen, o
                 }
             }
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open, items, initialItem])
 
     const filteredItems = items.filter(i =>

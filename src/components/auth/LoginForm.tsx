@@ -16,7 +16,7 @@ export function LoginForm() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
-    const router = useRouter()
+    const _router = useRouter()
     const supabase = createClient()
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -24,7 +24,7 @@ export function LoginForm() {
         setLoading(true)
 
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
+            const { error } = await supabase.auth.signInWithPassword({
                 email,
                 password,
             })
@@ -40,7 +40,7 @@ export function LoginForm() {
                 window.location.href = '/dashboard'
             }, 500)
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             if (error.message === 'Invalid login credentials') {
                 toast.error('Access verification failed', { description: 'Please check your password.' })
             } else if (error.message.includes('Email not confirmed')) {

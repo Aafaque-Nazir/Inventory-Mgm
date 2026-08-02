@@ -1,21 +1,15 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import {
     Box,
-    BarChart3,
-    ShieldCheck,
     ChevronRight,
     Zap,
     CheckCircle2,
-    Sparkles,
-    QrCode,
     Activity,
     ScanLine,
     Smartphone,
-    Eye,
     TrendingUp,
     LineChart,
     Settings,

@@ -1,5 +1,4 @@
 import { AppLayout } from '@/components/layout/AppLayout'
-import { AnnouncementBanner } from '@/components/layout/AnnouncementBanner'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'

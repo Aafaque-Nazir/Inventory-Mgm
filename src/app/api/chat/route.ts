@@ -95,7 +95,7 @@ export async function POST(req: Request) {
                     if (userMessage && userMessage.role === 'user') {
                         let userText = userMessage.content || ''
                         if (!userText && userMessage.parts) {
-                            // @ts-ignore
+                            // @ts-expect-error -- third-party type mismatch
                             userText = userMessage.parts.map(p => p.text || '').join('')
                         }
 

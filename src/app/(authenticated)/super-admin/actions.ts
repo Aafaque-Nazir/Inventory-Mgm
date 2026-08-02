@@ -110,7 +110,7 @@ export async function getAdminOverviewStats() {
             revenueByMonth[key] = 0
         }
 
-        let runningRevenue = 0;
+        const _runningRevenue = 0;
 
         // Correct Logic:
         const months = []
@@ -153,7 +153,7 @@ export async function getAdminOverviewStats() {
             mrr,
             revenueHistory
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Admin Stats Error:', error)
         return { error: 'Failed to fetch admin stats' }
     }

@@ -28,16 +28,16 @@ export default async function ReportsPage() {
             .single()
         organizationId = profile?.organization_id || null
         isSuperAdmin = profile?.is_super_admin || false
-        // @ts-ignore
+        // @ts-expect-error -- third-party type mismatch
         if (profile?.organizations?.plan_type) {
-            // @ts-ignore
+            // @ts-expect-error -- third-party type mismatch
             planType = profile.organizations.plan_type
 
-            // @ts-ignore
+            // @ts-expect-error -- third-party type mismatch
             const org = profile.organizations
-            // @ts-ignore
+            // @ts-expect-error -- third-party type mismatch
             if (planType === 'PRO' && org?.subscription_end_date) {
-                // @ts-ignore
+                // @ts-expect-error -- third-party type mismatch
                 const expiry = new Date(org.subscription_end_date)
                 if (expiry < new Date()) {
                     planType = 'FREE'
@@ -55,9 +55,9 @@ export default async function ReportsPage() {
     // --- CONTEXT AWARE DATA FETCHING ---
     const warehouseId = await getWarehouseCookie() // From Cookie
 
-    let items: any[] = []
-    let movements: any[] = []
-    let invoices: any[] = [] // NEW: Fetch Invoices
+    let items: unknown[] = []
+    let movements: unknown[] = []
+    let invoices: unknown[] = [] // NEW: Fetch Invoices
 
     const startDate = subDays(new Date(), 30).toISOString() // INCREASED TO 30 DAYS for better visibility
 
@@ -70,7 +70,7 @@ export default async function ReportsPage() {
                 .select('item_id, quantity, item:items(*)')
                 .eq('location_id', warehouseId)
 
-            items = locationStock?.map((record: any) => ({
+            items = locationStock?.map((record: unknown) => ({
                 ...record.item,
                 current_stock: record.quantity // Override with LOCAL quantity
             })) || []
@@ -121,7 +121,7 @@ export default async function ReportsPage() {
 
     // --- KPI Calculations (Context Aware) ---
     const totalItems = items.length
-    const totalStock = items.reduce((sum, i) => sum + Number(i.current_stock || 0), 0)
+    const _totalStock = items.reduce((sum, i) => sum + Number(i.current_stock || 0), 0)
     const lowStockItems = items.filter(i => i.current_stock < i.min_stock)
 
     // --- Stock Distribution Data (by Category) ---
@@ -160,7 +160,7 @@ export default async function ReportsPage() {
         map.set(m.item_id, current + Number(m.quantity))
     })
 
-    const getTopItems = (map: Map<string, number>, type: 'in' | 'out') => {
+    const getTopItems = (map: Map<string, number>, _type: 'in' | 'out') => {
         return Array.from(map.entries())
             .sort((a, b) => b[1] - a[1])
             .slice(0, 5)
@@ -215,7 +215,7 @@ export default async function ReportsPage() {
     let totalCOGS = 0
     invoices.forEach(inv => {
         if (Array.isArray(inv.items)) {
-            inv.items.forEach((lineItem: any) => {
+            inv.items.forEach((lineItem: unknown) => {
                 // lineItem has quantity. Need cost price.
                 // We use CURRENT cost price of the item from database.
                 // Ideally, we should snapshot cost price at time of sale, but we only snapshotted unit_price (selling).

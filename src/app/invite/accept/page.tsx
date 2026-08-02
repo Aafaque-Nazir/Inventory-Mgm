@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
@@ -88,7 +87,7 @@ export default async function InvitePage({
                             </Button>
                         </Link>
                         <div className="text-center text-sm text-slate-500">
-                            Don't have an account? <Link href={`/signup?next=/invite/accept?token=${token}`} className="text-indigo-400 hover:underline">Sign Up</Link>
+                            Don&apos;t have an account? <Link href={`/signup?next=/invite/accept?token=${token}`} className="text-indigo-400 hover:underline">Sign Up</Link>
                         </div>
                     </CardContent>
                 </Card>

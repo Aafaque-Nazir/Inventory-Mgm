@@ -12,7 +12,7 @@ import { createClient } from '@/lib/supabase/client'
 
 declare global {
     interface Window {
-        Cashfree: any;
+        Cashfree: unknown;
     }
 }
 
@@ -20,7 +20,7 @@ export default function PricingPage() {
     const [loading, setLoading] = useState(false)
     const [currentPlan, setCurrentPlan] = useState<string>('FREE')
     const [isLoadingPlan, setIsLoadingPlan] = useState(true)
-    const router = useRouter()
+    const _router = useRouter()
     const searchParams = useSearchParams()
     // const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null // BROKEN: Causes infinite loop
     const [trialUsed, setTrialUsed] = useState(false)
@@ -56,7 +56,7 @@ export default function PricingPage() {
             } else {
                 toast.error(data.error || "Payment verification failed")
             }
-        } catch (error) {
+        } catch (_error) {
             toast.error("Verification failed or Payment was cancelled")
         } finally {
             // Clean URL even on failure to prevent loop/retry on refresh
@@ -76,13 +76,13 @@ export default function PricingPage() {
                     .eq('id', user.id)
                     .single()
 
-                // @ts-ignore
+                // @ts-expect-error
                 if (profile?.organizations?.plan_type) {
-                    // @ts-ignore
+                    // @ts-expect-error
                     setCurrentPlan(profile.organizations.plan_type)
-                    // @ts-ignore
+                    // @ts-expect-error
                     setTrialUsed(profile.organizations.trial_used || false)
-                    // @ts-ignore
+                    // @ts-expect-error
                     setSubStatus(profile.organizations.subscription_status || '')
                 }
                 if (profile?.organization_id) setOrgId(profile.organization_id)
@@ -144,7 +144,7 @@ export default function PricingPage() {
                     Simple, Transparent Pricing
                 </h2>
                 <p className="text-lg text-slate-400 max-w-2xl">
-                    Choose the plan that's right for your business. Upgrade anytime as you grow.
+                    Choose the plan that&apos;s right for your business. Upgrade anytime as you grow.
                 </p>
             </div>
 

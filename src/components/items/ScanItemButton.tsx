@@ -10,7 +10,6 @@ import { getItemBySku } from '@/app/actions/items'
 import { toast } from 'sonner'
 import type { Item } from '@/types'
 
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 interface ScanItemButtonProps {
@@ -57,7 +56,7 @@ export function ScanItemButton({ isPro = false }: ScanItemButtonProps) {
             if (data.status === 1 && data.product) {
                 const p = data.product
                 const productName = p.product_name || p.product_name_en || p.brands || ''
-                let category = ''
+                const _category = ''
                 let unit = ''
                 let size = ''
 

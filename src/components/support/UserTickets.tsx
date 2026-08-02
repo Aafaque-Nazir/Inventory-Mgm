@@ -5,7 +5,7 @@ import { getUserTickets } from '@/app/actions/support'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Loader2, MessageSquare, Clock, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Loader2, MessageSquare, Clock, AlertCircle } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 
 type Ticket = {

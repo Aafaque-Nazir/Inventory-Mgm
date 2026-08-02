@@ -19,7 +19,7 @@ interface TrialOfferDialogProps {
 }
 
 export function TrialOfferDialog({ open, onOpenChange, organizationId, trialUsed, planType, isTrigger = false, trigger }: TrialOfferDialogProps) {
-    const router = useRouter()
+    const _router = useRouter()
     const [loading, setLoading] = useState(false)
     const [internalOpen, setInternalOpen] = useState(false)
 
@@ -44,14 +44,14 @@ export function TrialOfferDialog({ open, onOpenChange, organizationId, trialUsed
                 // Force reload to ensure all Pro features unlock immediately
                 window.location.reload()
             }
-        } catch (error) {
+        } catch (_error) {
             toast.error('Something went wrong. Please try again.')
         } finally {
             setLoading(false)
         }
     }
 
-    // Don't show if already pro or trial used
+    // don&apos;t show if already pro or trial used
     const canTry = !trialUsed && planType === 'FREE'
 
     return (
@@ -91,7 +91,7 @@ export function TrialOfferDialog({ open, onOpenChange, organizationId, trialUsed
                         {loading ? 'Activating...' : 'Start My 5-Day Free Trial'}
                     </Button>
                     <p className="text-xs text-center text-muted-foreground mt-2">
-                        Trial automatically ends after 5 days. You won't be charged.
+                        Trial automatically ends after 5 days. You won&apos;t be charged.
                     </p>
                 </DialogFooter>
             </DialogContent>

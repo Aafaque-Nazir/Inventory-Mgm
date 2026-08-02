@@ -20,12 +20,6 @@ import { createItem } from '@/app/actions/items'
 import { ITEM_CATEGORIES, ITEM_UNITS } from '@/lib/constants'
 import { BarcodeScanner } from '@/components/common/BarcodeScanner'
 import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
 } from "@/components/ui/command"
 import {
     Popover,
@@ -79,7 +73,7 @@ export function CreateItemDialog({
     const [color, setColor] = useState(defaultColor)
 
     const [isPending, startTransition] = useTransition()
-    const router = useRouter()
+    const _router = useRouter()
 
     // Sync state with props when dialog opens/closes
     const [prevOpen, setPrevOpen] = useState(open)
@@ -355,7 +349,7 @@ function FormCombobox({ items, value, onChange, placeholder, allowCustom = false
                                     className="w-full"
                                     onClick={() => handleSelect(search)}
                                 >
-                                    + Add "{search}"
+                                    + Add &quot;{search}&quot;
                                 </Button>
                             </div>
                         )}

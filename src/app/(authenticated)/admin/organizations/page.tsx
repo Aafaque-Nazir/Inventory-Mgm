@@ -40,7 +40,7 @@ export default async function AdminOrganizationsPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {orgs?.map((org: any) => (
+                        {orgs?.map((org: unknown) => (
                             <TableRow key={org.id}>
                                 <TableCell className="font-medium">{org.name}</TableCell>
                                 <TableCell>

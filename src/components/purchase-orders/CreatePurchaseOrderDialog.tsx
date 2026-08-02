@@ -49,7 +49,7 @@ export function CreatePurchaseOrderDialog({ warehouseId }: { warehouseId?: strin
     const router = useRouter()
     const supabase = createClient()
 
-    const form = useForm<any>({
+    const form = useForm<unknown>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             supplier_id: '',
@@ -90,7 +90,7 @@ export function CreatePurchaseOrderDialog({ warehouseId }: { warehouseId?: strin
             const { data: { user } } = await supabase.auth.getUser()
 
             // Calculate total
-            const total = values.items.reduce((sum: number, item: any) =>
+            const total = values.items.reduce((sum: number, item: unknown) =>
                 sum + (item.quantity * item.price), 0
             )
 
@@ -110,7 +110,7 @@ export function CreatePurchaseOrderDialog({ warehouseId }: { warehouseId?: strin
             if (poError) throw poError
 
             // Create line items
-            const lineItems = values.items.map((item: any) => ({
+            const lineItems = values.items.map((item: unknown) => ({
                 order_id: po.id,
                 item_id: item.item_id,
                 quantity: item.quantity,
@@ -128,13 +128,13 @@ export function CreatePurchaseOrderDialog({ warehouseId }: { warehouseId?: strin
             setOpen(false)
             form.reset()
             router.refresh()
-        } catch (error) {
+        } catch (_error) {
             toast.error('Failed to create purchase order')
         }
     }
 
     const watchedItems = form.watch('items')
-    const total = watchedItems?.reduce((sum: number, item: any) =>
+    const total = watchedItems?.reduce((sum: number, item: unknown) =>
         sum + ((item.quantity || 0) * (item.price || 0)), 0
     ) || 0
 

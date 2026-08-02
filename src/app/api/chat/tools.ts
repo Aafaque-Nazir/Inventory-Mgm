@@ -1,4 +1,3 @@
-import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import { tool } from 'ai'
 

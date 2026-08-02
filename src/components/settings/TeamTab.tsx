@@ -1,8 +1,6 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { toast } from 'sonner'
 import { Loader2, Mail, Trash2, X } from 'lucide-react'
@@ -18,7 +16,7 @@ import {
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 
-const inviteSchema = z.object({
+const _inviteSchema = z.object({
     email: z.string().email(),
     role: z.enum(['STOREKEEPER', 'MANAGER', 'ADMIN']),
 })
@@ -26,11 +24,10 @@ const inviteSchema = z.object({
 export function TeamTab({
     members,
     invitations,
-    plan,
     maxUsers
 }: {
-    members: any[],
-    invitations: any[],
+    members: unknown[],
+    invitations: unknown[],
     plan: string,
     maxUsers: number
 }) {

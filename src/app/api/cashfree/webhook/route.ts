@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
         // Acknowledge other event types (e.g. PAYMENT_FAILED_WEBHOOK)
         return NextResponse.json({ received: true })
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Cashfree Webhook Exception:', error)
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
     }

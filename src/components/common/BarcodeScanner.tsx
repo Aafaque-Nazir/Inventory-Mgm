@@ -13,7 +13,7 @@ interface BarcodeScannerProps {
 }
 
 const playBeep = () => {
-    const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const audioCtx = new (window.AudioContext || (window as unknown).webkitAudioContext)();
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
 
@@ -80,7 +80,7 @@ export function BarcodeScanner({ open, onOpenChange, onScanSuccess }: BarcodeSca
                             scanner.clear().catch(console.error)
                             toast.success(`Scanned: ${decodedText}`)
                         },
-                        (errorMessage) => {
+                        (_errorMessage) => {
                             // Error
                         }
                     )

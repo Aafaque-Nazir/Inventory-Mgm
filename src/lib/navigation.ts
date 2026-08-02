@@ -10,13 +10,14 @@ import {
     Book,
     HelpCircle,
     Store,
-    FileText
+    FileText,
+    LucideIcon,
 } from 'lucide-react'
 
 export type NavItem = {
     name: string
     href: string
-    icon: any
+    icon: LucideIcon
     isPro?: boolean
 }
 

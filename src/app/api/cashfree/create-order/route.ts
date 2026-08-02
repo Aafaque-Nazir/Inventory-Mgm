@@ -20,11 +20,11 @@ export async function POST(req: NextRequest) {
         }
 
         // Initialize v4
-        // @ts-ignore
+        // @ts-expect-error -- third-party type mismatch
         Cashfree.XClientId = appId
-        // @ts-ignore
+        // @ts-expect-error -- third-party type mismatch
         Cashfree.XClientSecret = secretKey
-        // @ts-ignore
+        // @ts-expect-error -- third-party type mismatch
         Cashfree.XEnvironment = process.env.CASHFREE_ENV === 'PRODUCTION'
             ? Cashfree.Environment.PRODUCTION
             : Cashfree.Environment.SANDBOX
@@ -54,13 +54,13 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        // @ts-ignore
+        // @ts-expect-error -- third-party type mismatch
         const response = await Cashfree.PGCreateOrder('2022-09-01', request)
         const paymentSessionId = response.data.payment_session_id
 
         return NextResponse.json({ paymentSessionId, orderId })
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Cashfree Error:', error)
         return NextResponse.json({ error: 'Failed to create payment order' }, { status: 500 })
     }

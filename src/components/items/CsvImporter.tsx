@@ -24,7 +24,6 @@ import { Input } from '@/components/ui/input'
 import { Upload, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { bulkCreateItems } from '@/app/actions/items'
-import { cn } from '@/lib/utils'
 
 interface CsvItem {
     name: string
@@ -42,7 +41,7 @@ interface CsvItem {
 export function CsvImporter() {
     const [open, setOpen] = useState(false)
     const [data, setData] = useState<CsvItem[]>([])
-    const [fileName, setFileName] = useState('')
+    const [__fileName, setFileName] = useState('')
     const [isPending, startTransition] = useTransition()
     const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -56,8 +55,8 @@ export function CsvImporter() {
             header: true,
             skipEmptyLines: true,
             transformHeader: (h: string) => h.toLowerCase().replace(/\s+/g, '_').trim(), // Normalize headers
-            complete: (results: any) => {
-                const parsedData = results.data.map((row: any) => ({
+            complete: (results: unknown) => {
+                const parsedData = results.data.map((row: unknown) => ({
                     name: row.name || row.item_name || '',
                     sku: row.sku || row.barcode || '',
                     category: row.category || '',

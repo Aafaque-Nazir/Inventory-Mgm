@@ -10,7 +10,7 @@ const onboardingSchema = z.object({
     slug: z.string().min(3).regex(/^[a-z0-9-]+$/, "Slug must be lowercase alphanumeric with hyphens"),
 })
 
-export async function createOrganization(prevState: any, formData: FormData) {
+export async function createOrganization(prevState: unknown, formData: FormData) {
     const supabase = await createClient()
 
     const orgName = formData.get('orgName') as string
@@ -63,7 +63,7 @@ export async function createOrganization(prevState: any, formData: FormData) {
         // 3. Revalidate and Redirect
         revalidatePath('/')
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Onboarding Error:', error)
         return { error: error.message || 'Failed to create organization' }
     }

@@ -59,6 +59,7 @@ export function AiChatWidget() {
         if (isOpen && !historyLoaded) {
             loadHistory()
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpen, historyLoaded])
 
     // Auto-scroll to bottom on new messages or loading state
@@ -251,7 +252,7 @@ export function AiChatWidget() {
                             ) : (
                                 // Message list
                                 <div className="space-y-4">
-                                    {messages.map((message: any) => (
+                                    {messages.map((message: unknown) => (
                                         <ChatMessage
                                             key={message.id}
                                             role={

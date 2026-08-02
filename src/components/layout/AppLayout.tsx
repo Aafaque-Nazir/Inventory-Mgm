@@ -4,9 +4,8 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
-import { Loader2, AlertCircle, Phone, Mail } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { Loader2,  } from 'lucide-react'
+import {  } from '@/components/ui/card'
 import { WarehouseProvider } from '@/context/WarehouseContext'
 import { AiChatWidget } from '@/components/chat/AiChatWidget'
 
@@ -15,8 +14,8 @@ import { usePathname } from 'next/navigation'
 export function AppLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname()
     const [loading, setLoading] = useState(true)
-    const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null)
-    const [isSuperAdmin, setIsSuperAdmin] = useState(false)
+    const [_subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null)
+    const [_isSuperAdmin, setIsSuperAdmin] = useState(false)
     const supabase = createClient()
 
 

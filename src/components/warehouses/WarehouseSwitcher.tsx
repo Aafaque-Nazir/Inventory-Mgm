@@ -16,7 +16,7 @@ import { useRouter } from 'next/navigation'
 export function WarehouseSwitcher() {
     const [isSwitching, setIsSwitching] = useState(false)
     const { locations, selectedWarehouseId, selectWarehouse, isLoading } = useWarehouse()
-    const router = useRouter()
+    const _router = useRouter()
 
     const handleSelect = async (value: string) => {
         setIsSwitching(true)

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Plus, MapPin, Trash2, Edit, Store } from 'lucide-react'
+import { Plus, Trash2, Edit, Store } from 'lucide-react'
 import {
     Dialog,
     DialogContent,

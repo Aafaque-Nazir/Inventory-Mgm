@@ -41,7 +41,7 @@ export function CreateSupplierDialog() {
     const router = useRouter()
     const supabase = createClient()
 
-    const form = useForm<any>({
+    const form = useForm<unknown>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: '',
@@ -60,7 +60,7 @@ export function CreateSupplierDialog() {
             setOpen(false)
             form.reset()
             router.refresh()
-        } catch (error) {
+        } catch (_error) {
             toast.error('Failed to create supplier')
         }
     }

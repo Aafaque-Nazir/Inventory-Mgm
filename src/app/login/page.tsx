@@ -1,5 +1,5 @@
 import { LoginForm } from '@/components/auth/LoginForm'
-import { Command, Sparkles } from 'lucide-react'
+import { Command } from 'lucide-react'
 import Link from 'next/link'
 import { Metadata } from 'next'
 

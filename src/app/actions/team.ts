@@ -12,7 +12,7 @@ const inviteSchema = z.object({
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-export async function inviteMember(prevState: any, formData: FormData) {
+export async function inviteMember(prevState: unknown, formData: FormData) {
     const supabase = await createClient()
 
     const email = formData.get('email') as string
@@ -40,9 +40,9 @@ export async function inviteMember(prevState: any, formData: FormData) {
         }
 
         const orgId = profile.organization_id
-        // @ts-ignore
+        // @ts-expect-error -- third-party type mismatch
         const plan = profile.organizations?.plan_type || 'FREE'
-        // @ts-ignore
+        // @ts-expect-error -- third-party type mismatch
         const maxUsers = profile.organizations?.max_users || 1
 
         // 2. Check User Limit
@@ -98,13 +98,13 @@ export async function inviteMember(prevState: any, formData: FormData) {
         revalidatePath('/settings')
         return { message: 'Invitation sent successfully' }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Invite Error:', error)
         return { error: error.message || 'Failed to invite user' }
     }
 }
 
-export async function removeMember(prevState: any, formData: FormData) {
+export async function removeMember(prevState: unknown, formData: FormData) {
     const supabase = await createClient()
     const userId = formData.get('userId') as string
 
@@ -133,7 +133,7 @@ export async function removeMember(prevState: any, formData: FormData) {
         revalidatePath('/settings')
         return { message: 'Member removed' }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         return { error: error.message }
     }
 }
@@ -164,7 +164,7 @@ export async function cancelInvitation(formData: FormData) {
 
         revalidatePath('/settings')
         return { message: 'Invitation cancelled' }
-    } catch (error: any) {
+    } catch (_error: unknown) {
         return { error: 'Failed to cancel invitation' }
     }
 }

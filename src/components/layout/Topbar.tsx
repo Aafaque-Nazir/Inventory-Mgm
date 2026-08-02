@@ -25,15 +25,7 @@ import {
     User,
     Settings,
     Menu,
-    LayoutDashboard,
-    Package,
-    ArrowRightLeft,
-    Users,
-    ShoppingCart,
-    BarChart3,
     Shield,
-    CreditCard,
-    HelpCircle,
     Crown,
     MoreVertical
 } from 'lucide-react'
@@ -42,7 +34,7 @@ import { useEffect, useState } from 'react'
 import { Profile } from '@/types'
 import { cn } from '@/lib/utils'
 import { WarehouseSwitcher } from '@/components/warehouses/WarehouseSwitcher'
-import { navGroups, NavItem } from '@/lib/navigation'
+import { navGroups } from '@/lib/navigation'
 
 export function Topbar() {
     const router = useRouter()
