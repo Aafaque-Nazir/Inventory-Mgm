@@ -9,7 +9,7 @@ const ticketSchema = z.object({
     message: z.string().min(10),
 })
 
-export async function submitSupportTicket(prevState: unknown, formData: FormData) {
+export async function submitSupportTicket(prevState: any, formData: FormData) {
     const supabase = await createClient()
 
     const type = formData.get('type')
@@ -66,13 +66,13 @@ export async function submitSupportTicket(prevState: unknown, formData: FormData
                     <p>Organization ID: ${profile?.organization_id}</p>
                 `
             })
-        } catch (emailError) {
+        } catch (emailError: any) {
             console.error('Failed to send support email:', emailError)
             // Don't fail the request if email fails, just log it
         }
 
         return { message: 'Ticket submitted successfully!' }
-    } catch (error: unknown) {
+    } catch (error: any) {
         console.error('Ticket submission error:', error)
         return { error: 'Failed to submit ticket. Please try again.' }
     }

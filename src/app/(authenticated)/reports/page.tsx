@@ -28,16 +28,11 @@ export default async function ReportsPage() {
             .single()
         organizationId = profile?.organization_id || null
         isSuperAdmin = profile?.is_super_admin || false
-        // @ts-expect-error -- third-party type mismatch
-        if (profile?.organizations?.plan_type) {
-            // @ts-expect-error -- third-party type mismatch
-            planType = profile.organizations.plan_type
+        const org = profile?.organizations as any
+        if (org?.plan_type) {
+            planType = org.plan_type
 
-            // @ts-expect-error -- third-party type mismatch
-            const org = profile.organizations
-            // @ts-expect-error -- third-party type mismatch
             if (planType === 'PRO' && org?.subscription_end_date) {
-                // @ts-expect-error -- third-party type mismatch
                 const expiry = new Date(org.subscription_end_date)
                 if (expiry < new Date()) {
                     planType = 'FREE'
@@ -55,9 +50,9 @@ export default async function ReportsPage() {
     // --- CONTEXT AWARE DATA FETCHING ---
     const warehouseId = await getWarehouseCookie() // From Cookie
 
-    let items: unknown[] = []
-    let movements: unknown[] = []
-    let invoices: unknown[] = [] // NEW: Fetch Invoices
+    let items: any[] = []
+    let movements: any[] = []
+    let invoices: any[] = [] // NEW: Fetch Invoices
 
     const startDate = subDays(new Date(), 30).toISOString() // INCREASED TO 30 DAYS for better visibility
 
@@ -70,7 +65,7 @@ export default async function ReportsPage() {
                 .select('item_id, quantity, item:items(*)')
                 .eq('location_id', warehouseId)
 
-            items = locationStock?.map((record: unknown) => ({
+            items = locationStock?.map((record: any) => ({
                 ...record.item,
                 current_stock: record.quantity // Override with LOCAL quantity
             })) || []
@@ -215,7 +210,7 @@ export default async function ReportsPage() {
     let totalCOGS = 0
     invoices.forEach(inv => {
         if (Array.isArray(inv.items)) {
-            inv.items.forEach((lineItem: unknown) => {
+            inv.items.forEach((lineItem: any) => {
                 // lineItem has quantity. Need cost price.
                 // We use CURRENT cost price of the item from database.
                 // Ideally, we should snapshot cost price at time of sale, but we only snapshotted unit_price (selling).

@@ -65,7 +65,7 @@ export function ItemsTable({ items }: ItemsTableProps) {
             toast.success('Item deleted successfully')
             setDeleteId(null)
             router.refresh()
-        } catch (_error) {
+        } catch (_error: any) {
             toast.error('Failed to delete item')
         }
     }

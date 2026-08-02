@@ -100,7 +100,7 @@ export function AiChatWidget() {
                     }))
                 )
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error('Failed to load chat history:', err)
         } finally {
             setHistoryLoaded(true)
@@ -114,7 +114,7 @@ export function AiChatWidget() {
             if (!result.error) {
                 setMessages([])
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error('Failed to clear history:', err)
         } finally {
             setIsClearing(false)
@@ -252,7 +252,7 @@ export function AiChatWidget() {
                             ) : (
                                 // Message list
                                 <div className="space-y-4">
-                                    {messages.map((message: unknown) => (
+                                    {messages.map((message: any) => (
                                         <ChatMessage
                                             key={message.id}
                                             role={

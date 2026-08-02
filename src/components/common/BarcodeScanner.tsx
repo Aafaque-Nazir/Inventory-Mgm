@@ -13,7 +13,7 @@ interface BarcodeScannerProps {
 }
 
 const playBeep = () => {
-    const audioCtx = new (window.AudioContext || (window as unknown).webkitAudioContext)();
+    const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
 
@@ -85,7 +85,7 @@ export function BarcodeScanner({ open, onOpenChange, onScanSuccess }: BarcodeSca
                         }
                     )
                     scannerRef.current = scanner
-                } catch (e) {
+                } catch (e: any) {
                     console.error("Scanner init error:", e)
                     setScanError("Failed to initialize camera. Ensure permissions are granted.")
                 }

@@ -86,7 +86,7 @@ export function ScanItemButton({ isPro = false }: ScanItemButtonProps) {
             } else {
                 handleNewItem(code, "New item detected! Enter details.")
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error fetching product:', error)
             handleNewItem(code, "Offline or unknown item. Ready to add!")
         }

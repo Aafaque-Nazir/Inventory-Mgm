@@ -17,8 +17,7 @@ export default async function TeamSettingsPage() {
         .eq('id', user.id)
         .single()
 
-    // @ts-expect-error -- third-party type mismatch
-    const org = Array.isArray(profile?.organization) ? profile?.organization[0] : profile?.organization as unknown
+    const org = Array.isArray(profile?.organization) ? profile?.organization[0] : profile?.organization as any
     const orgId = profile.organization_id
 
     // Fetch Team Members

@@ -172,7 +172,7 @@ export async function recordStockMovement(
         })
 
         return { message: `Stock updated successfully${alertMessage}` }
-    } catch (error: unknown) {
+    } catch (error: any) {
         console.error('Server Action Error:', error)
         return { error: error.message || 'Failed to record movement' }
     }

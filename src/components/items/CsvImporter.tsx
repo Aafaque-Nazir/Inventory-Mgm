@@ -55,8 +55,8 @@ export function CsvImporter() {
             header: true,
             skipEmptyLines: true,
             transformHeader: (h: string) => h.toLowerCase().replace(/\s+/g, '_').trim(), // Normalize headers
-            complete: (results: unknown) => {
-                const parsedData = results.data.map((row: unknown) => ({
+            complete: (results: any) => {
+                const parsedData = results.data.map((row: any) => ({
                     name: row.name || row.item_name || '',
                     sku: row.sku || row.barcode || '',
                     category: row.category || '',

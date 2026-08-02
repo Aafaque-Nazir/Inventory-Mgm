@@ -46,7 +46,7 @@ export async function GET() {
       },
       { status: 200 }
     )
-  } catch (error: unknown) {
+  } catch (error: any) {
     const message =
       error instanceof Error ? error.message : 'Unknown error'
     console.error('Keep-alive critical error:', message)

@@ -56,7 +56,7 @@ export default function PricingPage() {
             } else {
                 toast.error(data.error || "Payment verification failed")
             }
-        } catch (_error) {
+        } catch (_error: any) {
             toast.error("Verification failed or Payment was cancelled")
         } finally {
             // Clean URL even on failure to prevent loop/retry on refresh
@@ -76,14 +76,11 @@ export default function PricingPage() {
                     .eq('id', user.id)
                     .single()
 
-                // @ts-expect-error -- Supabase dynamic types
-                if (profile?.organizations?.plan_type) {
-                    // @ts-expect-error -- Supabase dynamic types
-                    setCurrentPlan(profile.organizations.plan_type)
-                    // @ts-expect-error -- Supabase dynamic types
-                    setTrialUsed(profile.organizations.trial_used || false)
-                    // @ts-expect-error -- Supabase dynamic types
-                    setSubStatus(profile.organizations.subscription_status || '')
+                const orgs = profile?.organizations as any
+                if (orgs?.plan_type) {
+                    setCurrentPlan(orgs.plan_type)
+                    setTrialUsed(orgs.trial_used || false)
+                    setSubStatus(orgs.subscription_status || '')
                 }
                 if (profile?.organization_id) setOrgId(profile.organization_id)
             }
@@ -120,7 +117,7 @@ export default function PricingPage() {
                 returnUrl: `${window.location.origin}/pricing?order_id=${data.orderId}`
             });
 
-        } catch (error) {
+        } catch (error: any) {
             console.error("Payment Error:", error)
             toast.error("Failed to initiate payment")
             setLoading(false)

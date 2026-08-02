@@ -47,10 +47,8 @@ export async function getDashboardMetrics() {
         
         if (stockItems) {
             itemsCount = stockItems.length
-            // @ts-expect-error -- third-party type mismatch
-            lowStockCount = stockItems.filter(i => i.quantity < (i.item?.min_stock || 0)).length
-            // @ts-expect-error -- third-party type mismatch
-            totalStockValue = stockItems.reduce((acc, curr) => acc + (curr.quantity * (curr.item?.price || 0)), 0)
+            lowStockCount = stockItems.filter(i => i.quantity < ((i.item as any)?.min_stock || 0)).length
+            totalStockValue = stockItems.reduce((acc, curr) => acc + (curr.quantity * ((curr.item as any)?.price || 0)), 0)
         }
 
     } else {

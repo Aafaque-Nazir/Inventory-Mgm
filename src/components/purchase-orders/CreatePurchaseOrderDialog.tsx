@@ -128,7 +128,7 @@ export function CreatePurchaseOrderDialog({ warehouseId }: { warehouseId?: strin
             setOpen(false)
             form.reset()
             router.refresh()
-        } catch (_error) {
+        } catch (_error: any) {
             toast.error('Failed to create purchase order')
         }
     }

@@ -12,7 +12,7 @@ const inviteSchema = z.object({
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-export async function inviteMember(prevState: unknown, formData: FormData) {
+export async function inviteMember(prevState: any, formData: FormData) {
     const supabase = await createClient()
 
     const email = formData.get('email') as string
@@ -40,9 +40,7 @@ export async function inviteMember(prevState: unknown, formData: FormData) {
         }
 
         const orgId = profile.organization_id
-        // @ts-expect-error -- third-party type mismatch
         const plan = profile.organizations?.plan_type || 'FREE'
-        // @ts-expect-error -- third-party type mismatch
         const maxUsers = profile.organizations?.max_users || 1
 
         // 2. Check User Limit
@@ -98,13 +96,13 @@ export async function inviteMember(prevState: unknown, formData: FormData) {
         revalidatePath('/settings')
         return { message: 'Invitation sent successfully' }
 
-    } catch (error: unknown) {
+    } catch (error: any) {
         console.error('Invite Error:', error)
         return { error: error.message || 'Failed to invite user' }
     }
 }
 
-export async function removeMember(prevState: unknown, formData: FormData) {
+export async function removeMember(prevState: any, formData: FormData) {
     const supabase = await createClient()
     const userId = formData.get('userId') as string
 
@@ -133,7 +131,7 @@ export async function removeMember(prevState: unknown, formData: FormData) {
         revalidatePath('/settings')
         return { message: 'Member removed' }
 
-    } catch (error: unknown) {
+    } catch (error: any) {
         return { error: error.message }
     }
 }
@@ -164,7 +162,7 @@ export async function cancelInvitation(formData: FormData) {
 
         revalidatePath('/settings')
         return { message: 'Invitation cancelled' }
-    } catch (_error: unknown) {
+    } catch (_error: any) {
         return { error: 'Failed to cancel invitation' }
     }
 }

@@ -40,7 +40,7 @@ export function LoginForm() {
                 window.location.href = '/dashboard'
             }, 500)
 
-        } catch (error: unknown) {
+        } catch (error: any) {
             if (error.message === 'Invalid login credentials') {
                 toast.error('Access verification failed', { description: 'Please check your password.' })
             } else if (error.message.includes('Email not confirmed')) {

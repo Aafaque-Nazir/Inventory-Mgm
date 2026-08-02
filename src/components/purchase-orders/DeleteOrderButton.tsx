@@ -39,7 +39,7 @@ export function DeleteOrderButton({ orderId }: DeleteOrderButtonProps) {
 
             toast.success('Order deleted successfully')
             router.refresh()
-        } catch (error: unknown) {
+        } catch (error: any) {
             console.error('Delete error:', error)
             toast.error('Failed to delete order')
         } finally {

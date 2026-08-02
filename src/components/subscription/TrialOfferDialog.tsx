@@ -44,7 +44,7 @@ export function TrialOfferDialog({ open, onOpenChange, organizationId, trialUsed
                 // Force reload to ensure all Pro features unlock immediately
                 window.location.reload()
             }
-        } catch (_error) {
+        } catch (_error: any) {
             toast.error('Something went wrong. Please try again.')
         } finally {
             setLoading(false)

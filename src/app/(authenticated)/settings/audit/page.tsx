@@ -24,10 +24,9 @@ export default async function AuditLogsPage() {
         isSuperAdmin = profile?.is_super_admin || false
 
         // Check Pro (Logic should be centralized but copying here for now to be safe)
-        // @ts-expect-error -- third-party type mismatch
-        if (profile?.organizations?.plan_type === 'PRO') {
-            // @ts-expect-error -- third-party type mismatch
-            const endDate = profile.organizations.subscription_end_date
+        const orgs = profile?.organizations as any
+        if (orgs?.plan_type === 'PRO') {
+            const endDate = orgs.subscription_end_date
             if (endDate && new Date(endDate) > new Date()) {
                 isPro = true
             }
@@ -36,7 +35,7 @@ export default async function AuditLogsPage() {
 
     const { logs } = await getAuditLogs(1, 100)
 
-    function formatDetails(details: unknown) {
+    function formatDetails(details: any) {
         if (!details) return '-'
         return Object.entries(details).map(([k, v]) => `${k}: ${v}`).join(', ')
     }

@@ -11,7 +11,7 @@ const invoiceItemSchema = z.array(z.object({
     unit_price: z.number().optional()
 }))
 
-export async function createInvoice(prevState: unknown, formData: FormData) {
+export async function createInvoice(prevState: any, formData: FormData) {
     const supabase = await createClient()
 
     try {
@@ -31,7 +31,7 @@ export async function createInvoice(prevState: unknown, formData: FormData) {
         let items: z.infer<typeof invoiceItemSchema>
         try {
             items = invoiceItemSchema.parse(JSON.parse(itemsJson))
-        } catch (_e) {
+        } catch (_e: any) {
             return { error: 'Invalid invoice items format' }
         }
 
@@ -125,7 +125,7 @@ export async function createInvoice(prevState: unknown, formData: FormData) {
 
         return { message: 'Invoice created successfully', invoiceId: invoice.id }
 
-    } catch (error: unknown) {
+    } catch (error: any) {
         console.error('Create Invoice Error:', error)
         return { error: error.message || 'Failed to create invoice' }
     }

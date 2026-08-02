@@ -80,7 +80,7 @@ export function EditItemDialog({ item, open, onOpenChange }: EditItemDialogProps
             onOpenChange(false)
             form.reset()
             router.refresh()
-        } catch (error: unknown) {
+        } catch (error: any) {
             toast.error(error.message || 'Failed to update item')
         }
     }

@@ -147,8 +147,7 @@ export async function getAiInsights(): Promise<AiInsight[]> {
     // --- ALGORITHM 2: Seasonal & Category Trends ---
     const categoryVelocity: Record<string, number> = {}
     movements.forEach(m => {
-        // @ts-expect-error -- third-party type mismatch
-        const cat = m.items?.category || 'Uncategorized'
+        const cat = (m.items as any)?.category || 'Uncategorized'
         categoryVelocity[cat] = (categoryVelocity[cat] || 0) + m.quantity
     })
 

@@ -38,7 +38,7 @@ export default async function DashboardPage() {
     const chartData = await getRevenueChartData('7d')
 
     // 3. Recent Activity (Movements)
-    let recentMovements: unknown[] = []
+    let recentMovements: any[] = []
     
     if (organizationId) {
         let query = supabase

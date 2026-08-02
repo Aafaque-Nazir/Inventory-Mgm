@@ -57,8 +57,7 @@ export async function POST(req: NextRequest) {
         const payments = response.data
 
         // Check if any payment is successful
-        // @ts-expect-error -- third-party type mismatch
-        const successfulPayment = payments?.find((p: unknown) => p.payment_status === 'SUCCESS')
+        const successfulPayment = payments?.find((p: any) => p.payment_status === 'SUCCESS')
 
         if (!successfulPayment) {
             return NextResponse.json({ error: 'Payment not successful' }, { status: 400 })
@@ -95,7 +94,7 @@ export async function POST(req: NextRequest) {
             message: 'Subscription upgraded to PRO'
         })
 
-    } catch (error: unknown) {
+    } catch (error: any) {
         console.error('Cashfree Verification Error:', error)
         return NextResponse.json(
             { error: 'Internal Server Error' },

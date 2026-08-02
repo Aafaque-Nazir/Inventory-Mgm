@@ -95,8 +95,7 @@ export async function POST(req: Request) {
                     if (userMessage && userMessage.role === 'user') {
                         let userText = userMessage.content || ''
                         if (!userText && userMessage.parts) {
-                            // @ts-expect-error -- third-party type mismatch
-                            userText = userMessage.parts.map(p => p.text || '').join('')
+                            userText = userMessage.parts.map((p: any) => p.text || '').join('')
                         }
 
                         messagesToInsert.push({
@@ -139,7 +138,7 @@ export async function POST(req: Request) {
         })
 
         return result.toUIMessageStreamResponse()
-    } catch (error: unknown) {
+    } catch (error: any) {
         console.error('Chat API Error Trace:', error)
         const message =
             error instanceof Error ? error.message : 'Internal server error'

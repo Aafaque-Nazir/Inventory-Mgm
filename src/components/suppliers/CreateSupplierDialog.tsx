@@ -60,7 +60,7 @@ export function CreateSupplierDialog() {
             setOpen(false)
             form.reset()
             router.refresh()
-        } catch (_error) {
+        } catch (_error: any) {
             toast.error('Failed to create supplier')
         }
     }

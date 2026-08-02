@@ -54,7 +54,7 @@ export function ReceiveOrderButton({ orderId, items }: { orderId: string; items:
 
             toast.success('Purchase order received and stock updated')
             router.refresh()
-        } catch (_error) {
+        } catch (_error: any) {
             toast.error('Failed to receive order')
         }
     }

@@ -47,7 +47,7 @@ export function RecordSaleDialog({ trigger, initialItem, open: controlledOpen, o
     const [searchTerm, setSearchTerm] = useState('')
     const [isPending, startTransition] = useTransition()
     const [_lastInvoiceId, setLastInvoiceId] = useState<string | null>(null)
-    const [lastInvoiceData, setLastInvoiceData] = useState<unknown>(null)
+    const [lastInvoiceData, setLastInvoiceData] = useState<any>(null)
 
     // Customer Details
     const [customerName, setCustomerName] = useState('')

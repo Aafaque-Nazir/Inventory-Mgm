@@ -12,7 +12,7 @@ import { RevenueChart } from '@/components/super-admin/RevenueChart'
 import { StatCard } from '@/components/dashboard/StatCard'
 
 export default function SuperAdminPage() {
-    const [stats, setStats] = useState<unknown>(null)
+    const [stats, setStats] = useState<any>(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -24,7 +24,7 @@ export default function SuperAdminPage() {
                 } else {
                     setStats(data)
                 }
-            } catch (err) {
+            } catch (err: any) {
                 console.error('Failed to fetch stats:', err)
             } finally {
                 setLoading(false)
@@ -194,7 +194,7 @@ export default function SuperAdminPage() {
                             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                 {loading ? (
                                     <div className="col-span-full py-12 text-center text-slate-500 animate-pulse">Loading amazing new companies...</div>
-                                ) : stats?.recentOrgs?.map((org: unknown) => (
+                                ) : stats?.recentOrgs?.map((org: any) => (
                                     <div key={org.id} className="group p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-indigo-500/30 hover:bg-indigo-500/5 transition-all duration-300">
                                         <div className="flex items-center gap-4">
                                             <div className="h-12 w-12 rounded-xl bg-indigo-500/20 border border-white/10 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">

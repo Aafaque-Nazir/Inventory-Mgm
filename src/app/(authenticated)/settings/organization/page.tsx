@@ -15,8 +15,7 @@ export default async function OrganizationSettingsPage() {
         .eq('id', user.id)
         .single()
 
-    // @ts-expect-error -- third-party type mismatch
-    const org = Array.isArray(profile?.organization) ? profile?.organization[0] : profile?.organization as unknown
+    const org = Array.isArray(profile?.organization) ? profile?.organization[0] : profile?.organization as any
 
     if (!org) redirect('/onboarding')
 

@@ -134,7 +134,7 @@ export function CreateItemDialog({
             } else {
                 toast.info('Product not found in database')
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error fetching product:', error)
             toast.error('Failed to fetch product details')
         }

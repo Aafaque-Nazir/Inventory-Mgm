@@ -153,7 +153,7 @@ export async function getAdminOverviewStats() {
             mrr,
             revenueHistory
         }
-    } catch (error: unknown) {
+    } catch (error: any) {
         console.error('Admin Stats Error:', error)
         return { error: 'Failed to fetch admin stats' }
     }

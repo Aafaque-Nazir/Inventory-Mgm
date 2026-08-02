@@ -37,7 +37,7 @@ export async function sendLowStockAlert(
         } else {
             return { success: true }
         }
-    } catch (err) {
+    } catch (err: any) {
         console.error('Failed to send email alert:', err)
         return { success: false, error: err }
     }

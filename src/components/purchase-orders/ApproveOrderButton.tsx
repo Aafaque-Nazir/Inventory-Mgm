@@ -26,7 +26,7 @@ export function ApproveOrderButton({ orderId }: { orderId: string }) {
 
             toast.success('Purchase order approved')
             router.refresh()
-        } catch (_error) {
+        } catch (_error: any) {
             toast.error('Failed to approve order')
         }
     }
