@@ -52,7 +52,7 @@ export function AddStockMovementDialog({ defaultType = 'IN', defaultReason = '',
     const _router = useRouter()
     const supabase = createClient()
 
-    const form = useForm<unknown>({
+    const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             item_id: '',

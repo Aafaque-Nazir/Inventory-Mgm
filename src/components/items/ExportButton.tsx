@@ -24,7 +24,8 @@ import {
 import { Label } from '@/components/ui/label'
 
 interface ExportButtonProps {
-    items: unknown[]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    items: any[]
     isPro: boolean
 }
 

@@ -82,7 +82,8 @@ export function EditSupplierDialog({ supplier }: EditSupplierDialogProps) {
             toast.success('Supplier updated successfully')
             setOpen(false)
             router.refresh()
-        } catch (error: unknown) {
+        } catch (err) {
+            const error = err as Error;
             console.error('Update supplier error:', error)
             toast.error(error.message || 'Failed to update supplier')
         }

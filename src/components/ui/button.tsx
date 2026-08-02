@@ -66,13 +66,13 @@ function Button({
   }
 
   return (
-    // @ts-expect-error -- third-party type mismatch
+    // @ts-expect-error -- framer motion type mismatch
     <motion.button
       data-slot="button"
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.95 }}
       className={cn(buttonVariants({ variant, size, className }))}
-      {...props as unknown}
+      {...props}
     />
   )
 }

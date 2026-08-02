@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { getWarehouseCookie } from './warehouse-cookie'
-import { addDays, format, subDays, _startOfDay, _endOfDay } from 'date-fns'
+import { addDays, format, subDays, startOfDay, endOfDay } from 'date-fns'
 
 export interface DashboardMetric {
     label: string

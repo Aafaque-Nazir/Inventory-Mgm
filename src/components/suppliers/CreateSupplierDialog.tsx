@@ -41,7 +41,7 @@ export function CreateSupplierDialog() {
     const router = useRouter()
     const supabase = createClient()
 
-    const form = useForm<unknown>({
+    const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: '',

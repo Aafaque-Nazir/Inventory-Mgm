@@ -32,7 +32,7 @@ export async function getLocations(_organizationId?: string) {
     return locations
 }
 
-export async function createLocation(data: { name: string; address?: string; _organizationId?: string }) {
+export async function createLocation(data: { name: string; address?: string; organizationId?: string }) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { error: 'Unauthorized' }

@@ -44,7 +44,8 @@ export function Sidebar() {
     const [trialDays, setTrialDays] = useState<number | null>(null)
     const [collapsed, setCollapsed] = useState(false)
     const [mounted, setMounted] = useState(false)
-    const [userProfile, setUserProfile] = useState<unknown>(null)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [userProfile, setUserProfile] = useState<any>(null)
 
     useEffect(() => {
         setMounted(true)
@@ -67,15 +68,10 @@ export function Sidebar() {
                     if (profile.is_super_admin) setIsSuperAdmin(true)
 
                     let effectivePlan = 'FREE'
-                    // @ts-expect-error -- Supabase join typing
                     if (profile.organizations?.plan_type) {
-                        // @ts-expect-error -- Supabase join typing
                         effectivePlan = profile.organizations.plan_type
-                        // @ts-expect-error -- Supabase join typing
                         if (profile.organizations?.subscription_end_date) {
-                            // @ts-expect-error -- Supabase join typing
                             const expiry = new Date(profile.organizations.subscription_end_date)
-                            // @ts-expect-error -- Supabase join typing
                             if (profile.organizations.subscription_status === 'TRIALING') {
                                 const days = differenceInDays(expiry, new Date())
                                 setTrialDays(days >= 0 ? days + 1 : 0)

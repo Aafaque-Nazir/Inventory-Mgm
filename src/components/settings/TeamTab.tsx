@@ -26,8 +26,10 @@ export function TeamTab({
     invitations,
     maxUsers
 }: {
-    members: unknown[],
-    invitations: unknown[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    members: any[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    invitations: any[],
     plan: string,
     maxUsers: number
 }) {

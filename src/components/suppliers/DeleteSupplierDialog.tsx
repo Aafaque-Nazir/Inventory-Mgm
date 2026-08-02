@@ -40,7 +40,8 @@ export function DeleteSupplierDialog({ supplierId, supplierName }: DeleteSupplie
             toast.success('Supplier deleted successfully')
             router.refresh()
             setOpen(false)
-        } catch (error: unknown) {
+        } catch (err) {
+            const error = err as Error;
             console.error('Delete supplier error:', error)
             toast.error(error.message || 'Failed to delete supplier. They may have linked purchase orders.')
         }

@@ -46,7 +46,7 @@ interface QuickStockDialogProps {
 export function QuickStockDialog({ item, open, onOpenChange, defaultType = 'IN' }: QuickStockDialogProps) {
     const [isPending, startTransition] = useTransition()
 
-    const form = useForm<unknown>({
+    const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             quantity: 0,

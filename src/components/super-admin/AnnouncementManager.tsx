@@ -85,7 +85,7 @@ export function AnnouncementManager() {
                     </h3>
                     <div className="flex flex-col lg:flex-row gap-5">
                         <div className="w-full lg:w-[200px]">
-                            <Select value={type} onValueChange={(v: unknown) => setType(v)}>
+                            <Select value={type} onValueChange={(v: "INFO" | "WARNING" | "CRITICAL") => setType(v)}>
                                 <SelectTrigger className="h-12 bg-black/40 border-white/10 text-white rounded-xl focus:ring-2 focus:ring-indigo-500/50 transition-all font-bold">
                                     <SelectValue />
                                 </SelectTrigger>
