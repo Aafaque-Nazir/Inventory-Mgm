@@ -32,7 +32,7 @@ export function RecentActivityList({ activities }: { activities: Activity[] }) {
             </div>
 
             <div className="space-y-4">
-                {activities?.map((activity, idx) => {
+                {activities?.map((activity) => {
                     const Icon = iconMap[activity.type] || Package
                     const isPositive = activity.type === 'IN'
 

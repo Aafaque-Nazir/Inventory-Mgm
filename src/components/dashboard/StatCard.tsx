@@ -14,7 +14,6 @@ interface StatCardProps {
         positive?: boolean
     }
     color?: 'blue' | 'cyan' | 'sky' | 'emerald' | 'green' | 'purple' | 'orange' | 'pink'
-    delay?: number
 }
 
 const colorStyles = {
@@ -68,7 +67,7 @@ const colorStyles = {
     }
 }
 
-export function StatCard({ title, value, icon, description, trend, color = 'blue', delay = 0 }: StatCardProps) {
+export function StatCard({ title, value, icon, description, trend, color = 'blue' }: StatCardProps) {
     const styles = colorStyles[color] || colorStyles.blue
     const [displayValue, setDisplayValue] = useState(0)
 
