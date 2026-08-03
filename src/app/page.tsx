@@ -17,44 +17,13 @@ import {
     User,
     AlertCircle
 } from 'lucide-react'
-import { motion, useScroll, useTransform, Variants } from 'framer-motion'
 import { useRef } from 'react'
-
-const fadeUp: Variants = {
-    hidden: { opacity: 0, y: 40 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
-}
-
-const staggerContainer: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: {
-            staggerChildren: 0.1,
-            delayChildren: 0.2
-        }
-    }
-}
 
 export default function Home() {
     const containerRef = useRef(null)
-    const { scrollYProgress } = useScroll({
-        target: containerRef,
-        offset: ["start start", "end start"]
-    })
-
-    // Deep parallax for hero
-    const yHero = useTransform(scrollYProgress, [0, 1], ["0%", "40%"])
-    const opacityHero = useTransform(scrollYProgress, [0, 0.8], [1, 0])
-
-    // Dashboard 3D Tilt Effect on Scroll
-    const rotateX = useTransform(scrollYProgress, [0, 0.3], [20, 0])
-    const scaleDashboard = useTransform(scrollYProgress, [0, 0.3], [0.85, 1])
-    const opacityDashboard = useTransform(scrollYProgress, [0, 0.2], [0.5, 1])
 
     return (
         <div className="flex min-h-screen flex-col bg-[#050505] text-slate-50 selection:bg-blue-500/30 selection:text-blue-200 overflow-x-hidden relative font-sans">
-
             {/* 1. ANTIGRAVITY BACKGROUND */}
             <div className="fixed inset-0 z-0 pointer-events-none">
                 {/* Subtle Grid */}
@@ -101,24 +70,19 @@ export default function Home() {
 
                 {/* 3. HERO SECTION (Mind-Blowing Parallax) */}
                 <section className="relative flex min-h-[100vh] flex-col items-center justify-center pt-24 md:pt-32 pb-20 px-6 overflow-hidden perspective-1000">
-                    <motion.div
-                        initial="hidden"
-                        animate="visible"
-                        variants={staggerContainer}
-                        style={{ y: yHero, opacity: opacityHero }}
+                    <div
                         className="container mx-auto relative z-10 flex flex-col items-center text-center max-w-5xl"
                     >
-                        <motion.div variants={fadeUp} className="mb-8 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 backdrop-blur-md hover:bg-white/10 transition-colors cursor-pointer group">
+                        <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 backdrop-blur-md hover:bg-white/10 transition-colors cursor-pointer group">
                             <span className="relative flex h-2 w-2">
                                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75"></span>
                                 <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
                             </span>
                             <span className="text-xs font-semibold text-slate-300 tracking-wide uppercase group-hover:text-white transition-colors">InvMaster 2.0 AI Engine is Live</span>
                             <ChevronRight className="h-3 w-3 text-slate-500 group-hover:text-white transition-colors" />
-                        </motion.div>
+                        </div>
 
-                        <motion.h1
-                            variants={fadeUp}
+                        <h1
                             className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-8 relative"
                         >
                             <span className="text-white">
@@ -128,17 +92,15 @@ export default function Home() {
                             <span className="text-blue-400">
                                 perfected.
                             </span>
-                        </motion.h1>
+                        </h1>
 
-                        <motion.p
-                            variants={fadeUp}
+                        <p
                             className="max-w-2xl text-lg md:text-2xl text-slate-400 font-medium leading-relaxed mb-12"
                         >
                             The modern operating system for top-tier fulfillment. Stop guessing, start scaling with AI-driven velocity insights.
-                        </motion.p>
+                        </p>
 
-                        <motion.div
-                            variants={fadeUp}
+                        <div
                             className="flex flex-col sm:flex-row gap-6 items-center justify-center w-full"
                         >
                             <Link href="/signup" className="w-full sm:w-auto">
@@ -150,12 +112,11 @@ export default function Home() {
                                 </Button>
                             </Link>
                             <span className="text-sm font-medium text-slate-500">No credit card required.</span>
-                        </motion.div>
-                    </motion.div>
+                        </div>
+                    </div>
 
                     {/* Dashboard Mockup - 3D Reveal */}
-                    <motion.div
-                        style={{ rotateX, scale: scaleDashboard, opacity: opacityDashboard }}
+                    <div
                         className="mt-24 relative w-full max-w-6xl mx-auto rounded-3xl md:rounded-[40px] border border-white/10 bg-[#0a0a0a] shadow-[0_0_100px_rgba(37,99,235,0.15)] origin-top transform-style-3d overflow-hidden"
                     >
                         <div className="absolute inset-0 bg-black/50 z-10 block pointer-events-none h-full w-full opacity-90"></div>
@@ -250,17 +211,14 @@ export default function Home() {
                                         <div className="flex-1 flex items-end justify-between gap-1 sm:gap-2 pt-4 relative z-10 border-b border-white/5 pb-2 min-h-[120px]">
                                             {[40, 60, 45, 80, 55, 90, 75].map((height, i) => (
                                                 <div key={i} className="relative w-full flex justify-center group/bar h-full items-end">
-                                                    <motion.div
-                                                        initial={{ height: 0 }}
-                                                        whileInView={{ height: `${height}%` }}
-                                                        transition={{ duration: 1.5, delay: 0.1 + (i * 0.1), type: "spring", bounce: 0.4 }}
-                                                        viewport={{ once: true, margin: "-100px" }}
+                                                    <div
                                                         className="w-full max-w-[40px] bg-blue-500/20 rounded-t border-t-2 border-blue-500 relative cursor-pointer group-hover/bar:bg-blue-500/40 transition-colors"
+                                                        style={{ height: `${height}%` }}
                                                     >
                                                         <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] font-bold py-1 px-2 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity pointer-events-none shadow-lg whitespace-nowrap z-20">
                                                             ★ {height * 12}
                                                         </div>
-                                                    </motion.div>
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>
@@ -298,7 +256,7 @@ export default function Home() {
                                 </div>
                             </div>
                         </div>
-                    </motion.div>
+                    </div>
 
                     {/* Soft Gradient Fade into next section */}
                     <div className="absolute bottom-0 left-0 right-0 h-64 bg-black/50 pointer-events-none z-20"></div>
@@ -344,13 +302,10 @@ export default function Home() {
                                     <div className="absolute inset-0 bg-[#091629] opacity-50 z-10"></div>
                                     <div className="absolute bottom-0 w-full px-10 pb-10 flex items-end gap-2 isolate">
                                         {[30, 45, 20, 60, 80, 50, 90, 100, 70, 85].map((h, i) => (
-                                            <motion.div
+                                            <div
                                                 key={i}
-                                                initial={{ height: 0 }}
-                                                whileInView={{ height: `${h}%` }}
-                                                transition={{ delay: i * 0.05, duration: 0.8, type: "spring" }}
-                                                viewport={{ once: true, margin: "-100px" }}
                                                 className="w-full bg-blue-500/80 rounded-t-md hover:bg-blue-400 transition-colors"
+                                                style={{ height: `${h}%` }}
                                             />
                                         ))}
                                     </div>
@@ -405,12 +360,8 @@ export default function Home() {
                                 { title: "Define the rules, let AI execute.", desc: "Set reorder points or let our algorithm dynamically predict them based on seasonal trends and supplier lead times.", icon: <Settings className="w-8 h-8 text-white" /> },
                                 { title: "Ship faster with zero errors.", desc: "Custom picking routes for warehouse staff. Scan to verify. Box. Ship. Your error rate plummets to 0.01%.", icon: <Box className="w-8 h-8 text-white" /> }
                             ].map((step, idx) => (
-                                <motion.div
+                                <div
                                     key={idx}
-                                    initial={{ opacity: 0, y: 30 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true, margin: "-100px" }}
-                                    transition={{ duration: 0.6 }}
                                     className="flex flex-col md:flex-row items-center gap-8 md:gap-16 text-left group"
                                 >
                                     <div className="shrink-0 relative">
@@ -425,7 +376,7 @@ export default function Home() {
                                         <h3 className="text-xl md:text-2xl font-bold text-white mb-3">{step.title}</h3>
                                         <p className="text-lg text-slate-400">{step.desc}</p>
                                     </div>
-                                </motion.div>
+                                </div>
                             ))}
                         </div>
                     </div>

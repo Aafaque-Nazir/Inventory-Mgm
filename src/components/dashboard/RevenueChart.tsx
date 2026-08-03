@@ -3,7 +3,6 @@
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ChartData } from '@/app/actions/dashboard'
-import { motion } from 'framer-motion'
 import { FileBarChart } from 'lucide-react'
 
 export function RevenueChart({ data }: { data: ChartData }) {
@@ -22,10 +21,7 @@ export function RevenueChart({ data }: { data: ChartData }) {
     }
 
     return (
-        <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+        <div
             className="col-span-4"
         >
             <Card className="border-white/5 bg-white/5 backdrop-blur-sm">
@@ -93,6 +89,6 @@ export function RevenueChart({ data }: { data: ChartData }) {
                     </div>
                 </CardContent>
             </Card>
-        </motion.div>
+        </div>
     )
 }

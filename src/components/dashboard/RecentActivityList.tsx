@@ -2,7 +2,6 @@
 
 import { format } from 'date-fns'
 import { ArrowRight, Package, Truck, ShoppingCart } from 'lucide-react'
-import { motion } from 'framer-motion'
 import Link from 'next/link'
 
 interface Activity {
@@ -38,11 +37,8 @@ export function RecentActivityList({ activities }: { activities: Activity[] }) {
                     const isPositive = activity.type === 'IN'
 
                     return (
-                        <motion.div 
+                        <div 
                             key={activity.id}
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: idx * 0.1 }}
                             className="group flex items-center gap-4 p-3 rounded-xl border border-transparent hover:border-white/5 hover:bg-white/5 transition-all"
                         >
                              <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${
@@ -75,7 +71,7 @@ export function RecentActivityList({ activities }: { activities: Activity[] }) {
                                      {format(new Date(activity.created_at), 'MMM d, HH:mm')}
                                  </p>
                              </div>
-                        </motion.div>
+                        </div>
                     )
                 })}
 

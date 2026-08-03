@@ -3,7 +3,6 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
-import { motion } from "framer-motion"
 
 import { cn } from "@/lib/utils"
 
@@ -49,7 +48,7 @@ function Button({
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean
   }) {
-  const _Comp = asChild ? Slot : motion.button
+  const _Comp = asChild ? Slot : "button"
 
   // If it's a Slot (asChild), we can't easily adhere to motion props without complexity, 
   // so we might lose the animation for asChild=true unless we wrap the child.
@@ -65,11 +64,8 @@ function Button({
       )
   }
   return (
-    // @ts-expect-error -- framer motion type mismatch
-    <motion.button
+    <button
       data-slot="button"
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.95 }}
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />

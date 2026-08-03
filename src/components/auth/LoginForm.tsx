@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { Loader2, Mail, Lock, ArrowRight } from 'lucide-react'
 import { GoogleSignInButton } from './GoogleSignInButton'
-import { motion } from 'framer-motion'
 import Link from 'next/link'
 
 export function LoginForm() {
@@ -54,10 +53,7 @@ export function LoginForm() {
     }
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+        <div
             className="grid gap-4"
         >
             <GoogleSignInButton />
@@ -130,6 +126,6 @@ export function LoginForm() {
                     </Link>
                 </p>
             </div>
-        </motion.div>
+        </div>
     )
 }

@@ -2,7 +2,6 @@
 
 import { Sparkles, TrendingUp, AlertOctagon, PackageX } from 'lucide-react'
 import { AiInsight } from '@/app/actions/ai'
-import { motion } from 'framer-motion'
 
 const iconMap = {
     RISK: AlertOctagon,
@@ -24,10 +23,7 @@ export function AiInsightsCard({ insights }: { insights: AiInsight[] }) {
     if (!insights || insights.length === 0) return null
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+        <div
             className="col-span-full relative overflow-hidden rounded-2xl border border-blue-500/20 bg-slate-950 p-6 shadow-2xl backdrop-blur-md"
         >
             {/* Glowing orb effect - BLUE/CYAN */}
@@ -51,11 +47,8 @@ export function AiInsightsCard({ insights }: { insights: AiInsight[] }) {
                         const colorClass = colorMap[insight.color] || colorMap.blue
 
                         return (
-                            <motion.div
+                            <div
                                 key={idx}
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.1 * idx }}
                                 className={`group relative p-4 rounded-xl border ${colorClass} transition-all duration-300 flex flex-col justify-between`}
                             >
                                 <div>
@@ -80,11 +73,11 @@ export function AiInsightsCard({ insights }: { insights: AiInsight[] }) {
                                         <TrendingUp className="h-3 w-3 transition-transform group-hover:translate-x-1" />
                                     </div>
                                 )}
-                            </motion.div>
+                            </div>
                         )
                     })}
                 </div>
             </div>
-        </motion.div>
+        </div>
     )
 }

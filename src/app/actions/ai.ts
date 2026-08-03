@@ -12,6 +12,8 @@ export interface AiInsight {
     priority: number
 }
 
+
+
 export async function getAiInsights(): Promise<AiInsight[]> {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -21,8 +23,6 @@ export async function getAiInsights(): Promise<AiInsight[]> {
     const { data: profile } = await supabase.from('profiles').select('organization_id').eq('id', user.id).single()
     if (!profile?.organization_id) return []
     const orgId = profile.organization_id
-
-    const insights: AiInsight[] = []
 
     // 2. Fetch Data (Last 30 Days)
     const thirtyDaysAgo = new Date()
@@ -40,9 +40,17 @@ export async function getAiInsights(): Promise<AiInsight[]> {
         .in('type', ['OUT', 'SALE'])
         .gte('created_at', thirtyDaysAgo.toISOString())
 
-    if (!items || !movements) return []
+    if (!items || !movements || items.length === 0) return []
 
-    // --- ALGORITHM 1: Velocity & Stockout Risk ---
+
+
+    // --- FALLBACK ALGORITHM ---
+    return generateHardcodedInsights(items, movements)
+}
+
+function generateHardcodedInsights(items: any[], movements: any[]): AiInsight[] {
+    const insights: AiInsight[] = []
+
     // Calculate daily consumption for each item
     const itemUsage: Record<string, number> = {}
     movements.forEach(m => {
@@ -65,57 +73,50 @@ export async function getAiInsights(): Promise<AiInsight[]> {
         if (dailyVelocity > 0) {
             const daysRemaining = item.quantity / dailyVelocity
 
-            // Risk: Less than 7 days left
             if (daysRemaining < 7) {
                 atRiskItems.push({ name: item.name, days: Math.ceil(daysRemaining) })
             }
 
-            // High Margin Risk: Margin > 40% and running out in < 14 days
             if (profitMargin > 0.4 && daysRemaining < 14 && daysRemaining >= 7) {
                 highMarginRisks.push({ name: item.name, margin: Math.round(profitMargin * 100), days: Math.ceil(daysRemaining) })
             }
 
-            // Overstock: Stock lasting more than 90 days
             if (daysRemaining > 90 && item.quantity > 50) {
                 const excessValue = (item.quantity - (dailyVelocity * 30)) * (item.cost_price || 0)
                 overstockedItems.push({ name: item.name, excessValue })
             }
         } else if (item.quantity > 0) {
-            // Dead stock
             deadStockValue += (item.quantity * (item.cost_price || 0))
             deadStockItems.push(item.name)
         }
     }
 
-    // Push Stockout Risk
     if (atRiskItems.length > 0) {
         const topRisk = atRiskItems.sort((a, b) => a.days - b.days)[0]
         insights.push({
             type: 'RISK',
             title: 'Critical Stockout Predicted',
             description: `'${topRisk.name}' is depleting fast and will run out in approx. ${topRisk.days} days.`,
-            metric: `High Urgency`,
+            metric: 'High Urgency',
             action: 'Reorder Now',
             color: 'red',
             priority: 1
         })
     }
 
-    // Push High Margin
     if (highMarginRisks.length > 0) {
         const topMarginRisk = highMarginRisks.sort((a, b) => a.days - b.days)[0]
         insights.push({
             type: 'OPPORTUNITY',
             title: 'Protect High-Margin Revenue',
             description: `'${topMarginRisk.name}' ( ${topMarginRisk.margin}% margin ) is selling fast but has only ${topMarginRisk.days} days of stock left.`,
-            metric: `Revenue Risk`,
+            metric: 'Revenue Risk',
             action: 'Prioritize Restock',
             color: 'green',
             priority: 2
         })
     }
 
-    // Push Overstock
     if (overstockedItems.length > 0) {
         const topOverstock = overstockedItems.sort((a, b) => b.excessValue - a.excessValue)[0]
         if (topOverstock.excessValue > 0) {
@@ -131,7 +132,6 @@ export async function getAiInsights(): Promise<AiInsight[]> {
         }
     }
 
-    // Push Dead Stock
     if (deadStockItems.length > 0 && deadStockValue > 0) {
         insights.push({
             type: 'WARNING',
@@ -144,7 +144,6 @@ export async function getAiInsights(): Promise<AiInsight[]> {
         })
     }
 
-    // --- ALGORITHM 2: Seasonal & Category Trends ---
     const categoryVelocity: Record<string, number> = {}
     movements.forEach(m => {
         const cat = (m.items as any)?.category || 'Uncategorized'
@@ -152,7 +151,6 @@ export async function getAiInsights(): Promise<AiInsight[]> {
     })
 
     const topCategory = Object.entries(categoryVelocity).sort(([, a], [, b]) => b - a)[0]
-
     const month = new Date().getMonth()
     const seasons = ['Winter', 'Winter', 'Spring', 'Spring', 'Summer', 'Summer', 'Monsoon', 'Monsoon', 'Autumn', 'Autumn', 'Winter', 'Winter']
     const currentSeason = seasons[month]
@@ -162,11 +160,11 @@ export async function getAiInsights(): Promise<AiInsight[]> {
             type: 'SEASONAL',
             title: `${currentSeason} Demand Surge`,
             description: `'${topCategory[0]}' category is driving the most volume this season. Ensure adequate safety stock across this category.`,
-            metric: `Top Category`,
+            metric: 'Top Category',
             color: 'blue',
             priority: 5
         })
     }
 
-    return insights.sort((a, b) => a.priority - b.priority).slice(0, 3) // Return top 3 most important
+    return insights.sort((a, b) => a.priority - b.priority).slice(0, 3)
 }

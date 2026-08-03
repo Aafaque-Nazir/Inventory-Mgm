@@ -1,6 +1,5 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useEffect, useState } from 'react'
 
@@ -99,10 +98,7 @@ export function StatCard({ title, value, icon, description, trend, color = 'blue
 
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay }}
+        <div
             className={cn(
                 "group relative rounded-[2rem] border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6 lg:p-7 backdrop-blur-xl transition-all duration-500",
                 "hover:-translate-y-1 hover:bg-white/[0.04]",
@@ -146,6 +142,6 @@ export function StatCard({ title, value, icon, description, trend, color = 'blue
                     )}
                 </div>
             </div>
-        </motion.div>
+        </div>
     )
 }

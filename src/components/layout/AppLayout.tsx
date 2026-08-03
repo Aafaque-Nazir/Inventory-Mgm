@@ -7,7 +7,6 @@ import { Topbar } from './Topbar'
 import { Loader2,  } from 'lucide-react'
 import {  } from '@/components/ui/card'
 import { WarehouseProvider } from '@/context/WarehouseContext'
-import { AiChatWidget } from '@/components/chat/AiChatWidget'
 
 import { usePathname } from 'next/navigation'
 
@@ -99,7 +98,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                     </main>
                 </div>
             </div>
-            <AiChatWidget />
         </WarehouseProvider>
     )
 }

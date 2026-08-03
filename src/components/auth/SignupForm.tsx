@@ -10,7 +10,6 @@ import { Loader2, User, Mail, Lock, ArrowRight, LayoutDashboard } from "lucide-r
 import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton'
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
-import { motion } from "framer-motion"
 
 export function SignupForm() {
     const router = useRouter()
@@ -58,9 +57,7 @@ export function SignupForm() {
 
     if (isSuccess) {
         return (
-            <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
+            <div
                 className="text-center space-y-6 p-6 rounded-2xl bg-white/5 border border-white/10"
             >
                 <div className="mx-auto h-16 w-16 rounded-full bg-green-500/20 flex items-center justify-center">
@@ -73,15 +70,12 @@ export function SignupForm() {
                 <Button variant="outline" className="w-full border-white/10 hover:bg-white/5 hover:text-white" onClick={() => router.push('/login')}>
                     Back to Login
                 </Button>
-            </motion.div>
+            </div>
         )
     }
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+        <div
             className="grid gap-4"
         >
             <GoogleSignInButton />
@@ -178,6 +172,6 @@ export function SignupForm() {
                     Sign In
                 </Link>
             </div>
-        </motion.div>
+        </div>
     )
 }
