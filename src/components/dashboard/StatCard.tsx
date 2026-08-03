@@ -14,6 +14,7 @@ interface StatCardProps {
         positive?: boolean
     }
     color?: 'blue' | 'cyan' | 'sky' | 'emerald' | 'green' | 'purple' | 'orange' | 'pink'
+    delay?: number
 }
 
 const colorStyles = {
