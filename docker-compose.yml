@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  inv-mgm-app:
+    # Build from the local Dockerfile if image is not present
+    build: .
+    # Or in production, you would pull from a registry like:
+    # image: aafaque/inv-mgm-app:latest
+    container_name: inv-mgm-prod
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
+    restart: always # Pro move: If the app crashes or server restarts, Docker will restart it automatically!
+    # If you had a DB, you'd link it here
+    # depends_on:
+    #   - postgres-db
+
+  # Example of how a Senior Dev adds a Database locally
+  # postgres-db:
+  #   image: postgres:15-alpine
+  #   environment:
+  #     POSTGRES_USER: admin
+  #     POSTGRES_PASSWORD: mysecretpassword
+  #     POSTGRES_DB: inv_mgm
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+
+# Volumes are used to persist data even if the container is deleted
+# volumes:
+#   pgdata:
