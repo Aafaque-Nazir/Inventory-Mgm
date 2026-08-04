@@ -36,8 +36,9 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: .
-        push: true
-        # Yahan apna Dockerhub username change kar lena (e.g. username/inv-mgm-app:latest)
+        # SMART LOGIC: Agar Pull Request hai, toh sirf build karo (test karo). 
+        # Jab code merge ho jaye ('push'), tabhi Docker Hub par upload karo.
+        push: ${{ github.event_name != 'pull_request' }}
         tags: aafaquenazir75/inv-mgm-app:latest 
         # Caching on Github Actions to make future builds faster
         cache-from: type=registry,ref=aafaquenazir75/inv-mgm-app:buildcache
