@@ -25,6 +25,12 @@ jobs:
     - name: ⚙️ Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
+    # Ye step GitHub pe ek temporary .env.local banayega jisse Next.js build ho sake
+    - name: 📝 Create .env.local for Next.js build
+      run: |
+        echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" >> .env.local
+        echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" >> .env.local
+
     # Ye actual build aur push ka command hai
     - name: 🚀 Build and push Docker image
       uses: docker/build-push-action@v5
