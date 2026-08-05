@@ -5,6 +5,7 @@ import { Download, Crown } from 'lucide-react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import Papa from 'papaparse'
 import {
     Dialog,
     DialogContent,
@@ -65,25 +66,21 @@ export function ExportButton({ items, isPro }: ExportButtonProps) {
             return
         }
 
-        // Convert key-value pairs to CSV
-        // 1. Get headers
-        const headers = ['Name', 'SKU', 'Category', 'Unit', 'Current Stock', 'Min Stock', 'Cost Price', 'Selling Price', 'Size', 'Color', 'Created At']
-        const csvContent = [
-            headers.join(','),
-            ...filteredItems.map(item => [
-                `"${item.name}"`,
-                `"${item.sku}"`,
-                `"${item.category || ''}"`,
-                `"${item.unit}"`,
-                item.current_stock,
-                item.min_stock,
-                item.cost_price || 0,
-                item.selling_price || 0,
-                `"${item.size || ''}"`,
-                `"${item.color || ''}"`,
-                `"${item.created_at || ''}"`
-            ].join(','))
-        ].join('\n')
+        // Convert key-value pairs to CSV using PapaParse for reliable formatting
+        const csvData = filteredItems.map(item => ({
+            Name: item.name,
+            SKU: item.sku,
+            Category: item.category || '',
+            Unit: item.unit,
+            'Current Stock': item.current_stock,
+            'Min Stock': item.min_stock,
+            'Cost Price': item.cost_price || 0,
+            'Selling Price': item.selling_price || 0,
+            Size: item.size || '',
+            Color: item.color || '',
+            'Created At': item.created_at || ''
+        }))
+        const csvContent = Papa.unparse(csvData)
 
         // Create Blob and download
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
