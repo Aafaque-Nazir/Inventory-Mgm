@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="bgGlow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#0e2a1b" stop-opacity="0.9" />
+      <stop offset="60%" stop-color="#07170e" stop-opacity="1" />
+      <stop offset="100%" stop-color="#030905" stop-opacity="1" />
+    </radialGradient>
+
+    <!-- Top Isometric Face Gradient -->
+    <linearGradient id="topFace" x1="116" y1="110" x2="396" y2="276" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="50%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+
+    <!-- Left Isometric Face Gradient -->
+    <linearGradient id="leftFace" x1="116" y1="192" x2="256" y2="412" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="60%" stop-color="#047857" />
+      <stop offset="100%" stop-color="#022c22" />
+    </linearGradient>
+
+    <!-- Right Isometric Face Gradient -->
+    <linearGradient id="rightFace" x1="396" y1="192" x2="256" y2="412" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="60%" stop-color="#065f46" />
+      <stop offset="100%" stop-color="#022c22" />
+    </linearGradient>
+
+    <!-- Core Glow Filter -->
+    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Drop Shadow Filter -->
+    <filter id="shadowFilter" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#000000" flood-opacity="0.65" />
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#10b981" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <!-- Squircle Base / App Icon Frame -->
+  <rect x="24" y="24" width="464" height="464" rx="112" fill="url(#bgGlow)" stroke="#10b981" stroke-width="6" stroke-opacity="0.35" />
+
+  <!-- Inner Ambient Ring -->
+  <rect x="34" y="34" width="444" height="444" rx="102" fill="none" stroke="#34d399" stroke-width="1.5" stroke-opacity="0.2" />
+
+  <!-- Isometric 3D Inventory Cube with Drop Shadow -->
+  <g filter="url(#shadowFilter)">
+    <!-- Top Face -->
+    <path
+      d="M256 112 L400 196 L256 280 L112 196 Z"
+      fill="url(#topFace)"
+      stroke="#6ee7b7"
+      stroke-width="5"
+      stroke-linejoin="round"
+    />
+
+    <!-- Left Face -->
+    <path
+      d="M112 196 L256 280 L256 414 L112 330 Z"
+      fill="url(#leftFace)"
+      stroke="#34d399"
+      stroke-width="5"
+      stroke-linejoin="round"
+    />
+
+    <!-- Right Face -->
+    <path
+      d="M256 280 L400 196 L400 330 L256 414 Z"
+      fill="url(#rightFace)"
+      stroke="#10b981"
+      stroke-width="5"
+      stroke-linejoin="round"
+    />
+
+    <!-- Center Inventory Core Pulse Dot -->
+    <circle cx="256" cy="280" r="16" fill="#a7f3d0" filter="url(#neonGlow)" />
+    <circle cx="256" cy="280" r="8" fill="#ffffff" />
+  </g>
+</svg>
