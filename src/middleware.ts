@@ -46,6 +46,19 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/login', request.url))
     }
 
+    // Enforce super-admin role for /super-admin routes
+    if (user && path.startsWith('/super-admin')) {
+        const { data: adminProfile } = await supabase
+            .from('profiles')
+            .select('is_super_admin')
+            .eq('id', user.id)
+            .single()
+
+        if (!adminProfile?.is_super_admin) {
+            return NextResponse.redirect(new URL('/dashboard', request.url))
+        }
+    }
+
     // Redirect logged-in users away from login page
     if (user && path.startsWith('/login')) {
         // Optionally, we could check if they are super admin and redirect to /super-admin

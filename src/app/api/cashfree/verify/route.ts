@@ -26,8 +26,8 @@ export async function POST(req: NextRequest) {
         const body = await req.json()
         const { orderId } = body
 
-        if (!orderId) {
-            return NextResponse.json({ error: 'Order ID required' }, { status: 400 })
+        if (!orderId || typeof orderId !== 'string') {
+            return NextResponse.json({ error: 'Valid Order ID required' }, { status: 400 })
         }
 
         // 2. Initialize Cashfree inside handler
@@ -44,7 +44,29 @@ export async function POST(req: NextRequest) {
             ? Cashfree.Environment.PRODUCTION
             : Cashfree.Environment.SANDBOX
 
-        // 3. Verify Order Details & Customer Ownership (Prevents Order ID spoofing)
+        // 3. Admin client for privileged operations
+        const supabaseAdmin = createSupabaseAdmin(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!
+        )
+
+        // ── Idempotency Check ──────────────────────────────────────────
+        // If this order was already processed (by this endpoint or by webhook),
+        // return success without re-upgrading. Prevents replay attacks.
+        const { data: existingOrder } = await supabaseAdmin
+            .from('payment_orders')
+            .select('id, status')
+            .eq('order_id', orderId)
+            .single()
+
+        if (existingOrder?.status === 'SUCCESS') {
+            return NextResponse.json({
+                success: true,
+                message: 'Payment already verified and processed'
+            })
+        }
+
+        // 4. Verify Order Details & Customer Ownership (Prevents Order ID spoofing)
         const orderResponse = await Cashfree.PGFetchOrder('2023-08-01', orderId)
         const orderData = orderResponse.data
 
@@ -52,7 +74,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Order does not belong to this account' }, { status: 403 })
         }
 
-        // 4. Fetch Order Payments Status
+        // 5. Fetch Order Payments Status
         const response = await Cashfree.PGOrderFetchPayments('2023-08-01', orderId)
         const payments = response.data
 
@@ -63,12 +85,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Payment not successful' }, { status: 400 })
         }
 
-        // 5. Upgrade Organization using Admin Client
-        const supabaseAdmin = createSupabaseAdmin(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.SUPABASE_SERVICE_ROLE_KEY!
-        )
-
+        // 6. Upgrade Organization using Admin Client
         const startDate = new Date()
         const endDate = new Date()
         endDate.setDate(startDate.getDate() + 30) // Add 30 Days
@@ -89,6 +106,23 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Failed to update subscription' }, { status: 500 })
         }
 
+        // ── Record successful payment for idempotency ──────────────────
+        // This is the dedup key — once recorded as SUCCESS, neither this
+        // endpoint nor the webhook will re-process this order.
+        await supabaseAdmin
+            .from('payment_orders')
+            .upsert({
+                order_id: orderId,
+                organization_id: profile.organization_id,
+                user_id: user.id,
+                amount: orderData?.order_amount || 49,
+                status: 'SUCCESS',
+                cashfree_payment_id: successfulPayment.cf_payment_id?.toString() || null,
+                processed_at: new Date().toISOString(),
+                source: 'VERIFY',
+                updated_at: new Date().toISOString()
+            }, { onConflict: 'order_id' })
+
         return NextResponse.json({
             success: true,
             message: 'Subscription upgraded to PRO'
@@ -102,4 +136,3 @@ export async function POST(req: NextRequest) {
         )
     }
 }
-

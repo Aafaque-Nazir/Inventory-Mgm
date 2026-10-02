@@ -9,6 +9,15 @@ const ticketSchema = z.object({
     message: z.string().min(10),
 })
 
+function escapeHtml(str: string): string {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;')
+}
+
 export async function submitSupportTicket(prevState: any, formData: FormData) {
     const supabase = await createClient()
 
@@ -56,14 +65,14 @@ export async function submitSupportTicket(prevState: any, formData: FormData) {
                 to: 'aafaquebuisness@gmail.com',
                 subject: `New Support Ticket: ${validatedFields.data.subject}`,
                 html: `
-                    <h1>New Ticket from ${user.email}</h1>
-                    <p><strong>Type:</strong> ${validatedFields.data.type}</p>
-                    <p><strong>Subject:</strong> ${validatedFields.data.subject}</p>
+                    <h1>New Ticket from ${escapeHtml(user.email || '')}</h1>
+                    <p><strong>Type:</strong> ${escapeHtml(validatedFields.data.type)}</p>
+                    <p><strong>Subject:</strong> ${escapeHtml(validatedFields.data.subject)}</p>
                     <p><strong>Message:</strong></p>
                     <blockquote style="border-left: 4px solid #ccc; padding-left: 10px;">
-                        ${validatedFields.data.message}
+                        ${escapeHtml(validatedFields.data.message)}
                     </blockquote>
-                    <p>Organization ID: ${profile?.organization_id}</p>
+                    <p>Organization ID: ${profile?.organization_id || 'N/A'}</p>
                 `
             })
         } catch (emailError: any) {

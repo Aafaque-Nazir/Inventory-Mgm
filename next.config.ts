@@ -50,7 +50,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; font-src 'self' data:; connect-src 'self' https: wss:;"
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com https://sdk.cashfree.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; font-src 'self' data:; connect-src 'self' https: wss:; frame-ancestors 'self'; frame-src 'self' https://sdk.cashfree.com;"
           }
         ]
       }

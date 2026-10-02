@@ -71,52 +71,39 @@ export async function createInvoice(prevState: any, formData: FormData) {
         for (const item of items) {
             const { item_id, quantity } = item
 
-            // Logic similar to recordStockMovement...
-            // Fetch current stock
-            // Deduct
-            // Upsert
-
-            // NOTE: We are "recording a sale", so it IS a stock movement too.
-            // We should ideally insert into stock_movements table as well for Audit Log?
-            // YES. 
-
             // A. Insert Movement Log
             await supabase.from('stock_movements').insert({
                 item_id,
                 quantity: Number(quantity),
                 type: 'OUT',
-                reason: `Invoice #${invoice.id.slice(0, 8)}`, // Link to invoice
+                reason: `Invoice #${invoice.id.slice(0, 8)}`,
                 organization_id: profile.organization_id,
                 location_id: warehouseId,
                 unit_price: item.unit_price,
                 created_by: user.id
             })
 
-            // B. Update Stock Levels (Global + Local)
+            // B. Atomic Stock Deduction (uses DB-level row locking to prevent race conditions)
             if (warehouseId) {
-                const { data: currentStock } = await supabase
-                    .from('item_stock')
-                    .select('quantity')
-                    .eq('item_id', item_id)
-                    .eq('location_id', warehouseId)
-                    .single()
+                const { error: rpcError } = await supabase
+                    .rpc('atomic_stock_deduct', {
+                        p_item_id: item_id,
+                        p_location_id: warehouseId,
+                        p_quantity: Number(quantity)
+                    })
 
-                const newQty = (currentStock?.quantity || 0) - Number(quantity)
-
-                await supabase.from('item_stock').upsert({
-                    item_id,
-                    location_id: warehouseId,
-                    quantity: newQty,
-                    updated_at: new Date().toISOString()
-                }, { onConflict: 'item_id, location_id' })
+                if (rpcError) {
+                    console.error(`Stock deduction failed for item ${item_id}:`, rpcError.message)
+                    // Don't throw — the invoice is already created. Log the error.
+                    // In production, this should trigger a reconciliation alert.
+                }
             }
 
             // C. Global Stock (Legacy / Aggregate)
-            // Ideally we use RPC, but to ensure it works without DB migrations right now:
             const { data: globalItem } = await supabase.from('items').select('current_stock').eq('id', item_id).single()
             if (globalItem) {
                 const newGlobalStock = (globalItem.current_stock || 0) - Number(quantity)
-                await supabase.from('items').update({ current_stock: newGlobalStock }).eq('id', item_id)
+                await supabase.from('items').update({ current_stock: Math.max(0, newGlobalStock) }).eq('id', item_id)
             }
         }
 

@@ -7,7 +7,7 @@ export const runtime = 'edge' // Faster cold start, lower timeout risk
 export async function GET() {
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
     if (!supabaseUrl || !supabaseKey) {
       console.error('Keep-alive failed: Missing Supabase credentials')
@@ -17,8 +17,8 @@ export async function GET() {
       )
     }
 
-    // Use service_role key to bypass RLS — guarantees the query reaches the DB.
-    // The anon key might be blocked by RLS policies on the profiles table.
+    // Use anon key — the query still reaches the DB even if RLS filters all rows,
+    // which is all we need to prevent Supabase from pausing the project.
     const supabase = createClient(supabaseUrl, supabaseKey)
 
     const { error } = await supabase

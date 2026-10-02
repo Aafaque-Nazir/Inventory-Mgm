@@ -80,7 +80,7 @@ export async function startFreeTrial(targetOrganizationId?: string) {
 
     if (updateError) {
         console.error('Trial Start Error:', updateError)
-        return { error: `DB Error: ${updateError.message}` }
+        return { error: 'Failed to activate trial. Please try again or contact support.' }
     }
 
     revalidatePath('/')

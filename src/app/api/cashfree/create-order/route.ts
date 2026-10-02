@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Cashfree } from 'cashfree-pg'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseAdmin } from '@supabase/supabase-js'
 
 export async function POST(req: NextRequest) {
     try {
@@ -16,7 +17,7 @@ export async function POST(req: NextRequest) {
         const secretKey = process.env.CASHFREE_SECRET_KEY
 
         if (!appId || !secretKey) {
-            return NextResponse.json({ error: 'Missing Keys' }, { status: 500 })
+            return NextResponse.json({ error: 'Payment configuration missing' }, { status: 500 })
         }
 
         // Initialize v4
@@ -26,23 +27,48 @@ export async function POST(req: NextRequest) {
             ? Cashfree.Environment.PRODUCTION
             : Cashfree.Environment.SANDBOX
 
+        // ── Pre-check: Don't create orders for already-active PRO users ──
         const { data: profile } = await supabase
             .from('profiles')
-            .select('full_name, mobile')
+            .select('full_name, mobile, organization_id, organizations(plan_type, subscription_status, subscription_end_date)')
             .eq('id', user.id)
             .single()
 
-        const orderId = 'order_' + Date.now() + '_' + user.id.slice(0, 5)
+        if (!profile?.organization_id) {
+            return NextResponse.json({ error: 'No organization found' }, { status: 400 })
+        }
+
+        const org = profile.organizations as any
+        if (org?.plan_type === 'PRO' && org?.subscription_status === 'ACTIVE') {
+            const endDate = org.subscription_end_date ? new Date(org.subscription_end_date) : null
+            if (endDate && endDate > new Date()) {
+                return NextResponse.json(
+                    { error: 'You already have an active PRO subscription.' },
+                    { status: 400 }
+                )
+            }
+        }
+
+        // ── Validate phone (no fake fallback) ──────────────────────────
+        if (!profile?.mobile) {
+            return NextResponse.json(
+                { error: 'Please update your phone number in settings before purchasing.' },
+                { status: 400 }
+            )
+        }
+
+        // ── Cryptographically random order ID ──────────────────────────
+        const orderId = `order_${crypto.randomUUID()}`
 
         const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || req.nextUrl.origin).replace(/\/$/, '')
 
         const request = {
-            order_amount: 399,
+            order_amount: 49,
             order_currency: 'INR',
             order_id: orderId,
             customer_details: {
                 customer_id: user.id,
-                customer_phone: profile?.mobile || '9999999999',
+                customer_phone: profile.mobile,
                 customer_email: user.email!,
                 customer_name: profile?.full_name || 'Inventory User'
             },
@@ -53,6 +79,22 @@ export async function POST(req: NextRequest) {
 
         const response = await Cashfree.PGCreateOrder('2022-09-01', request)
         const paymentSessionId = response.data.payment_session_id
+
+        // ── Record order in payment_orders for idempotency tracking ────
+        const supabaseAdmin = createSupabaseAdmin(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!
+        )
+
+        await supabaseAdmin
+            .from('payment_orders')
+            .insert({
+                order_id: orderId,
+                organization_id: profile.organization_id,
+                user_id: user.id,
+                amount: 49,
+                status: 'CREATED'
+            })
 
         return NextResponse.json({ paymentSessionId, orderId })
 

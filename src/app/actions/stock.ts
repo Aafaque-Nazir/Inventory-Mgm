@@ -98,8 +98,7 @@ export async function recordStockMovement(
         const newQty = type === 'IN' ? currentQty + quantity : currentQty - quantity
 
         if (newQty < 0) {
-            // Optional: allow negative stock? Usually no.
-            // return { error: 'Insufficient stock in this warehouse' }
+            return { error: `Insufficient stock at this warehouse. Available: ${currentQty}, Requested: ${quantity}` }
         }
 
         const { error: stockError } = await supabase

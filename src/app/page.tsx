@@ -429,7 +429,7 @@ export default function Home() {
                                 <p className="text-sm text-slate-400 mb-6 relative z-10 h-10">For growing businesses that need power.</p>
 
                                 <div className="mb-8 relative z-10 flex items-end gap-1">
-                                    <span className="text-5xl font-black text-white">₹399</span>
+                                    <span className="text-5xl font-black text-white">₹49</span>
                                     <span className="text-sm text-blue-400/80 font-medium mb-1"> / mo</span>
                                 </div>
 
