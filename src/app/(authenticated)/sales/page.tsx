@@ -27,29 +27,29 @@ export default async function SalesPage() {
     }
 
     return (
-        <div className="space-y-8 p-2">
+        <div className="space-y-6 sm:space-y-8">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                     <h1 className="text-3xl font-bold tracking-tight text-white">Sales & Invoices</h1>
-                     <p className="text-sm text-slate-400 mt-1">Record sales, track revenue, and manage customer invoices.</p>
+                     <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">Sales & Invoices</h1>
+                     <p className="text-xs sm:text-sm text-slate-400 mt-1">Record sales, track revenue, and manage customer invoices.</p>
                 </div>
-                <div>
+                <div className="w-full sm:w-auto">
                     <RecordSaleDialog />
                 </div>
             </div>
 
-            <Card className="rounded-2xl border-white/5 bg-white/5 backdrop-blur-sm shadow-xl">
-                <CardHeader>
+            <Card className="rounded-2xl border-white/10 bg-[#111613] backdrop-blur-sm shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)]">
+                <CardHeader className="p-4 sm:p-6">
                     <div className="flex items-center gap-2">
-                        <ShoppingBag className="h-5 w-5 text-blue-400" />
-                        <CardTitle className="text-white">Recent Transactions</CardTitle>
+                        <ShoppingBag className="h-5 w-5 text-emerald-400" />
+                        <CardTitle className="text-base sm:text-lg text-white">Recent Transactions</CardTitle>
                     </div>
-                     <CardDescription className="text-slate-400">Latest 50 invoices from all channels</CardDescription>
+                     <CardDescription className="text-xs sm:text-sm text-slate-400">Latest 50 invoices from all channels</CardDescription>
                 </CardHeader>
-                <CardContent>
-                    <div className="overflow-hidden rounded-xl border border-white/5 mx-auto">
+                <CardContent className="p-4 sm:p-6 pt-0">
+                    <div className="overflow-x-auto rounded-xl border border-white/10 mx-auto">
                         <Table>
-                            <TableHeader className="bg-white/5">
+                            <TableHeader className="bg-white/[0.02]">
                                 <TableRow className="border-white/5 hover:bg-transparent">
                                     <TableHead className="text-slate-400 font-medium pl-6">Invoice #</TableHead>
                                     <TableHead className="text-slate-400 font-medium">Date</TableHead>
@@ -67,9 +67,9 @@ export default async function SalesPage() {
                                     </TableRow>
                                 )}
                                 {invoices.map((inv: any) => (
-                                    <TableRow key={inv.id} className="border-white/5 hover:bg-blue-500/5 transition-colors group">
+                                    <TableRow key={inv.id} className="border-white/5 hover:bg-emerald-500/5 transition-colors group">
                                         <TableCell className="font-mono text-sm pl-6">
-                                            <span className="text-blue-400 group-hover:text-blue-300 bg-blue-500/10 px-2 py-1 rounded-md border border-blue-500/10 transition-colors">
+                                            <span className="text-emerald-400 group-hover:text-emerald-300 bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/20 transition-colors">
                                                 #{inv.id.slice(0, 8)}
                                             </span>
                                         </TableCell>

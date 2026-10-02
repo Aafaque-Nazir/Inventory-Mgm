@@ -35,6 +35,7 @@ import { Profile } from '@/types'
 import { cn } from '@/lib/utils'
 import { WarehouseSwitcher } from '@/components/warehouses/WarehouseSwitcher'
 import { navGroups } from '@/lib/navigation'
+import { BrandLogo } from '@/components/common/BrandLogo'
 
 export function Topbar() {
     const router = useRouter()
@@ -77,18 +78,19 @@ export function Topbar() {
     }
 
     return (
-        <header className="flex h-16 items-center justify-between px-3 sm:px-6 bg-transparent">
-            <div className="flex items-center gap-2 sm:gap-4">
+        <header className="flex h-14 sm:h-16 items-center justify-between px-3 sm:px-5 bg-transparent">
+            <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-1 mr-2">
                 <Sheet open={open} onOpenChange={setOpen}>
                     <SheetTrigger asChild>
-                        <Button variant="ghost" size="icon" className="md:hidden shrink-0">
+                        <Button variant="ghost" size="icon" className="md:hidden shrink-0 h-9 w-9">
                             <Menu className="h-5 w-5" />
                             <span className="sr-only">Toggle menu</span>
                         </Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="flex flex-col w-[280px] p-0">
-                        <div className="flex h-16 items-center border-b px-6">
-                            <SheetTitle className="text-xl font-bold tracking-tight">Inventory <span className="text-primary">Management</span></SheetTitle>
+                        <div className="flex h-16 items-center border-b px-5">
+                            <BrandLogo size="md" />
+                            <SheetTitle className="sr-only">InvMaster Menu</SheetTitle>
                             <SheetDescription className="sr-only">Mobile navigation menu</SheetDescription>
                         </div>
 
@@ -124,7 +126,7 @@ export function Topbar() {
                                                     </div>
                                                     <div className="flex items-center gap-2">
                                                         {item.isPro && (
-                                                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-600 border border-indigo-500/20">
+                                                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                                                                 PRO
                                                             </span>
                                                         )}
@@ -208,8 +210,8 @@ export function Topbar() {
                         </div>
                     </SheetContent>
                 </Sheet>
-                <div className="flex items-center gap-2 sm:gap-3">
-                    <h2 className="text-lg font-semibold hidden md:block shrink-0">
+                <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
+                    <h2 className="text-lg font-semibold hidden md:block shrink-0 truncate">
                         {pathname.startsWith('/super-admin')
                             ? 'Super Admin'
                             : pathname.startsWith('/items')
@@ -232,11 +234,13 @@ export function Topbar() {
                             ? 'Help & Support'
                             : pathname.startsWith('/suppliers')
                             ? 'Suppliers'
+                            : pathname.startsWith('/pricing')
+                            ? 'Pricing & Plans'
                             : 'Dashboard'}
                     </h2>
                     {profile?.is_super_admin ? (
                         <Badge
-                            className="bg-purple-600 hover:bg-purple-700 text-[10px] px-2 h-5 font-semibold tracking-wide uppercase border-purple-500/20 hidden sm:inline-flex"
+                            className="bg-purple-600 hover:bg-purple-700 text-[10px] px-2 h-5 font-semibold tracking-wide uppercase border-purple-500/20 hidden sm:inline-flex shrink-0"
                         >
                             SUPER ADMIN
                         </Badge>
@@ -244,17 +248,17 @@ export function Topbar() {
                         <Badge
                             variant="secondary"
                             className={cn(
-                                "text-[10px] px-2 h-5 font-semibold tracking-wide uppercase hidden sm:inline-flex",
-                                profile.organization.plan_type === 'FREE' && "bg-blue-500/10 text-blue-500 border-blue-500/20",
-                                profile.organization.plan_type === 'PRO' && "bg-amber-500/10 text-amber-500 border-amber-500/20",
-                                profile.organization.plan_type === 'ENTERPRISE' && "bg-purple-500/10 text-purple-500 border-purple-500/20",
+                                "text-[10px] px-2 h-5 font-semibold tracking-wide uppercase hidden sm:inline-flex shrink-0",
+                                profile.organization.plan_type === 'FREE' && "bg-white/10 text-slate-300 border-white/20",
+                                profile.organization.plan_type === 'PRO' && "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
+                                profile.organization.plan_type === 'ENTERPRISE' && "bg-purple-500/10 text-purple-400 border-purple-500/20",
                             )}
                         >
                             {profile.organization.plan_type} PLAN
                         </Badge>
                     )}
                     {!pathname.startsWith('/super-admin') && (
-                        <div className="ml-0 sm:ml-2">
+                        <div className="ml-0 sm:ml-2 shrink-0">
                             <WarehouseSwitcher />
                         </div>
                     )}
@@ -263,10 +267,10 @@ export function Topbar() {
             <div className="flex items-center gap-2 sm:gap-4 shrink-0">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="relative h-10 w-10 rounded-full shrink-0">
-                            <Avatar className="h-10 w-10 border-2 border-primary/10 shrink-0">
+                        <Button variant="ghost" className="relative h-9 w-9 rounded-full shrink-0">
+                            <Avatar className="h-9 w-9 border-2 border-primary/10 shrink-0">
                                 <AvatarImage src="" alt={profile?.full_name || ''} />
-                                <AvatarFallback className="bg-primary/5 text-primary font-medium">
+                                <AvatarFallback className="bg-primary/5 text-primary font-medium text-xs">
                                     {profile?.full_name?.[0] || 'U'}
                                 </AvatarFallback>
                             </Avatar>

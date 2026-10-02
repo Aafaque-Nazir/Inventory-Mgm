@@ -232,8 +232,8 @@ export function RecordSaleDialog({ trigger, initialItem, open: controlledOpen, o
                     </Button>
                 )}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[800px] h-[90vh] flex flex-col p-0 gap-0">
-                <DialogHeader className="p-6 pb-2">
+            <DialogContent className="w-[calc(100%-1.5rem)] sm:max-w-[800px] h-[92vh] sm:h-[90vh] flex flex-col p-0 gap-0 overflow-hidden">
+                <DialogHeader className="p-4 sm:p-6 pb-2 sm:pb-2">
                     <DialogTitle>
                         {step === 'CART' && 'New Sale'}
                         {step === 'DETAILS' && 'Customer Details'}
@@ -242,9 +242,9 @@ export function RecordSaleDialog({ trigger, initialItem, open: controlledOpen, o
                 </DialogHeader>
 
                 {step === 'CART' && (
-                    <div className="flex flex-1 gap-4 overflow-hidden p-6 pt-0">
+                    <div className="flex flex-col md:flex-row flex-1 gap-4 overflow-y-auto md:overflow-hidden p-4 sm:p-6 pt-0 min-h-0">
                         {/* Left: Search & Items */}
-                        <div className="w-1/2 flex flex-col gap-4">
+                        <div className="w-full md:w-1/2 flex flex-col gap-3 sm:gap-4 shrink-0 md:shrink md:flex-1 h-[260px] sm:h-[300px] md:h-auto min-h-0">
                             <div className="relative">
                                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                                 <Input
@@ -255,20 +255,20 @@ export function RecordSaleDialog({ trigger, initialItem, open: controlledOpen, o
                                     autoFocus
                                 />
                             </div>
-                            <div className="flex-1 overflow-y-auto border rounded-md p-2 space-y-2">
-                                {filteredItems.length === 0 && <p className="text-center text-muted-foreground py-4">No items found</p>}
+                            <div className="flex-1 overflow-y-auto border rounded-md p-2 space-y-2 min-h-0">
+                                {filteredItems.length === 0 && <p className="text-center text-muted-foreground py-4 text-xs sm:text-sm">No items found</p>}
                                 {filteredItems.map(item => (
                                     <div key={item.id}
-                                        className="flex justify-between items-center p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer border border-transparent hover:border-slate-200"
+                                        className="flex justify-between items-center p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer border border-transparent hover:border-slate-200 gap-2"
                                         onClick={() => addToCart(item)}
                                     >
-                                        <div className="truncate">
-                                            <p className="font-medium truncate">{item.name}</p>
-                                            <p className="text-xs text-muted-foreground">Qty: {item.current_stock}</p>
+                                        <div className="truncate min-w-0 flex-1">
+                                            <p className="font-medium truncate text-xs sm:text-sm">{item.name}</p>
+                                            <p className="text-[11px] text-muted-foreground">Qty: {item.current_stock}</p>
                                         </div>
-                                        <div className="text-right">
-                                            <p className="font-bold">₹{item.selling_price}</p>
-                                            <Button size="icon" variant="ghost" className="h-6 w-6"><Plus className="h-4 w-4" /></Button>
+                                        <div className="text-right shrink-0 flex items-center gap-1.5">
+                                            <p className="font-bold text-xs sm:text-sm">₹{item.selling_price}</p>
+                                            <Button size="icon" variant="ghost" className="h-6 w-6"><Plus className="h-3.5 w-3.5" /></Button>
                                         </div>
                                     </div>
                                 ))}
@@ -276,33 +276,33 @@ export function RecordSaleDialog({ trigger, initialItem, open: controlledOpen, o
                         </div>
 
                         {/* Right: Cart */}
-                        <div className="w-1/2 flex flex-col border-l pl-4">
-                            <h3 className="font-semibold mb-2">Current Cart</h3>
-                            <div className="flex-1 overflow-y-auto space-y-3">
-                                {cart.length === 0 && <div className="h-full flex items-center justify-center text-muted-foreground text-sm">Cart is empty</div>}
+                        <div className="w-full md:w-1/2 flex flex-col border-t md:border-t-0 md:border-l pt-3 md:pt-0 md:pl-4 flex-1 md:flex-1 min-h-[220px] justify-between">
+                            <h3 className="font-semibold mb-2 text-xs sm:text-sm uppercase tracking-wider text-muted-foreground">Current Cart</h3>
+                            <div className="flex-1 overflow-y-auto space-y-2 sm:space-y-3 max-h-[160px] sm:max-h-[220px] md:max-h-none min-h-0">
+                                {cart.length === 0 && <div className="h-full flex items-center justify-center text-muted-foreground text-xs sm:text-sm py-4">Cart is empty</div>}
                                 {cart.map(item => (
-                                    <div key={item.item_id} className="flex justify-between items-start text-sm">
-                                        <div className="flex-1">
-                                            <p className="font-medium">{item.name}</p>
+                                    <div key={item.item_id} className="flex justify-between items-start text-xs sm:text-sm gap-2">
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-medium truncate">{item.name}</p>
                                             <div className="flex items-center gap-2 mt-1">
-                                                <button onClick={() => updateQty(item.item_id, item.quantity - 1)} className="px-1.5 bg-slate-200 dark:bg-slate-800 rounded">-</button>
-                                                <span>{item.quantity}</span>
-                                                <button onClick={() => updateQty(item.item_id, item.quantity + 1)} className="px-1.5 bg-slate-200 dark:bg-slate-800 rounded">+</button>
+                                                <button onClick={() => updateQty(item.item_id, item.quantity - 1)} className="px-2 py-0.5 bg-slate-200 dark:bg-slate-800 rounded text-xs">-</button>
+                                                <span className="text-xs font-semibold">{item.quantity}</span>
+                                                <button onClick={() => updateQty(item.item_id, item.quantity + 1)} className="px-2 py-0.5 bg-slate-200 dark:bg-slate-800 rounded text-xs">+</button>
                                             </div>
                                         </div>
-                                        <div className="text-right flex flex-col items-end">
+                                        <div className="text-right flex flex-col items-end shrink-0">
                                             <p className="font-bold">₹{item.total}</p>
-                                            <button onClick={() => removeFromCart(item.item_id)} className="text-red-500 text-xs mt-1"><Trash2 className="h-3 w-3" /></button>
+                                            <button onClick={() => removeFromCart(item.item_id)} className="text-red-500 text-xs mt-1 hover:text-red-400 p-0.5"><Trash2 className="h-3.5 w-3.5" /></button>
                                         </div>
                                     </div>
                                 ))}
                             </div>
-                            <div className="mt-4 pt-4 border-t">
-                                <div className="flex justify-between text-lg font-bold">
+                            <div className="mt-3 pt-3 border-t">
+                                <div className="flex justify-between text-base sm:text-lg font-bold">
                                     <span>Total</span>
                                     <span>₹{cartTotal}</span>
                                 </div>
-                                <Button className="w-full mt-4" disabled={cart.length === 0} onClick={() => setStep('DETAILS')}>
+                                <Button className="w-full mt-3 h-10 sm:h-11" disabled={cart.length === 0} onClick={() => setStep('DETAILS')}>
                                     Proceed to Checkout
                                 </Button>
                             </div>
@@ -311,16 +311,17 @@ export function RecordSaleDialog({ trigger, initialItem, open: controlledOpen, o
                 )}
 
                 {step === 'DETAILS' && (
-                    <div className="space-y-4 pt-4 p-6">
+                    <div className="space-y-4 pt-2 p-4 sm:p-6 overflow-y-auto">
                         <div className="grid gap-2">
                             <Label>Payment Method</Label>
-                            <div className="flex gap-2">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                                 {['CASH', 'UPI', 'CARD', 'OTHER'].map(m => (
                                     <Button
                                         key={m}
+                                        type="button"
                                         variant={paymentMethod === m ? 'default' : 'outline'}
                                         onClick={() => setPaymentMethod(m)}
-                                        className="flex-1"
+                                        className="w-full h-10 text-xs sm:text-sm font-semibold"
                                     >
                                         {m}
                                     </Button>
@@ -329,16 +330,16 @@ export function RecordSaleDialog({ trigger, initialItem, open: controlledOpen, o
                         </div>
                         <div className="grid gap-2">
                             <Label>Customer Name (Optional)</Label>
-                            <Input value={customerName} onChange={e => setCustomerName(e.target.value)} placeholder="e.g. Rahul Kumar" />
+                            <Input value={customerName} onChange={e => setCustomerName(e.target.value)} placeholder="e.g. Rahul Kumar" className="h-10" />
                         </div>
                         <div className="grid gap-2">
                             <Label>Phone Number (Optional)</Label>
-                            <Input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} placeholder="e.g. 9876543210" />
+                            <Input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} placeholder="e.g. 9876543210" className="h-10" />
                         </div>
 
-                        <div className="flex justify-between gap-4 mt-8 pt-4 border-t">
-                            <Button variant="outline" onClick={() => setStep('CART')}>Back</Button>
-                            <Button onClick={handleCheckout} disabled={isPending} className="flex-1 bg-green-600 hover:bg-green-700">
+                        <div className="flex flex-col sm:flex-row justify-between gap-3 mt-6 pt-4 border-t">
+                            <Button variant="outline" onClick={() => setStep('CART')} className="order-2 sm:order-1 h-10">Back</Button>
+                            <Button onClick={handleCheckout} disabled={isPending} className="flex-1 bg-green-600 hover:bg-green-700 order-1 sm:order-2 h-10 font-bold">
                                 {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 Complete Payment (₹{cartTotal})
                             </Button>
@@ -347,20 +348,19 @@ export function RecordSaleDialog({ trigger, initialItem, open: controlledOpen, o
                 )}
 
                 {step === 'SUCCESS' && (
-                    <div className="flex flex-col items-center justify-center flex-1 space-y-6 pt-4 p-6 bg-slate-50 dark:bg-slate-900 overflow-hidden">
-
+                    <div className="flex flex-col items-center justify-center flex-1 space-y-4 sm:space-y-6 pt-3 p-3 sm:p-6 bg-slate-50 dark:bg-slate-900 overflow-hidden min-h-0 w-full">
                         {/* Invoice Preview */}
-                        <div className="border rounded-lg shadow-lg bg-white overflow-y-auto w-full max-w-full flex-1">
-                            <div className="min-w-[600px] p-4">
+                        <div className="border rounded-lg shadow-lg bg-white overflow-x-auto overflow-y-auto w-full max-w-full flex-1 touch-pan-x">
+                            <div className="min-w-[500px] sm:min-w-[600px] p-2 sm:p-4">
                                 <InvoiceTemplate invoice={lastInvoiceData} />
                             </div>
                         </div>
 
-                        <div className="flex gap-4 w-full pt-4 border-t bg-white dark:bg-slate-950 p-4">
-                            <Button className="flex-1 bg-slate-900 text-white hover:bg-slate-800" onClick={() => window.print()}>
+                        <div className="flex flex-col sm:flex-row gap-3 w-full pt-3 border-t bg-white dark:bg-slate-950 p-3 sm:p-4 shrink-0">
+                            <Button className="flex-1 bg-slate-900 text-white hover:bg-slate-800 h-10" onClick={() => window.print()}>
                                 <Printer className="mr-2 h-4 w-4" /> Print Receipt
                             </Button>
-                            <Button className="flex-1" variant="outline" onClick={reset}>
+                            <Button className="flex-1 h-10" variant="outline" onClick={reset}>
                                 New Sale
                             </Button>
                         </div>

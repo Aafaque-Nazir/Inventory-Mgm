@@ -27,19 +27,19 @@ export function SummaryCard({ title, value, subtitle, icon, trend }: SummaryCard
     // Determine styles based on icon type (for aesthetic variety)
     const getStyles = () => {
         switch (icon) {
-            case 'package': return "bg-blue-500/10 text-blue-500 border-blue-200/50"
-            case 'trendingUp': return "bg-emerald-500/10 text-emerald-500 border-emerald-200/50"
-            case 'trendingDown': return "bg-rose-500/10 text-rose-500 border-rose-200/50" // Only used for "Out of Stock" etc
-            case 'alertTriangle': return "bg-amber-500/10 text-amber-500 border-amber-200/50"
-            default: return "bg-primary/10 text-primary border-primary/20"
+            case 'package': return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+            case 'trendingUp': return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+            case 'trendingDown': return "bg-rose-500/10 text-rose-400 border-rose-500/20" // Only used for "Out of Stock" etc
+            case 'alertTriangle': return "bg-amber-500/10 text-amber-400 border-amber-500/20"
+            default: return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
         }
     }
     const iconStyle = getStyles()
 
     return (
-        <div className={`overflow-hidden rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm shadow-xl p-6 hover:bg-white/10 transition-all duration-300 group`}>
+        <div className={`overflow-hidden rounded-2xl border border-white/10 bg-[#111613] backdrop-blur-sm shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] p-6 hover:border-emerald-500/30 transition-all duration-300 group`}>
             <div className="flex flex-row items-center justify-between pb-4">
-                <h3 className="text-sm font-medium text-slate-400 group-hover:text-slate-300 transition-colors">{title}</h3>
+                <h3 className="text-sm font-medium text-slate-400 group-hover:text-slate-200 transition-colors">{title}</h3>
                 <div className={`p-2.5 rounded-xl ${iconStyle} shadow-lg shadow-black/20`}>
                     <Icon className="h-4 w-4" />
                 </div>

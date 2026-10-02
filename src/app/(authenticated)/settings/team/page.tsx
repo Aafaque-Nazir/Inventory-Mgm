@@ -42,15 +42,15 @@ export default async function TeamSettingsPage() {
                 </p>
             </div>
 
-            <div className="rounded-3xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-xl">
-                <div className="p-8 border-b border-white/5 bg-white/5">
-                    <h2 className="text-xl font-semibold text-white">Team</h2>
-                    <p className="text-sm text-slate-400 mt-1">
+            <div className="rounded-2xl sm:rounded-3xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-xl">
+                <div className="p-4 sm:p-6 md:p-8 border-b border-white/5 bg-white/5">
+                    <h2 className="text-lg sm:text-xl font-semibold text-white">Team</h2>
+                    <p className="text-xs sm:text-sm text-slate-400 mt-1">
                         Manage who has access to your organization. (Pro Feature)
                     </p>
                 </div>
 
-                <div className="p-8">
+                <div className="p-4 sm:p-6 md:p-8">
                     <TeamTab
                         members={members || []}
                         invitations={invitations || []}

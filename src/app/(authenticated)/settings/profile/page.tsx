@@ -24,15 +24,15 @@ export default async function ProfileSettingsPage() {
                 </p>
             </div>
 
-            <div className="rounded-3xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-xl">
-                <div className="p-8 border-b border-white/5 bg-white/5">
-                    <h2 className="text-xl font-semibold text-white">Your Profile</h2>
-                    <p className="text-sm text-slate-400 mt-1">
+            <div className="rounded-2xl sm:rounded-3xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-xl">
+                <div className="p-4 sm:p-6 md:p-8 border-b border-white/5 bg-white/5">
+                    <h2 className="text-lg sm:text-xl font-semibold text-white">Your Profile</h2>
+                    <p className="text-xs sm:text-sm text-slate-400 mt-1">
                         This information is visible to your team.
                     </p>
                 </div>
 
-                <div className="p-8 space-y-8">
+                <div className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
                     <div className="flex flex-col md:flex-row md:items-center gap-6">
                         <Avatar className="h-24 w-24 border-4 border-white/10 shadow-xl">
                             <AvatarImage src="" />

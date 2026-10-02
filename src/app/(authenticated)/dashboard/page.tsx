@@ -61,11 +61,11 @@ export default async function DashboardPage() {
     const insights = await getAiInsights()
 
     return (
-        <div className="space-y-8 p-2 min-h-screen">
+        <div className="space-y-3.5 sm:space-y-4">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-white">Dashboard</h1>
-                    <p className="text-sm text-slate-400 mt-1">Real-time overview of your operations</p>
+                    <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white">Dashboard</h1>
+                    <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5">Overview of your inventory and sales performance</p>
                 </div>
             </div>
 
@@ -73,41 +73,41 @@ export default async function DashboardPage() {
             <AiInsightsCard insights={insights} />
 
             {/* Stats Grid */}
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-2.5 sm:gap-3.5 grid-cols-2 lg:grid-cols-4">
                 <StatCard
                     title="Total Items"
                     value={metrics?.itemsCount || 0}
-                    icon={<Package className="h-6 w-6" />}
-                    color="blue"
+                    icon={<Package className="h-4 w-4 sm:h-5 sm:w-5" />}
+                    color="emerald"
                     delay={0.1}
                 />
                 <StatCard
                     title="Stock Value"
                     value={`₹${(metrics?.totalStockValue || 0).toLocaleString()}`}
-                    icon={<DollarSign className="h-6 w-6" />}
+                    icon={<DollarSign className="h-4 w-4 sm:h-5 sm:w-5" />}
                     color="emerald"
                     delay={0.2}
                 />
                 <StatCard
                     title="Low Stock"
                     value={metrics?.lowStockCount || 0}
-                    icon={<AlertTriangle className="h-6 w-6" />}
-                    color="cyan"
+                    icon={<AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5" />}
+                    color="orange"
                     delay={0.3}
                     trend={metrics?.lowStockCount ? { value: metrics.lowStockCount, label: 'Items', positive: false } : undefined}
                 />
                 <StatCard
                     title="Recent Activity"
                     value={recentMovements?.length || 0}
-                    icon={<ArrowRightLeft className="h-6 w-6" />}
-                    color="sky"
+                    icon={<ArrowRightLeft className="h-4 w-4 sm:h-5 sm:w-5" />}
+                    color="green"
                     delay={0.4}
                     description="Movements in last 24h"
                 />
             </div>
 
             {/* Main Content Grid */}
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+            <div className="grid gap-2.5 sm:gap-3.5 grid-cols-1 lg:grid-cols-12">
                 {/* Revenue Chart */}
                 <RevenueChart data={chartData} />
                 

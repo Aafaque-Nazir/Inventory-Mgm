@@ -8,23 +8,23 @@ export const metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden">
-       <nav className="border-b border-white/5 bg-black/50 backdrop-blur-xl sticky top-0 z-50">
+    <div className="min-h-screen bg-[#070908] text-white relative overflow-hidden">
+       <nav className="border-b border-white/10 bg-[#070908]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="container mx-auto flex h-20 items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center">
-              <Box className="h-6 w-6 text-white" />
+            <div className="h-10 w-10 rounded-xl bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+              <Box className="h-6 w-6 text-[#04160c]" />
             </div>
-            <span className="text-xl font-bold">InvMaster</span>
+            <span className="text-xl font-bold tracking-tight">InvMaster</span>
           </Link>
         </div>
       </nav>
 
       <div className="container mx-auto px-6 py-20 max-w-4xl relative z-10">
-        <h1 className="text-4xl md:text-5xl font-bold mb-8 text-blue-400">Privacy Policy</h1>
+        <h1 className="text-4xl md:text-5xl font-extrabold mb-8 text-emerald-400 tracking-tight">Privacy Policy</h1>
         <p className="text-slate-400 mb-12 text-lg">Last updated: February 6, 2025</p>
 
-        <div className="prose prose-invert prose-blue max-w-none">
+        <div className="prose prose-invert prose-emerald max-w-none">
           <h2 className="text-2xl font-bold text-white mt-10 mb-4">1. Introduction</h2>
           <p className="text-slate-300 leading-relaxed">
             Welcome to InvMaster. We respect your privacy and are committed to protecting your personal data. This privacy policy will inform you as to how we look after your personal data when you visit our website or use our services.
@@ -57,14 +57,14 @@ export default function PrivacyPage() {
 
           <h2 className="text-2xl font-bold text-white mt-10 mb-4">5. Contact Us</h2>
           <p className="text-slate-300 leading-relaxed">
-            If you have any questions about this privacy policy or our privacy practices, please contact us at: <a href="mailto:support@invmaster.com" className="text-blue-400 hover:underline">support@invmaster.com</a>.
+            If you have any questions about this privacy policy or our privacy practices, please contact us at: <a href="mailto:support@invmaster.com" className="text-emerald-400 hover:underline">support@invmaster.com</a>.
           </p>
         </div>
       </div>
       
       {/* Background decoration */}
-      <div className="fixed top-[20%] right-[-10%] w-[500px] h-[500px] bg-blue-900/20 blur-[120px] rounded-full -z-10 pointer-events-none"></div>
-      <div className="fixed bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-sky-900/10 blur-[120px] rounded-full -z-10 pointer-events-none"></div>
+      <div className="fixed top-[20%] right-[-10%] w-[500px] h-[500px] bg-emerald-900/15 blur-[140px] rounded-full -z-10 pointer-events-none"></div>
+      <div className="fixed bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-emerald-950/20 blur-[140px] rounded-full -z-10 pointer-events-none"></div>
     </div>
   )
 }

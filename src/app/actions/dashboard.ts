@@ -41,27 +41,34 @@ export async function getDashboardMetrics() {
             .from('item_stock')
             .select(`
                 quantity,
-                item:items (id, min_stock, price)
+                item:items (id, min_stock, cost_price, selling_price)
             `)
             .eq('location_id', warehouseId)
         
         if (stockItems) {
             itemsCount = stockItems.length
             lowStockCount = stockItems.filter(i => i.quantity < ((i.item as any)?.min_stock || 0)).length
-            totalStockValue = stockItems.reduce((acc, curr) => acc + (curr.quantity * ((curr.item as any)?.price || 0)), 0)
+            totalStockValue = stockItems.reduce((acc, curr) => {
+                const item = curr.item as any
+                const unitPrice = item?.selling_price || item?.cost_price || 0
+                return acc + (curr.quantity * unitPrice)
+            }, 0)
         }
 
     } else {
         // Global Scope
         const { data: allItems } = await supabase
             .from('items')
-            .select('current_stock, min_stock, price')
+            .select('current_stock, min_stock, cost_price, selling_price')
             .eq('organization_id', organizationId)
         
         if (allItems) {
             itemsCount = allItems.length
             lowStockCount = allItems.filter(i => (i.current_stock || 0) < (i.min_stock || 0)).length
-             totalStockValue = allItems.reduce((acc, curr) => acc + ((curr.current_stock || 0) * (curr.price || 0)), 0)
+            totalStockValue = allItems.reduce((acc, curr) => {
+                const unitPrice = curr.selling_price || curr.cost_price || 0
+                return acc + ((curr.current_stock || 0) * unitPrice)
+            }, 0)
         }
     }
 

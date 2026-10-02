@@ -15,8 +15,8 @@ export default async function InvitePage({
 
     if (!token) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-slate-950 p-4">
-                <Card className="w-full max-w-md border-white/10 bg-slate-900 text-white">
+            <div className="flex min-h-screen items-center justify-center bg-[#070908] p-4">
+                <Card className="w-full max-w-md border-white/10 bg-[#111613] text-white shadow-2xl">
                     <CardHeader>
                         <CardTitle className="text-red-400">Invalid Link</CardTitle>
                         <CardDescription>
@@ -44,8 +44,8 @@ export default async function InvitePage({
 
     if (error || !invitation) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-slate-950 p-4">
-                <Card className="w-full max-w-md border-white/10 bg-slate-900 text-white">
+            <div className="flex min-h-screen items-center justify-center bg-[#070908] p-4">
+                <Card className="w-full max-w-md border-white/10 bg-[#111613] text-white shadow-2xl">
                     <CardHeader>
                         <CardTitle className="text-red-400">Invitation Not Found</CardTitle>
                         <CardDescription>
@@ -70,8 +70,8 @@ export default async function InvitePage({
         // We use 'callbackUrl' or similar. 
         // Or we can show a specific "Login to Accept" card.
         return (
-            <div className="flex min-h-screen items-center justify-center bg-slate-950 p-4">
-                <Card className="w-full max-w-md border-white/10 bg-slate-900 text-white">
+            <div className="flex min-h-screen items-center justify-center bg-[#070908] p-4">
+                <Card className="w-full max-w-md border-white/10 bg-[#111613] text-white shadow-2xl">
                     <CardHeader>
                         <CardTitle>Join {invitation.organization.name}</CardTitle>
                         <CardDescription>
@@ -82,12 +82,12 @@ export default async function InvitePage({
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <Link href={`/login?next=/invite/accept?token=${token}`}>
-                            <Button className="w-full bg-indigo-600 hover:bg-indigo-700">
+                            <Button className="w-full bg-emerald-500 hover:bg-emerald-400 text-[#04160c] font-bold">
                                 Sign In to Accept
                             </Button>
                         </Link>
                         <div className="text-center text-sm text-slate-500">
-                            Don&apos;t have an account? <Link href={`/signup?next=/invite/accept?token=${token}`} className="text-indigo-400 hover:underline">Sign Up</Link>
+                            Don&apos;t have an account? <Link href={`/signup?next=/invite/accept?token=${token}`} className="text-emerald-400 hover:text-emerald-300 hover:underline">Sign Up</Link>
                         </div>
                     </CardContent>
                 </Card>
@@ -98,8 +98,8 @@ export default async function InvitePage({
     // 3. Check if email matches (Optional security step, but good for UX)
     if (user.email !== invitation.email) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-slate-950 p-4">
-                <Card className="w-full max-w-md border-white/10 bg-slate-900 text-white">
+            <div className="flex min-h-screen items-center justify-center bg-[#070908] p-4">
+                <Card className="w-full max-w-md border-white/10 bg-[#111613] text-white shadow-2xl">
                     <CardHeader>
                         <CardTitle className="text-yellow-400">Email Mismatch</CardTitle>
                         <CardDescription>
@@ -122,8 +122,8 @@ export default async function InvitePage({
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-slate-950 p-4">
-            <Card className="w-full max-w-md border-white/10 bg-slate-900 text-white">
+        <div className="flex min-h-screen items-center justify-center bg-[#070908] p-4">
+            <Card className="w-full max-w-md border-white/10 bg-[#111613] text-white shadow-2xl">
                 <CardHeader>
                     <CardTitle>Welcome to {invitation.organization.name}</CardTitle>
                     <CardDescription>
@@ -133,7 +133,7 @@ export default async function InvitePage({
                 <CardContent>
                     <form action={acceptInvitation}>
                         <input type="hidden" name="token" value={token} />
-                        <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">
+                        <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-400 text-[#04160c] font-bold">
                             Accept Invitation
                         </Button>
                     </form>

@@ -15,12 +15,12 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'
 
 export function StockDistributionChart({ data }: StockDistributionChartProps) {
     return (
-        <div className="col-span-1 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-xl p-6">
-            <div className="mb-6">
-                <h3 className="text-lg font-semibold text-white/90">Stock Distribution</h3>
-                <p className="text-sm text-slate-400">By Category</p>
+        <div className="col-span-1 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-xl p-4 sm:p-6">
+            <div className="mb-4 sm:mb-6">
+                <h3 className="text-base sm:text-lg font-semibold text-white/90">Stock Distribution</h3>
+                <p className="text-xs sm:text-sm text-slate-400">By Category</p>
             </div>
-            <div className="h-[300px]">
+            <div className="h-[240px] sm:h-[300px]">
                 <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                     <PieChart>
                         <Pie

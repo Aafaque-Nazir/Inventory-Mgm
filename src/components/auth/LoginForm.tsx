@@ -72,9 +72,9 @@ export function LoginForm() {
             <form onSubmit={handleSubmit}>
                 <div className="grid gap-4">
                     <div className="grid gap-2 group">
-                        <Label htmlFor="email" className="text-slate-400 text-xs font-semibold uppercase tracking-wider group-focus-within:text-white transition-colors">Email</Label>
+                        <Label htmlFor="email" className="text-slate-400 text-xs font-semibold uppercase tracking-wider group-focus-within:text-emerald-400 transition-colors">Email</Label>
                         <div className="relative">
-                            <Mail className="absolute left-3.5 top-3.5 h-5 w-5 text-slate-500 group-focus-within:text-white transition-colors" />
+                            <Mail className="absolute left-3.5 top-3.5 h-5 w-5 text-slate-500 group-focus-within:text-emerald-400 transition-colors" />
                             <Input
                                 id="email"
                                 type="email"
@@ -82,28 +82,28 @@ export function LoginForm() {
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="pl-11 h-14 bg-black/50 border-white/5 text-white placeholder:text-slate-600 focus:bg-black focus:border-white/20 focus:ring-1 focus:ring-white/20 transition-all rounded-xl"
+                                className="pl-11 h-14 bg-black/40 border-white/10 text-white placeholder:text-slate-600 focus:bg-black/60 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all rounded-xl"
                             />
                         </div>
                     </div>
                     <div className="grid gap-2 group">
                         <div className="flex items-center justify-between">
-                            <Label htmlFor="password" className="text-slate-400 text-xs font-semibold uppercase tracking-wider group-focus-within:text-white transition-colors">Password</Label>
+                            <Label htmlFor="password" className="text-slate-400 text-xs font-semibold uppercase tracking-wider group-focus-within:text-emerald-400 transition-colors">Password</Label>
                         </div>
                         <div className="relative">
-                            <Lock className="absolute left-3.5 top-3.5 h-5 w-5 text-slate-500 group-focus-within:text-white transition-colors" />
+                            <Lock className="absolute left-3.5 top-3.5 h-5 w-5 text-slate-500 group-focus-within:text-emerald-400 transition-colors" />
                             <Input
                                 id="password"
                                 type="password"
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="pl-11 h-14 bg-black/50 border-white/5 text-white placeholder:text-slate-600 focus:bg-black focus:border-white/20 focus:ring-1 focus:ring-white/20 transition-all rounded-xl"
+                                className="pl-11 h-14 bg-black/40 border-white/10 text-white placeholder:text-slate-600 focus:bg-black/60 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all rounded-xl"
                             />
                         </div>
                     </div>
                     <Button
-                        className="w-full h-14 bg-white hover:bg-slate-200 text-black font-bold shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all duration-300 rounded-xl"
+                        className="w-full h-14 bg-emerald-500 hover:bg-emerald-400 text-[#04160c] font-bold shadow-[0_0_25px_rgba(16,185,129,0.3)] transition-all duration-300 rounded-xl hover:scale-[1.01] active:scale-[0.99]"
                         type="submit"
                         disabled={loading}
                     >
@@ -121,7 +121,7 @@ export function LoginForm() {
             <div className="text-center">
                 <p className="text-sm text-slate-400">
                     Don&apos;t have an account?{" "}
-                    <Link href="/signup" className="font-semibold text-blue-400 hover:text-blue-300 transition-colors hover:underline underline-offset-4">
+                    <Link href="/signup" className="font-semibold text-emerald-400 hover:text-emerald-300 transition-colors hover:underline underline-offset-4">
                         Create an account
                     </Link>
                 </p>

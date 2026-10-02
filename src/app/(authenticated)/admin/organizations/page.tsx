@@ -28,7 +28,7 @@ export default async function AdminOrganizationsPage() {
             <h1 className="text-3xl font-bold tracking-tight">All Organizations</h1>
             <p className="text-muted-foreground">Manage all tenant organizations.</p>
 
-            <div className="border rounded-md">
+            <div className="border border-white/10 rounded-xl overflow-x-auto bg-slate-900/30">
                 <Table>
                     <TableHeader>
                         <TableRow>

@@ -231,7 +231,7 @@ export default async function ReportsPage() {
             </div>
 
             {/* KPI Summary Cards - Always Visible */}
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                 <SummaryCard title="Total Items" value={totalItems} icon="package" />
                 <SummaryCard title="Inventory Value" value={formatCurrency(totalValuation)} icon="trendingUp" />
                 <ProLock isPro={isPro} title="Profit Est." className="h-full">
@@ -243,12 +243,12 @@ export default async function ReportsPage() {
             {/* Financial Performance Section - PRO ONLY */}
             <ProLock isPro={isPro} title="Financial Analytics" description="Unlock detailed revenue and profit analysis.">
                 <div className="space-y-4">
-                    <div className="flex items-center justify-between pt-4">
-                        <h2 className="text-xl font-bold tracking-tight">Financial Performance (Last 30 Days)</h2>
-                        <span className="text-xs text-muted-foreground bg-slate-100 px-2 py-1 rounded">Realized</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-4">
+                        <h2 className="text-lg sm:text-xl font-bold tracking-tight">Financial Performance (Last 30 Days)</h2>
+                        <span className="text-xs text-muted-foreground bg-white/5 border border-white/10 px-2 py-1 rounded w-fit">Realized</span>
                     </div>
 
-                    <div className="grid gap-4 md:grid-cols-3">
+                    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
                         <SummaryCard
                             title="Total Sales (Revenue)"
                             value={formatCurrency(totalSalesRealized)}
@@ -270,18 +270,18 @@ export default async function ReportsPage() {
             </ProLock>
 
             {/* Charts Row - FREE */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 lg:grid-cols-3">
                 <StockDistributionChart data={distributionData} />
                 <MovementTrendChart data={trendData} />
             </div>
 
             {/* Tables Row */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 lg:grid-cols-3">
                 {/* Free: Low Stock */}
                 <LowStockTable items={lowStockData} />
 
                 {/* Free: Top Items */}
-                <div className="md:col-span-2 grid gap-4 grid-cols-1 md:grid-cols-2">
+                <div className="lg:col-span-2 grid gap-4 grid-cols-1 md:grid-cols-2">
                     <TopItemsTable title="Top 5 Stock In (7 Days)" items={topInItems} type="in" />
                     <TopItemsTable title="Top 5 Stock Out (7 Days)" items={topOutItems} type="out" />
                 </div>

@@ -62,23 +62,23 @@ export function TrialOfferDialog({ open, onOpenChange, organizationId, trialUsed
                 </div>
             )}
 
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-md bg-[#111613] border border-white/10 text-white rounded-3xl p-6 sm:p-7 shadow-2xl">
                 <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2 text-2xl font-bold text-primary">
-                        <Sparkles className="h-6 w-6 text-yellow-500" />
+                    <DialogTitle className="flex items-center gap-2 text-2xl font-bold text-white tracking-tight">
+                        <Sparkles className="h-6 w-6 text-emerald-400" />
                         Unlock Inventory Pro
                     </DialogTitle>
-                    <DialogDescription className="text-base pt-2">
-                        Experience the full power of our platform with a <strong>5-Day Free Trial</strong>. No credit card required.
+                    <DialogDescription className="text-base pt-2 text-slate-400">
+                        Experience the full power of our platform with a <strong className="text-white">5-Day Free Trial</strong>. No credit card required.
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-1 gap-3">
-                        <FeatureRow icon={<BarChart3 className="text-blue-500" />} text="Advanced Financial Analytics & KPIs" />
-                        <FeatureRow icon={<ScanBarcode className="text-purple-500" />} text="Barcode Scanning App for Mobile" />
-                        <FeatureRow icon={<ShieldCheck className="text-green-500" />} text="Security Audit Logs & Tracking" />
-                        <FeatureRow icon={<Rocket className="text-orange-500" />} text="AI Stock Predictions & Insights" />
+                        <FeatureRow icon={<BarChart3 className="text-emerald-400" />} text="Advanced Financial Analytics & KPIs" />
+                        <FeatureRow icon={<ScanBarcode className="text-teal-400" />} text="Barcode Scanning App for Mobile" />
+                        <FeatureRow icon={<ShieldCheck className="text-emerald-400" />} text="Security Audit Logs & Tracking" />
+                        <FeatureRow icon={<Rocket className="text-emerald-300" />} text="AI Stock Predictions & Insights" />
                     </div>
                 </div>
 
@@ -86,11 +86,11 @@ export function TrialOfferDialog({ open, onOpenChange, organizationId, trialUsed
                     <Button
                         onClick={handleStartTrial}
                         disabled={loading}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg py-6 shadow-lg shadow-blue-500/20"
+                        className="w-full bg-emerald-500 hover:bg-emerald-400 text-[#04160c] font-bold text-base py-6 rounded-xl shadow-lg shadow-emerald-500/25 transition-all"
                     >
                         {loading ? 'Activating...' : 'Start My 5-Day Free Trial'}
                     </Button>
-                    <p className="text-xs text-center text-muted-foreground mt-2">
+                    <p className="text-xs text-center text-slate-500 mt-2">
                         Trial automatically ends after 5 days. You won&apos;t be charged.
                     </p>
                 </DialogFooter>
@@ -101,12 +101,12 @@ export function TrialOfferDialog({ open, onOpenChange, organizationId, trialUsed
 
 function FeatureRow({ icon, text }: { icon: React.ReactNode, text: string }) {
     return (
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border hover:bg-muted/80 transition-colors">
-            <div className="h-8 w-8 rounded-full bg-background flex items-center justify-center p-1.5 shadow-sm">
+        <div className="flex items-center gap-3 p-3.5 rounded-xl bg-black/40 border border-white/10 hover:border-emerald-500/30 transition-colors">
+            <div className="h-9 w-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center p-1.5 shadow-inner">
                 {icon}
             </div>
-            <span className="font-medium text-sm">{text}</span>
-            <Check className="h-4 w-4 ml-auto text-green-500" />
+            <span className="font-medium text-sm text-slate-200">{text}</span>
+            <Check className="h-4 w-4 ml-auto text-emerald-400" />
         </div>
     )
 }

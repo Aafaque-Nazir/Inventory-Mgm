@@ -78,18 +78,18 @@ export function ItemsTable({ items }: ItemsTableProps) {
                         placeholder="Search items..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-slate-500 hover:bg-white/10 focus:border-blue-500/50 focus:ring-blue-500/20 transition-all rounded-xl h-11"
+                        className="pl-10 bg-black/50 border-white/10 text-white placeholder:text-slate-500 hover:bg-black/60 focus:border-emerald-500/50 focus:ring-emerald-500/20 transition-all rounded-xl h-11"
                     />
-                    <ScanBarcode className="absolute left-3 top-3 h-5 w-5 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
+                    <ScanBarcode className="absolute left-3 top-3 h-5 w-5 text-slate-500 group-focus-within:text-emerald-400 transition-colors" />
                  </div>
                  <div className="text-sm text-slate-400">
                      Showing <span className="font-bold text-white">{filteredItems.length}</span> items
                  </div>
             </div>
 
-            <div className="rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-2xl">
+            <div className="rounded-2xl border border-white/10 bg-[#111613] backdrop-blur-sm overflow-x-auto shadow-2xl">
                 <Table>
-                    <TableHeader className="bg-white/5">
+                    <TableHeader className="bg-white/[0.02]">
                         <TableRow className="border-white/5 hover:bg-transparent">
                             <TableHead className="text-slate-400 font-medium pl-6">Name</TableHead>
                             <TableHead className="hidden md:table-cell text-slate-400 font-medium">SKU</TableHead>
@@ -111,7 +111,7 @@ export function ItemsTable({ items }: ItemsTableProps) {
                              </TableRow>
                         )}
                         {filteredItems.map((item, _index) => (
-                            <TableRow key={item.id} className="border-white/5 hover:bg-blue-500/5 transition-all duration-200 group">
+                            <TableRow key={item.id} className="border-white/5 hover:bg-emerald-500/5 transition-all duration-200 group">
                                 <TableCell className="font-medium pl-6">
                                     <div className="flex flex-col">
                                         <span className="text-slate-200 group-hover:text-white transition-colors font-semibold">{item.name}</span>
@@ -121,7 +121,7 @@ export function ItemsTable({ items }: ItemsTableProps) {
                                 <TableCell className="hidden md:table-cell text-slate-400 group-hover:text-slate-300 font-mono text-xs">{item.sku}</TableCell>
                                 <TableCell className="hidden md:table-cell text-slate-400 group-hover:text-slate-300">
                                     {item.category ? (
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/10 group-hover:border-blue-500/30 transition-colors">
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 group-hover:border-emerald-500/40 transition-colors">
                                             {item.category}
                                         </span>
                                     ) : (
@@ -142,36 +142,36 @@ export function ItemsTable({ items }: ItemsTableProps) {
                                 <TableCell>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-blue-500/20 text-slate-400 hover:text-blue-400 rounded-lg transition-colors">
+                                            <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-emerald-500/20 text-slate-400 hover:text-emerald-400 rounded-lg transition-colors">
                                                 <MoreHorizontal className="h-4 w-4" />
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" className="bg-slate-900 border-white/10 text-slate-200">
+                                        <DropdownMenuContent align="end" className="bg-[#0d1410] border-white/10 text-slate-200">
                                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                             <DropdownMenuSeparator className="bg-white/10" />
-                                            <DropdownMenuItem asChild className="focus:bg-blue-600 focus:text-white cursor-pointer transition-colors">
+                                            <DropdownMenuItem asChild className="focus:bg-emerald-500/20 focus:text-emerald-400 cursor-pointer transition-colors">
                                                 <Link href={`/items/${item.id}`} className="flex items-center gap-2">
                                                     <Eye className="h-4 w-4" />
                                                     View Details
                                                 </Link>
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => setEditItem(item)} className="flex items-center gap-2 focus:bg-blue-600 focus:text-white cursor-pointer transition-colors">
+                                            <DropdownMenuItem onClick={() => setEditItem(item)} className="flex items-center gap-2 focus:bg-emerald-500/20 focus:text-emerald-400 cursor-pointer transition-colors">
                                                 <Edit className="h-4 w-4" />
                                                 Edit Item
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator className="bg-white/10" />
-                                            <DropdownMenuItem onClick={() => { setQuickStockItem(item); setQuickStockType('IN'); }} className="flex items-center gap-2 focus:bg-emerald-600 focus:text-white cursor-pointer text-emerald-400 focus:text-white">
+                                            <DropdownMenuItem onClick={() => { setQuickStockItem(item); setQuickStockType('IN'); }} className="flex items-center gap-2 focus:bg-emerald-500/20 focus:text-emerald-400 cursor-pointer text-emerald-400">
                                                 <TrendingUp className="h-4 w-4" />
                                                 Add Stock
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => { setQuickStockItem(item); setQuickStockType('OUT'); }} className="flex items-center gap-2 focus:bg-orange-600 focus:text-white cursor-pointer text-orange-400 focus:text-white">
+                                            <DropdownMenuItem onClick={() => { setQuickStockItem(item); setQuickStockType('OUT'); }} className="flex items-center gap-2 focus:bg-orange-600/20 focus:text-orange-400 cursor-pointer text-orange-400">
                                                 <TrendingDown className="h-4 w-4" />
                                                 Remove Stock
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator className="bg-white/10" />
                                             <DropdownMenuItem
                                                 onClick={() => setDeleteId(item.id)}
-                                                className="flex items-center gap-2 text-red-400 focus:bg-red-600 focus:text-white cursor-pointer"
+                                                className="flex items-center gap-2 text-red-400 focus:bg-red-600/20 focus:text-red-400 cursor-pointer"
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                                 Delete

@@ -145,7 +145,7 @@ export function CreatePurchaseOrderDialog({ warehouseId }: { warehouseId?: strin
                     <Plus className="mr-2 h-4 w-4" /> Create Order
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+            <DialogContent className="w-[calc(100%-1.5rem)] sm:max-w-[700px] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
                 <DialogHeader>
                     <DialogTitle>Create Purchase Order</DialogTitle>
                     <DialogDescription>
@@ -179,7 +179,7 @@ export function CreatePurchaseOrderDialog({ warehouseId }: { warehouseId?: strin
                             )}
                         />
 
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                             <div className="flex items-center justify-between">
                                 <FormLabel>Items</FormLabel>
                                 <Button
@@ -193,9 +193,9 @@ export function CreatePurchaseOrderDialog({ warehouseId }: { warehouseId?: strin
                             </div>
 
                             {fields.map((field, index) => (
-                                <Card key={field.id} className="p-4">
-                                    <div className="grid grid-cols-12 gap-4">
-                                        <div className="col-span-5">
+                                <Card key={field.id} className="p-3 sm:p-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-4 items-end">
+                                        <div className="sm:col-span-5">
                                             <FormField
                                                 control={form.control}
                                                 name={`items.${index}.item_id`}
@@ -221,43 +221,46 @@ export function CreatePurchaseOrderDialog({ warehouseId }: { warehouseId?: strin
                                                 )}
                                             />
                                         </div>
-                                        <div className="col-span-3">
-                                            <FormField
-                                                control={form.control}
-                                                name={`items.${index}.quantity`}
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Qty</FormLabel>
-                                                        <FormControl>
-                                                            <Input type="number" step="0.01" {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
+                                        <div className="grid grid-cols-2 sm:col-span-6 gap-2 sm:gap-4">
+                                            <div className="col-span-1">
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`items.${index}.quantity`}
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Qty</FormLabel>
+                                                            <FormControl>
+                                                                <Input type="number" step="0.01" {...field} />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                            <div className="col-span-1">
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`items.${index}.price`}
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Price (₹)</FormLabel>
+                                                            <FormControl>
+                                                                <Input type="number" step="0.01" {...field} />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
                                         </div>
-                                        <div className="col-span-3">
-                                            <FormField
-                                                control={form.control}
-                                                name={`items.${index}.price`}
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Price</FormLabel>
-                                                        <FormControl>
-                                                            <Input type="number" step="0.01" {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-                                        <div className="col-span-1 flex items-end">
+                                        <div className="sm:col-span-1 flex justify-end sm:justify-center">
                                             {fields.length > 1 && (
                                                 <Button
                                                     type="button"
                                                     variant="ghost"
                                                     size="icon"
                                                     onClick={() => remove(index)}
+                                                    className="text-red-500 hover:text-red-400 hover:bg-red-500/10 h-9 w-9 rounded-lg"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>

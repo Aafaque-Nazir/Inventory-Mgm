@@ -100,28 +100,28 @@ export function StockScanner({ isPro = false }: StockScannerProps) {
                     <div className="grid grid-cols-2 gap-4 py-4">
                         <Button
                             variant="outline"
-                            className="h-24 flex flex-col gap-2 hover:bg-slate-100 border-2"
+                            className="h-24 flex flex-col gap-2 hover:bg-emerald-500/10 border hover:border-emerald-500/30"
                             onClick={() => {
                                 setShowActionDialog(false)
                                 setShowStockDialog(true)
                             }}
                         >
-                            <ScanBarcode className="h-8 w-8 text-blue-500" />
-                            <span className="font-semibold">Update Stock</span>
-                            <span className="text-xs text-muted-foreground">Adjust Count (In/Out)</span>
+                            <ScanBarcode className="h-8 w-8 text-emerald-400" />
+                            <span className="font-semibold text-white">Update Stock</span>
+                            <span className="text-xs text-slate-400">Adjust Count (In/Out)</span>
                         </Button>
 
                         <Button
                             variant="outline"
-                            className="h-24 flex flex-col gap-2 hover:bg-green-50 border-2 hover:border-green-500"
+                            className="h-24 flex flex-col gap-2 hover:bg-emerald-500/10 border hover:border-emerald-500/30"
                             onClick={() => {
                                 setShowActionDialog(false)
                                 setShowSaleDialog(true) // Trigger RecordSaleDialog
                             }}
                         >
-                            <Crown className="h-8 w-8 text-green-600" />
-                            <span className="font-semibold text-green-700">Sell Item</span>
-                            <span className="text-xs text-muted-foreground">Create Invoice & Profit</span>
+                            <Crown className="h-8 w-8 text-emerald-400" />
+                            <span className="font-semibold text-emerald-400">Sell Item</span>
+                            <span className="text-xs text-slate-400">Create Invoice & Profit</span>
                         </Button>
                     </div>
                 </DialogContent>

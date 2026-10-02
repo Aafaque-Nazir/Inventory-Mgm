@@ -48,41 +48,67 @@ export default async function AuditLogsPage() {
             </div>
 
             <ProLock isPro={isPro || isSuperAdmin} title="Audit Logs" description="Upgrade to Pro to view detailed security logs.">
-                <div className="rounded-3xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-xl">
-                    {/* Header */}
-                    <div className="grid grid-cols-12 gap-4 p-4 border-b border-white/5 bg-white/5 text-xs uppercase font-semibold text-slate-400">
-                        <div className="col-span-2">Date</div>
-                        <div className="col-span-2">Action</div>
-                        <div className="col-span-3">User</div>
-                        <div className="col-span-2">Entity</div>
-                        <div className="col-span-3">Details</div>
+                <div className="rounded-2xl sm:rounded-3xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-xl">
+                    {/* Desktop Header */}
+                    <div className="hidden sm:grid sm:grid-cols-12 gap-4 p-4 border-b border-white/5 bg-white/5 text-xs uppercase font-semibold text-slate-400">
+                        <div className="sm:col-span-2">Date</div>
+                        <div className="sm:col-span-2">Action</div>
+                        <div className="sm:col-span-3">User</div>
+                        <div className="sm:col-span-2">Entity</div>
+                        <div className="sm:col-span-3">Details</div>
                     </div>
 
                     <div className="divide-y divide-white/5">
                         {logs && logs.length > 0 ? (
                             logs.map((log) => (
-                                <div key={log.id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-white/5 transition-colors">
-                                    <div className="col-span-2 font-medium text-slate-300">
-                                        {format(new Date(log.created_at), 'MMM d, HH:mm')}
-                                    </div>
-                                    <div className="col-span-2">
-                                        <Badge variant="outline" className="border-white/10 text-slate-300 bg-white/5">
-                                            {log.action}
-                                        </Badge>
-                                    </div>
-                                    <div className="col-span-3">
+                                <div key={log.id} className="hover:bg-white/5 transition-colors">
+                                    {/* Mobile Card Layout */}
+                                    <div className="sm:hidden p-4 space-y-2">
+                                        <div className="flex items-center justify-between gap-2">
+                                            <Badge variant="outline" className="border-white/10 text-slate-300 bg-white/5 text-xs">
+                                                {log.action}
+                                            </Badge>
+                                            <span className="text-xs text-slate-400 font-medium">
+                                                {format(new Date(log.created_at), 'MMM d, HH:mm')}
+                                            </span>
+                                        </div>
                                         <div className="text-sm text-white font-medium">
-                                            {log.profile?.full_name || 'Unknown'}
+                                            {log.profile?.full_name || 'Unknown'} <span className="text-xs text-slate-500">({log.actor_id?.slice(0, 8)}...)</span>
                                         </div>
-                                        <div className="text-xs text-slate-500 truncate">
-                                            ID: {log.actor_id?.slice(0, 8)}...
+                                        <div className="text-xs text-slate-300">
+                                            <span className="text-slate-500">Target:</span> {log.entity_type} {log.entity_id ? `(${log.entity_id.slice(0, 8)}...)` : ''}
                                         </div>
+                                        {formatDetails(log.details) !== '-' && (
+                                            <div className="text-xs text-slate-400 bg-black/20 p-2 rounded-lg font-mono break-all">
+                                                {formatDetails(log.details)}
+                                            </div>
+                                        )}
                                     </div>
-                                    <div className="col-span-2 text-sm text-slate-300">
-                                        {log.entity_type} {log.entity_id ? `(${log.entity_id.slice(0, 8)}...)` : ''}
-                                    </div>
-                                    <div className="col-span-3 text-sm text-slate-400 truncate" title={JSON.stringify(log.details, null, 2)}>
-                                        {formatDetails(log.details)}
+
+                                    {/* Tablet/Desktop Grid Layout */}
+                                    <div className="hidden sm:grid sm:grid-cols-12 gap-4 p-4 items-center">
+                                        <div className="sm:col-span-2 font-medium text-slate-300 text-xs md:text-sm">
+                                            {format(new Date(log.created_at), 'MMM d, HH:mm')}
+                                        </div>
+                                        <div className="sm:col-span-2">
+                                            <Badge variant="outline" className="border-white/10 text-slate-300 bg-white/5">
+                                                {log.action}
+                                            </Badge>
+                                        </div>
+                                        <div className="sm:col-span-3 min-w-0">
+                                            <div className="text-sm text-white font-medium truncate">
+                                                {log.profile?.full_name || 'Unknown'}
+                                            </div>
+                                            <div className="text-xs text-slate-500 truncate">
+                                                ID: {log.actor_id?.slice(0, 8)}...
+                                            </div>
+                                        </div>
+                                        <div className="sm:col-span-2 text-xs md:text-sm text-slate-300 truncate">
+                                            {log.entity_type} {log.entity_id ? `(${log.entity_id.slice(0, 8)}...)` : ''}
+                                        </div>
+                                        <div className="sm:col-span-3 text-xs text-slate-400 truncate" title={JSON.stringify(log.details, null, 2)}>
+                                            {formatDetails(log.details)}
+                                        </div>
                                     </div>
                                 </div>
                             ))

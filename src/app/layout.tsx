@@ -1,6 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { LenisProvider } from "@/components/lenis-provider";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { AnnouncementBanner } from "@/components/layout/AnnouncementBanner";
@@ -16,6 +15,13 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#050505",
+};
 
 export const metadata: Metadata = {
   title: {
@@ -73,13 +79,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <LenisProvider>
-          <AnnouncementBanner />
-          {children}
-          <Toaster />
-          <Analytics />
-          <SpeedInsights />
-        </LenisProvider>
+        <AnnouncementBanner />
+        {children}
+        <Toaster />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

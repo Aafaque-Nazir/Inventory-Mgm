@@ -126,7 +126,7 @@ export function ScanItemButton({ isPro = false }: ScanItemButtonProps) {
                     }
                     setIsScanning(true)
                 }}
-                className="gap-2 bg-blue-600 hover:bg-blue-700 text-white relative group overflow-visible"
+                className="gap-2 bg-emerald-500 hover:bg-emerald-400 text-[#04160c] font-bold shadow-lg shadow-emerald-500/20 relative group overflow-visible"
             >
                 {!isPro && (
                     <div className="absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow-sm border border-yellow-500/20">

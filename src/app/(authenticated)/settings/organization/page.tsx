@@ -28,15 +28,15 @@ export default async function OrganizationSettingsPage() {
                 </p>
             </div>
 
-            <div className="rounded-3xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-xl">
-                <div className="p-8 border-b border-white/5 bg-white/5">
-                    <h2 className="text-xl font-semibold text-white">Organization Details</h2>
-                    <p className="text-sm text-slate-400 mt-1">
+            <div className="rounded-2xl sm:rounded-3xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-xl">
+                <div className="p-4 sm:p-6 md:p-8 border-b border-white/5 bg-white/5">
+                    <h2 className="text-lg sm:text-xl font-semibold text-white">Organization Details</h2>
+                    <p className="text-xs sm:text-sm text-slate-400 mt-1">
                         View and manage your organization&apos;s information.
                     </p>
                 </div>
 
-                <div className="p-8 space-y-6">
+                <div className="p-4 sm:p-6 md:p-8 space-y-6">
                     <div className="grid gap-8 md:grid-cols-2">
                         <div className="space-y-2">
                             <span className="text-sm font-medium text-slate-400">Organization Name</span>

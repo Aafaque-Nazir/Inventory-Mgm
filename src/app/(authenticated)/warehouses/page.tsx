@@ -30,11 +30,11 @@ export default async function WarehousesPage() {
     const isPro = org.plan_type === 'PRO' || org.plan_type === 'ENTERPRISE'
 
     return (
-        <div className="flex-1 space-y-8 p-2">
+        <div className="flex-1 space-y-6 sm:space-y-8">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-white/90">Warehouses</h1>
-                    <p className="text-sm text-slate-400">Manage your inventory locations.</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white/90">Warehouses</h1>
+                    <p className="text-xs sm:text-sm text-slate-400">Manage your inventory locations.</p>
                 </div>
             </div>
 

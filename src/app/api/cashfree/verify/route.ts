@@ -19,7 +19,19 @@ export async function POST(req: NextRequest) {
             .eq('id', user.id)
             .single()
 
-        if (!profile?.organization_id) {
+        let orgId = profile?.organization_id
+        if (!orgId) {
+            const { data: userOrg } = await supabase
+                .from('organizations')
+                .select('id')
+                .eq('created_by', user.id)
+                .maybeSingle()
+            if (userOrg?.id) {
+                orgId = userOrg.id
+            }
+        }
+
+        if (!orgId) {
             return NextResponse.json({ error: 'No organization found' }, { status: 400 })
         }
 
@@ -99,7 +111,7 @@ export async function POST(req: NextRequest) {
                 subscription_end_date: endDate.toISOString(),
                 max_users: 5
             })
-            .eq('id', profile.organization_id)
+            .eq('id', orgId)
 
         if (updateError) {
             console.error('DB Update Error:', updateError)
@@ -113,7 +125,7 @@ export async function POST(req: NextRequest) {
             .from('payment_orders')
             .upsert({
                 order_id: orderId,
-                organization_id: profile.organization_id,
+                organization_id: orgId,
                 user_id: user.id,
                 amount: orderData?.order_amount || 49,
                 status: 'SUCCESS',

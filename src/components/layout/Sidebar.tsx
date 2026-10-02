@@ -10,7 +10,6 @@ import {
     Settings,
     Crown,
     Sparkles,
-    Store,
     ChevronLeft,
     ChevronRight,
     LogOut,
@@ -18,6 +17,7 @@ import {
 } from 'lucide-react'
 import { differenceInDays } from 'date-fns'
 import { Button } from '@/components/ui/button'
+import { BrandLogo } from '@/components/common/BrandLogo'
 import {
     Tooltip,
     TooltipContent,
@@ -118,24 +118,16 @@ export function Sidebar() {
 
                 {/* Header */}
                 <div className={cn(
-                    "flex h-16 items-center border-b px-6 transition-all duration-300",
+                    "flex h-16 items-center border-b px-5 transition-all duration-300",
                     collapsed ? "justify-center px-2" : "justify-between"
                 )}>
-                    <Link href="/dashboard" className="flex items-center gap-2 overflow-hidden">
-                        <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                            <Store className="h-5 w-5 text-primary" />
-                        </div>
-                        {!collapsed && (
-                            <div className="flex flex-col">
-                                <span className="text-sm font-bold tracking-tight">Inventory</span>
-                                <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Management</span>
-                            </div>
-                        )}
+                    <Link href="/dashboard" className="flex items-center overflow-hidden">
+                        <BrandLogo size="md" collapsed={collapsed} />
                     </Link>
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex-1 space-y-6 overflow-y-auto py-6 px-3 custom-scrollbar">
+                <nav className="flex-1 min-h-0 space-y-6 overflow-y-auto py-6 px-3 no-scrollbar">
 
                     {/* Trial Banner - Only show when expanded */}
                     {!collapsed && trialDays !== null && trialDays > 0 && (
@@ -183,14 +175,14 @@ export function Sidebar() {
                                                     >
                                                         <item.icon className="h-5 w-5" />
                                                         {item.isPro && !isActive && (
-                                                            <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-indigo-500 ring-2 ring-background block" />
+                                                            <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-background block" />
                                                         )}
                                                         {locked && <Crown className="absolute -bottom-1 -right-1 h-3 w-3 text-amber-500 fill-amber-500" />}
                                                     </Link>
                                                 </TooltipTrigger>
                                                 <TooltipContent side="right" className="font-medium">
                                                     {item.name}
-                                                    {item.isPro && <span className="ml-2 text-xs text-indigo-400 font-bold">PRO</span>}
+                                                    {item.isPro && <span className="ml-2 text-xs text-emerald-400 font-bold">PRO</span>}
                                                 </TooltipContent>
                                             </Tooltip>
                                         )
@@ -203,7 +195,7 @@ export function Sidebar() {
                                             className={cn(
                                                 "group flex items-center justify-between rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-200 border border-transparent mx-2",
                                                 isActive
-                                                    ? "bg-primary/5 text-primary border-primary/10 shadow-sm"
+                                                    ? "bg-primary/10 text-primary border-primary/20 shadow-sm"
                                                     : "text-muted-foreground hover:bg-accent hover:text-accent-foreground hover:translate-x-1"
                                             )}
                                         >
@@ -216,7 +208,7 @@ export function Sidebar() {
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 {item.isPro && (
-                                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-600 border border-indigo-500/20">
+                                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                                                         PRO
                                                     </span>
                                                 )}

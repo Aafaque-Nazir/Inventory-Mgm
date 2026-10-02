@@ -31,9 +31,9 @@ export function WarehouseSwitcher() {
 
     if (isLoading || isSwitching) {
         return (
-            <div className="flex items-center gap-2 px-3 py-2 border rounded-md bg-muted/50 w-[200px] h-9">
-                <Loader2 className="h-4 w-4 text-muted-foreground animate-spin" />
-                <span className="text-sm text-muted-foreground">Switching...</span>
+            <div className="flex items-center gap-2 px-2.5 py-1.5 border rounded-md bg-muted/50 w-[110px] xs:w-[140px] sm:w-[160px] md:w-[200px] h-9 shrink-0">
+                <Loader2 className="h-3.5 w-3.5 text-muted-foreground animate-spin shrink-0" />
+                <span className="text-xs sm:text-sm text-muted-foreground truncate">Switching...</span>
             </div>
         )
     }
@@ -42,10 +42,10 @@ export function WarehouseSwitcher() {
 
     return (
         <Select value={selectedWarehouseId || ''} onValueChange={handleSelect}>
-            <SelectTrigger className="w-[120px] sm:w-[160px] md:w-[200px] h-9 border-dashed overflow-hidden">
-                <div className="flex items-center gap-2 overflow-hidden w-full">
-                    <Store className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    <span className="truncate text-left text-sm flex-1"><SelectValue placeholder="Select Warehouse" /></span>
+            <SelectTrigger className="w-[110px] xs:w-[140px] sm:w-[160px] md:w-[200px] h-9 border-dashed overflow-hidden shrink-0 px-2 sm:px-3">
+                <div className="flex items-center gap-1.5 sm:gap-2 overflow-hidden w-full">
+                    <Store className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 text-muted-foreground" />
+                    <span className="truncate text-left text-xs sm:text-sm flex-1"><SelectValue placeholder="Warehouse" /></span>
                 </div>
             </SelectTrigger>
             <SelectContent>

@@ -8,6 +8,7 @@ import { OrgManager } from '@/components/super-admin/OrgManager'
 import { AnnouncementManager } from '@/components/super-admin/AnnouncementManager'
 import { Building2, Users, CreditCard, TrendingUp, DollarSign } from 'lucide-react'
 import { RevenueChart } from '@/components/super-admin/RevenueChart'
+import { SystemHealthWidget } from '@/components/super-admin/SystemHealthWidget'
 
 import { StatCard } from '@/components/dashboard/StatCard'
 
@@ -34,13 +35,13 @@ export default function SuperAdminPage() {
     }, [])
 
     return (
-        <div className="flex-1 space-y-10 p-4 md:p-8 pt-6 max-w-[1600px] mx-auto">
+        <div className="flex-1 space-y-6 sm:space-y-8 max-w-[1600px] mx-auto">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2">
-                        Super Admin <span className="text-indigo-400">Dashboard</span>
+                        Super Admin <span className="text-emerald-400">Dashboard</span>
                     </h2>
-                    <p className="text-slate-400 text-sm md:text-lg">System performance, growth, and organizational health.</p>
+                    <p className="text-slate-400 text-sm md:text-lg">Manage organizations, view revenue, and monitor system status.</p>
                 </div>
             </div>
 
@@ -122,62 +123,9 @@ export default function SuperAdminPage() {
                             <RevenueChart data={stats?.revenueHistory || []} />
                         </div>
 
-                        {/* System Health Section - Sleek & Modern */}
+                        {/* System Health Section - Live Real Diagnostics */}
                         <div className="md:col-span-2 lg:col-span-3">
-                            <div className="h-full rounded-[2rem] border border-white/[0.08] bg-white/[0.02] p-6 sm:p-8 flex flex-col backdrop-blur-sm">
-                                <div className="flex items-center justify-between mb-8">
-                                    <div>
-                                        <h3 className="text-xl font-black text-white tracking-tight">System Health</h3>
-                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Operational Status</p>
-                                    </div>
-                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-                                        <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                                        <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Online</span>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-6 flex-1">
-                                    <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.05] flex items-center gap-4">
-                                        <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
-                                        <div>
-                                            <p className="text-xs font-bold text-white uppercase tracking-wider">All Systems Operational</p>
-                                            <p className="text-[10px] text-slate-500 font-medium">Core services performance: 100%</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.05]">
-                                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Latency</p>
-                                            <div className="flex items-baseline gap-1">
-                                                <span className="text-xl font-bold text-white">38</span>
-                                                <span className="text-[10px] text-slate-500">ms</span>
-                                            </div>
-                                        </div>
-                                        <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.05]">
-                                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Uptime</p>
-                                            <div className="flex items-baseline gap-1">
-                                                <span className="text-xl font-bold text-white">99.9</span>
-                                                <span className="text-[10px] text-slate-500">%</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.05]">
-                                        <div className="flex items-center justify-between mb-3">
-                                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Active Server Load</span>
-                                            <span className="text-xs font-bold text-white">12.4%</span>
-                                        </div>
-                                        <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                                            <div className="h-full w-[12.4%] bg-indigo-500/50" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="mt-8 pt-6 border-t border-white/[0.05] flex items-center justify-between font-mono">
-                                    <span className="text-[10px] text-slate-600 uppercase">Nv_V20.10.x</span>
-                                    <button className="text-[10px] font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-widest">Access Logs →</button>
-                                </div>
-                            </div>
+                            <SystemHealthWidget />
                         </div>
                     </div>
 

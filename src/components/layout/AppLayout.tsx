@@ -1,21 +1,27 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
-import { Loader2,  } from 'lucide-react'
-import {  } from '@/components/ui/card'
+import { Loader2 } from 'lucide-react'
 import { WarehouseProvider } from '@/context/WarehouseContext'
 
 import { usePathname } from 'next/navigation'
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname()
+    const mainRef = useRef<HTMLElement>(null)
     const [loading, setLoading] = useState(true)
     const [_subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null)
     const [_isSuperAdmin, setIsSuperAdmin] = useState(false)
     const supabase = createClient()
+
+    useEffect(() => {
+        if (mainRef.current) {
+            mainRef.current.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+        }
+    }, [pathname])
 
 
     useEffect(() => {
@@ -68,7 +74,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         }
 
         checkSubscription()
-        checkSubscription()
     }, [supabase, pathname])
 
     // Bypassing layout for onboarding to allow full-screen design and avoid subscription checks
@@ -87,13 +92,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
     return (
         <WarehouseProvider>
-            <div className="flex min-h-screen bg-background">
+            <div className="flex h-screen bg-background overflow-hidden">
                 <Sidebar />
-                <div className="flex flex-1 flex-col min-w-0 min-h-screen relative">
-                    <div className="sticky top-0 z-20 w-full backdrop-blur-xl bg-background/90 border-b shadow-sm">
+                <div className="flex flex-1 flex-col min-w-0 min-h-0 h-screen relative overflow-hidden">
+                    <div className="shrink-0 z-20 w-full backdrop-blur-xl bg-background/90 border-b shadow-sm">
                         <Topbar />
                     </div>
-                    <main className="flex-1 p-4 md:p-6 w-full max-w-full">
+                    <main ref={mainRef} className="flex-1 min-h-0 overflow-y-auto p-3 md:p-5 w-full max-w-full custom-scrollbar">
                         {children}
                     </main>
                 </div>

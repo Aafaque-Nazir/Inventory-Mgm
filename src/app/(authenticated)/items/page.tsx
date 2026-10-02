@@ -110,18 +110,18 @@ export default async function ItemsPage() {
     }
 
     return (
-        <div className="space-y-8 p-2">
+        <div className="space-y-6 sm:space-y-8">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-white/90">Inventory</h1>
-                    <p className="text-sm text-slate-400">Manage your stock and items.</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white/90">Inventory</h1>
+                    <p className="text-xs sm:text-sm text-slate-400">Manage your stock and items.</p>
                 </div>
-                <div className="grid grid-cols-2 gap-2 w-full md:flex md:w-auto">
+                <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:flex-wrap sm:w-auto">
                     <ScanItemButton isPro={isPro || isSuperAdmin} />
                     <StockScanner isPro={isPro || isSuperAdmin} />
                     <CsvImporter />
                     <ExportButton items={items || []} isPro={isPro || isSuperAdmin} />
-                    <div className="col-span-2 md:col-auto">
+                    <div className="col-span-2 sm:col-auto">
                         <CreateItemDialog />
                     </div>
                 </div>

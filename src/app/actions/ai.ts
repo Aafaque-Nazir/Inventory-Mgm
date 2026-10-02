@@ -28,10 +28,16 @@ export async function getAiInsights(): Promise<AiInsight[]> {
     const thirtyDaysAgo = new Date()
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-    const { data: items } = await supabase
+    const { data: rawItems } = await supabase
         .from('items')
-        .select('id, name, quantity, low_stock_threshold, category, cost_price, selling_price')
+        .select('id, name, current_stock, min_stock, category, cost_price, selling_price')
         .eq('organization_id', orgId)
+
+    const items = (rawItems || []).map(item => ({
+        ...item,
+        quantity: item.current_stock ?? 0,
+        low_stock_threshold: item.min_stock ?? 0
+    }))
 
     const { data: movements } = await supabase
         .from('stock_movements')
@@ -95,9 +101,9 @@ function generateHardcodedInsights(items: any[], movements: any[]): AiInsight[] 
         const topRisk = atRiskItems.sort((a, b) => a.days - b.days)[0]
         insights.push({
             type: 'RISK',
-            title: 'Critical Stockout Predicted',
-            description: `'${topRisk.name}' is depleting fast and will run out in approx. ${topRisk.days} days.`,
-            metric: 'High Urgency',
+            title: 'Running Out of Stock',
+            description: `'${topRisk.name}' is selling quickly and will run out in approx. ${topRisk.days} days.`,
+            metric: 'Urgent',
             action: 'Reorder Now',
             color: 'red',
             priority: 1
@@ -108,10 +114,10 @@ function generateHardcodedInsights(items: any[], movements: any[]): AiInsight[] 
         const topMarginRisk = highMarginRisks.sort((a, b) => a.days - b.days)[0]
         insights.push({
             type: 'OPPORTUNITY',
-            title: 'Protect High-Margin Revenue',
-            description: `'${topMarginRisk.name}' ( ${topMarginRisk.margin}% margin ) is selling fast but has only ${topMarginRisk.days} days of stock left.`,
-            metric: 'Revenue Risk',
-            action: 'Prioritize Restock',
+            title: 'Top Seller Running Low',
+            description: `'${topMarginRisk.name}' (${topMarginRisk.margin}% margin) has only ${topMarginRisk.days} days of stock remaining.`,
+            metric: 'High Margin',
+            action: 'Restock Soon',
             color: 'green',
             priority: 2
         })
@@ -122,10 +128,10 @@ function generateHardcodedInsights(items: any[], movements: any[]): AiInsight[] 
         if (topOverstock.excessValue > 0) {
             insights.push({
                 type: 'WARNING',
-                title: 'Capital Tied in Overstock',
-                description: `'${topOverstock.name}' is heavily overstocked. Reducing inventory to 30-day levels could free up ₹${Math.round(topOverstock.excessValue).toLocaleString()}.`,
+                title: 'Excess Stock Alert',
+                description: `'${topOverstock.name}' has excess units. Normalizing to 30 days can recover ₹${Math.round(topOverstock.excessValue).toLocaleString()} in cash flow.`,
                 metric: 'Overstocked',
-                action: 'Launch Flash Sale',
+                action: 'Manage Stock',
                 color: 'purple',
                 priority: 3
             })
@@ -135,10 +141,10 @@ function generateHardcodedInsights(items: any[], movements: any[]): AiInsight[] 
     if (deadStockItems.length > 0 && deadStockValue > 0) {
         insights.push({
             type: 'WARNING',
-            title: 'Dead Stock Detected',
-            description: `${deadStockItems.length} items haven't moved in 30 days, locking up ₹${Math.round(deadStockValue).toLocaleString()} in capital.`,
-            metric: 'Capital Locked',
-            action: 'Liquidate Inventory',
+            title: 'Slow Moving Stock',
+            description: `${deadStockItems.length} items have had no sales in 30 days (₹${Math.round(deadStockValue).toLocaleString()} total value).`,
+            metric: 'No Movement',
+            action: 'Review Items',
             color: 'yellow',
             priority: 4
         })
@@ -158,8 +164,8 @@ function generateHardcodedInsights(items: any[], movements: any[]): AiInsight[] 
     if (topCategory && topCategory[1] > 0) {
         insights.push({
             type: 'SEASONAL',
-            title: `${currentSeason} Demand Surge`,
-            description: `'${topCategory[0]}' category is driving the most volume this season. Ensure adequate safety stock across this category.`,
+            title: `Top Selling Category (${currentSeason})`,
+            description: `'${topCategory[0]}' is currently your most active category. Keep items in this category well-stocked.`,
             metric: 'Top Category',
             color: 'blue',
             priority: 5

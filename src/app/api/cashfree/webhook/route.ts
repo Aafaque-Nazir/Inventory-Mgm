@@ -82,13 +82,25 @@ export async function POST(req: NextRequest) {
             }
 
             // Find user's profile and organization_id
-            const { data: profile, error: profileError } = await supabaseAdmin
+            const { data: profile, error: _profileError } = await supabaseAdmin
                 .from('profiles')
                 .select('organization_id')
                 .eq('id', customerId)
                 .single()
 
-            if (profileError || !profile?.organization_id) {
+            let orgId = profile?.organization_id
+            if (!orgId) {
+                const { data: userOrg } = await supabaseAdmin
+                    .from('organizations')
+                    .select('id')
+                    .eq('created_by', customerId)
+                    .maybeSingle()
+                if (userOrg?.id) {
+                    orgId = userOrg.id
+                }
+            }
+
+            if (!orgId) {
                 console.error('Webhook Error: Profile/Organization not found for customer:', customerId)
                 return NextResponse.json({ error: 'Organization not found' }, { status: 404 })
             }
@@ -106,7 +118,7 @@ export async function POST(req: NextRequest) {
                     subscription_end_date: endDate.toISOString(),
                     max_users: 5
                 })
-                .eq('id', profile.organization_id)
+                .eq('id', orgId)
 
             if (updateError) {
                 console.error('Webhook DB Error:', updateError)
@@ -118,7 +130,7 @@ export async function POST(req: NextRequest) {
                 .from('payment_orders')
                 .upsert({
                     order_id: orderId,
-                    organization_id: profile.organization_id,
+                    organization_id: orgId,
                     user_id: customerId,
                     amount: orderData?.order_amount || 49,
                     status: 'SUCCESS',
@@ -128,7 +140,7 @@ export async function POST(req: NextRequest) {
                     updated_at: new Date().toISOString()
                 }, { onConflict: 'order_id' })
 
-            console.log(`Webhook Success: Organization ${profile.organization_id} upgraded to PRO via payment webhook`)
+            console.log(`Webhook Success: Organization ${orgId} upgraded to PRO via payment webhook`)
             return NextResponse.json({ success: true, message: 'Subscription upgraded via webhook' })
         }
 

@@ -26,16 +26,16 @@ export default async function BillingSettingsPage() {
                 </p>
             </div>
 
-            <div className="rounded-3xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-xl">
-                <div className="p-8 border-b border-white/5 bg-white/5">
-                    <h2 className="text-xl font-semibold text-white">Current Plan</h2>
-                    <p className="text-sm text-slate-400 mt-1">
+            <div className="rounded-2xl sm:rounded-3xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-xl">
+                <div className="p-4 sm:p-6 md:p-8 border-b border-white/5 bg-white/5">
+                    <h2 className="text-lg sm:text-xl font-semibold text-white">Current Plan</h2>
+                    <p className="text-xs sm:text-sm text-slate-400 mt-1">
                         You are currently on the <span className="font-semibold text-white">{org.plan_type}</span> plan.
                     </p>
                 </div>
 
-                <div className="p-8">
-                    <div className="rounded-2xl border border-white/5 bg-black/20 p-6 flex flex-col items-start gap-4">
+                <div className="p-4 sm:p-6 md:p-8">
+                    <div className="rounded-2xl border border-white/5 bg-black/20 p-4 sm:p-6 flex flex-col items-start gap-4">
                         <div className="flex justify-between w-full items-start">
                             <div>
                                 <h3 className="text-xl font-bold text-white flex items-center gap-2">

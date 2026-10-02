@@ -19,57 +19,57 @@ interface StatCardProps {
 
 const colorStyles = {
     blue: {
-        text: 'text-blue-400',
-        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(59,130,246,0.3)]',
-        border: 'group-hover:border-blue-500/30',
-        bg: 'group-hover:bg-blue-500/5'
+        text: 'text-emerald-400',
+        glow: 'group-hover:shadow-[0_10px_35px_-5px_rgba(16,185,129,0.2)]',
+        border: 'group-hover:border-emerald-500/40',
+        bg: 'group-hover:bg-[#151d18]'
     },
     cyan: {
-        text: 'text-cyan-400',
-        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(6,182,212,0.3)]',
-        border: 'group-hover:border-cyan-500/30',
-        bg: 'group-hover:bg-cyan-500/5'
+        text: 'text-teal-400',
+        glow: 'group-hover:shadow-[0_10px_35px_-5px_rgba(20,184,166,0.2)]',
+        border: 'group-hover:border-teal-500/40',
+        bg: 'group-hover:bg-[#131c18]'
     },
     sky: {
-        text: 'text-sky-400',
-        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(14,165,233,0.3)]',
-        border: 'group-hover:border-sky-500/30',
-        bg: 'group-hover:bg-sky-500/5'
+        text: 'text-emerald-300',
+        glow: 'group-hover:shadow-[0_10px_35px_-5px_rgba(52,211,153,0.2)]',
+        border: 'group-hover:border-emerald-400/40',
+        bg: 'group-hover:bg-[#141e18]'
     },
     emerald: {
         text: 'text-emerald-400',
-        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.3)]',
-        border: 'group-hover:border-emerald-500/30',
-        bg: 'group-hover:bg-emerald-500/5'
+        glow: 'group-hover:shadow-[0_10px_35px_-5px_rgba(16,185,129,0.25)]',
+        border: 'group-hover:border-emerald-500/40',
+        bg: 'group-hover:bg-[#151d18]'
     },
     green: {
         text: 'text-green-400',
-        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(34,197,94,0.3)]',
-        border: 'group-hover:border-green-500/30',
-        bg: 'group-hover:bg-green-500/5'
+        glow: 'group-hover:shadow-[0_10px_35px_-5px_rgba(34,197,94,0.25)]',
+        border: 'group-hover:border-green-500/40',
+        bg: 'group-hover:bg-[#151d18]'
     },
     purple: {
-        text: 'text-purple-400',
-        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(168,85,247,0.3)]',
-        border: 'group-hover:border-purple-500/30',
-        bg: 'group-hover:bg-purple-500/5'
+        text: 'text-emerald-400',
+        glow: 'group-hover:shadow-[0_10px_35px_-5px_rgba(16,185,129,0.2)]',
+        border: 'group-hover:border-emerald-500/40',
+        bg: 'group-hover:bg-[#151d18]'
     },
     orange: {
-        text: 'text-orange-400',
-        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(249,115,22,0.3)]',
-        border: 'group-hover:border-orange-500/30',
-        bg: 'group-hover:bg-orange-500/5'
+        text: 'text-amber-400',
+        glow: 'group-hover:shadow-[0_10px_35px_-5px_rgba(245,158,11,0.2)]',
+        border: 'group-hover:border-amber-500/40',
+        bg: 'group-hover:bg-[#1c1a14]'
     },
     pink: {
-        text: 'text-pink-400',
-        glow: 'group-hover:shadow-[0_0_40px_-10px_rgba(236,72,153,0.3)]',
-        border: 'group-hover:border-pink-500/30',
-        bg: 'group-hover:bg-pink-500/5'
+        text: 'text-rose-400',
+        glow: 'group-hover:shadow-[0_10px_35px_-5px_rgba(244,63,94,0.2)]',
+        border: 'group-hover:border-rose-500/40',
+        bg: 'group-hover:bg-[#1c1417]'
     }
 }
 
-export function StatCard({ title, value, icon, description, trend, color = 'blue' }: StatCardProps) {
-    const styles = colorStyles[color] || colorStyles.blue
+export function StatCard({ title, value, icon, description, trend, color = 'emerald' }: StatCardProps) {
+    const styles = colorStyles[color] || colorStyles.emerald
     const [displayValue, setDisplayValue] = useState(0)
 
     // Simple counting animation for numbers
@@ -100,31 +100,31 @@ export function StatCard({ title, value, icon, description, trend, color = 'blue
     return (
         <div
             className={cn(
-                "group relative rounded-[2rem] border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6 lg:p-7 backdrop-blur-xl transition-all duration-500",
-                "hover:-translate-y-1 hover:bg-white/[0.04]",
+                "group relative rounded-xl sm:rounded-2xl border border-white/10 bg-[#111613] p-3.5 sm:p-4 lg:p-5 backdrop-blur-xl transition-all duration-300 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)]",
+                "hover:-translate-y-0.5 hover:bg-[#151c17] hover:border-emerald-500/30",
                 styles.glow,
                 styles.border,
                 styles.bg
             )}
         >
             {/* Inner Glow Gradient */}
-            <div className="absolute inset-0 rounded-[2rem] bg-white/[0.03] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+            <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-emerald-500/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-            <div className="relative z-10 space-y-4">
+            <div className="relative z-10 space-y-2.5">
                 <div className="flex items-center justify-between">
                     <div className={cn(
-                        "p-2.5 rounded-xl bg-white/5 border border-white/5 backdrop-blur-md transition-colors",
-                        "group-hover:bg-white/10 group-hover:scale-110 duration-300",
+                        "p-2 rounded-lg bg-[#162019] border border-white/5 backdrop-blur-md transition-colors",
+                        "group-hover:bg-[#1c2820] group-hover:scale-105 duration-300",
                         styles.text
                     )}>
                         {icon}
                     </div>
                     {trend && (
                         <div className={cn(
-                            "flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm px-2 py-0.5 rounded-full border border-white/5",
+                            "flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm px-1.5 py-0.5 rounded-full border",
                             trend.positive
-                                ? "text-emerald-400 bg-emerald-500/5"
-                                : "text-rose-400 bg-rose-500/5"
+                                ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
+                                : "text-rose-400 bg-rose-500/10 border-rose-500/20"
                         )}>
                             <span>{trend.positive ? '↑' : '↓'}</span>
                             <span>{trend.value}%</span>
@@ -132,13 +132,13 @@ export function StatCard({ title, value, icon, description, trend, color = 'blue
                     )}
                 </div>
 
-                <div className="space-y-1">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{title}</p>
-                    <h3 className="text-3xl font-black tracking-tight text-white drop-shadow-sm">
+                <div className="space-y-0.5">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">{title}</p>
+                    <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white drop-shadow-sm">
                         {typeof value === 'number' ? displayValue : value}
                     </h3>
                     {description && (
-                        <p className="text-[11px] text-slate-500 font-medium group-hover:text-slate-400 transition-colors">{description}</p>
+                        <p className="text-[10px] text-slate-400 font-medium group-hover:text-slate-300 transition-colors">{description}</p>
                     )}
                 </div>
             </div>

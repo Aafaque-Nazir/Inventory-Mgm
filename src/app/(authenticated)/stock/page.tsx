@@ -58,11 +58,11 @@ export default async function StockPage() {
 
     const { data: movements } = await movementsQuery
     return (
-        <div className="space-y-8 p-2">
+        <div className="space-y-6 sm:space-y-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-white/90">Stock Movements</h1>
-                    <p className="text-sm text-slate-400">Track inventory history and adjustments.</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white/90">Stock Movements</h1>
+                    <p className="text-xs sm:text-sm text-slate-400">Track inventory history and adjustments.</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
                     <ScanItemButton isPro={isPro || isSuperAdmin} />
@@ -88,11 +88,11 @@ export default async function StockPage() {
                 </div>
             </div>
 
-            <div className="rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-2xl p-6">
-                <div className="mb-6 flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-white/90">Recent Movements</h3>
+            <div className="rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden shadow-2xl p-4 sm:p-6">
+                <div className="mb-4 sm:mb-6 flex items-center justify-between">
+                    <h3 className="text-base sm:text-lg font-semibold text-white/90">Recent Movements</h3>
                 </div>
-                <div className="overflow-hidden rounded-xl border border-white/5 bg-slate-900/30">
+                <div className="overflow-x-auto rounded-xl border border-white/5 bg-slate-900/30">
                     <Table>
                         <TableHeader className="bg-white/5 hover:bg-white/5">
                             <TableRow className="border-white/5 hover:bg-transparent">
