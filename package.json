@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@cashfreepayments/cashfree-js": "^1.0.7",
     "@ducanh2912/next-pwa": "^10.2.9",
     "@formspree/react": "^3.0.0",
     "@hookform/resolvers": "^5.2.2",

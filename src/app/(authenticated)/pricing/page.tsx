@@ -14,16 +14,11 @@ import {
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { useState, useEffect } from 'react'
-import Script from 'next/script'
 import { toast } from 'sonner'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-
-declare global {
-    interface Window {
-        Cashfree: new (options: { mode: string }) => { checkout: (options: { paymentSessionId: string; returnUrl: string }) => void };
-    }
-}
+// @ts-ignore - cashfree-js does not expose types properly in all environments
+import { load } from '@cashfreepayments/cashfree-js'
 
 export default function PricingPage() {
     const [loading, setLoading] = useState(false)
@@ -159,15 +154,15 @@ export default function PricingPage() {
                 return
             }
 
-            if (!window.Cashfree) {
+            const cashfree = await load({
+                mode: process.env.NEXT_PUBLIC_CASHFREE_ENV === 'PRODUCTION' ? "production" : "sandbox"
+            })
+
+            if (!cashfree) {
                 toast.error("Payment SDK is loading, please try again in a moment")
                 setLoading(false)
                 return
             }
-
-            const cashfree = new window.Cashfree({
-                mode: process.env.NEXT_PUBLIC_CASHFREE_ENV === 'PRODUCTION' ? "production" : "sandbox"
-            })
 
             cashfree.checkout({
                 paymentSessionId: data.paymentSessionId,
@@ -191,11 +186,6 @@ export default function PricingPage() {
 
     return (
         <div className="w-full max-w-6xl mx-auto space-y-6 sm:space-y-8 pb-10">
-            <Script
-                id="cashfree-js"
-                src="https://sdk.cashfree.com/js/v3/cashfree.js"
-                strategy="lazyOnload"
-            />
 
             {/* Header */}
             <div className="text-center space-y-2 pt-1 sm:pt-2">
