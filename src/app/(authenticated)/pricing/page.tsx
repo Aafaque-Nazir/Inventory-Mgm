@@ -134,18 +134,48 @@ export default function PricingPage() {
         await initiatePayment(cleanDigits)
     }
 
+    const loadRazorpayScript = () => {
+        return new Promise<boolean>((resolve) => {
+            if (typeof window !== 'undefined' && (window as any).Razorpay) {
+                resolve(true)
+                return
+            }
+            const script = document.createElement('script')
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+            script.async = true
+            script.onload = () => resolve(true)
+            script.onerror = () => resolve(false)
+            document.body.appendChild(script)
+        })
+    }
+
     const initiatePayment = async (phoneToUse: string) => {
         setLoading(true)
         try {
+            const scriptLoaded = await loadRazorpayScript()
+            if (!scriptLoaded || !(window as any).Razorpay) {
+                toast.error("Could not load Razorpay checkout. Please check your internet connection or disable adblocker.")
+                setLoading(false)
+                return
+            }
+
             const res = await fetch('/api/razorpay/create-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ phone: phoneToUse })
             })
-            const data = await res.json()
 
-            if (data.error) {
-                toast.error(data.error)
+            let data: any = null
+            try {
+                data = await res.json()
+            } catch {
+                toast.error(`Order creation failed (Status ${res.status}). Please verify server configuration.`)
+                setLoading(false)
+                return
+            }
+
+            if (!res.ok || data?.error) {
+                toast.error(data?.error || `Order creation failed (${res.status})`)
                 setLoading(false)
                 return
             }
@@ -180,14 +210,14 @@ export default function PricingPage() {
 
             const rzp = new (window as any).Razorpay(options)
             rzp.on('payment.failed', function (response: any) {
-                toast.error(response.error.description || "Payment failed")
+                toast.error(response.error?.description || "Payment failed")
                 setLoading(false)
             })
             rzp.open()
 
         } catch (error: any) {
             console.error("Payment Error:", error)
-            toast.error("Failed to initiate payment")
+            toast.error(error?.message || "Failed to initiate payment")
             setLoading(false)
         }
     }
@@ -495,7 +525,7 @@ export default function PricingPage() {
                 planType={currentPlan}
             />
 
-            {/* Phone Collection Dialog for Cashfree PG */}
+            {/* Phone Collection Dialog for Razorpay PG */}
             <Dialog open={phoneModalOpen} onOpenChange={setPhoneModalOpen}>
                 <DialogContent className="sm:max-w-md bg-[#0f1712] border border-white/10 text-white backdrop-blur-xl shadow-2xl rounded-2xl p-5 sm:p-6">
                     <DialogHeader className="space-y-2">

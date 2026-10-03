@@ -50,7 +50,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com https://sdk.cashfree.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; font-src 'self' data:; connect-src 'self' https: wss:; frame-ancestors 'self'; frame-src 'self' https://sdk.cashfree.com;"
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com https://checkout.razorpay.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https: https://*.razorpay.com; font-src 'self' data:; connect-src 'self' https: wss: https://api.razorpay.com https://lumberjack.razorpay.com; frame-ancestors 'self'; frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com;"
           }
         ]
       }
