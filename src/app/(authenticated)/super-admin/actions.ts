@@ -387,13 +387,12 @@ export async function getSystemHealth() {
     const totalRecords = itemsCount + movementsCount + orgsCount + usersCount + warehousesCount + ticketsCount
 
     // 3. Real Payment Gateway Status & Configuration
-    const cashfreeAppId = process.env.CASHFREE_APP_ID || ''
-    const cashfreeSecret = process.env.CASHFREE_SECRET_KEY || ''
-    const cashfreeEnv = (process.env.CASHFREE_ENV || process.env.NEXT_PUBLIC_CASHFREE_ENV || 'SANDBOX').toUpperCase()
-    const paymentGatewayOnline = Boolean(cashfreeAppId && cashfreeSecret)
-    const maskedAppId = cashfreeAppId.length > 8
-        ? `${cashfreeAppId.slice(0, 4)}••••${cashfreeAppId.slice(-4)}`
-        : (cashfreeAppId ? 'Configured' : 'Missing')
+    const razorpayKeyId = process.env.RAZORPAY_KEY_ID || ''
+    const razorpaySecret = process.env.RAZORPAY_KEY_SECRET || ''
+    const paymentGatewayOnline = Boolean(razorpayKeyId && razorpaySecret)
+    const maskedAppId = razorpayKeyId.length > 8
+        ? `${razorpayKeyId.slice(0, 4)}••••${razorpayKeyId.slice(-4)}`
+        : (razorpayKeyId ? 'Configured' : 'Missing')
 
     // 4. Real Email Service Status & Configuration
     const resendKey = process.env.RESEND_API_KEY || ''
@@ -461,13 +460,13 @@ export async function getSystemHealth() {
             lastWriteTime
         },
         paymentGateway: {
-            provider: 'Cashfree Payments',
+            provider: 'Razorpay',
             status: paymentGatewayOnline ? 'ONLINE' : 'CONFIG_MISSING',
-            environment: cashfreeEnv,
+            environment: razorpayKeyId.startsWith('rzp_live_') ? 'PROD' : 'TEST',
             appIdMasked: maskedAppId,
-            webhookUrl: '/api/cashfree/webhook',
-            apiVersion: '2023-08-01',
-            mode: 'Seamless Checkout v3',
+            webhookUrl: '/api/razorpay/webhook',
+            apiVersion: 'v1',
+            mode: 'Standard Checkout',
             currency: 'INR (₹)'
         },
         emailService: {

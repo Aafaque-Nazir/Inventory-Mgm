@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Cashfree } from 'cashfree-pg'
+import Razorpay from 'razorpay'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseAdmin } from '@supabase/supabase-js'
+import crypto from 'crypto'
 
 export async function POST(req: NextRequest) {
     try {
@@ -13,19 +14,17 @@ export async function POST(req: NextRequest) {
         }
 
         // Check Keys
-        const appId = process.env.CASHFREE_APP_ID
-        const secretKey = process.env.CASHFREE_SECRET_KEY
+        const keyId = process.env.RAZORPAY_KEY_ID
+        const keySecret = process.env.RAZORPAY_KEY_SECRET
 
-        if (!appId || !secretKey) {
+        if (!keyId || !keySecret) {
             return NextResponse.json({ error: 'Payment configuration missing' }, { status: 500 })
         }
 
-        // Initialize v4
-        Cashfree.XClientId = appId
-        Cashfree.XClientSecret = secretKey
-        Cashfree.XEnvironment = process.env.CASHFREE_ENV === 'PRODUCTION'
-            ? Cashfree.Environment.PRODUCTION
-            : Cashfree.Environment.SANDBOX
+        const razorpay = new Razorpay({
+            key_id: keyId,
+            key_secret: keySecret
+        })
 
         // ── Pre-check: Don't create orders for already-active PRO users ──
         const { data: profile } = await supabase
@@ -36,7 +35,6 @@ export async function POST(req: NextRequest) {
 
         let orgId = profile?.organization_id
         if (!orgId) {
-            // Check if user has an organization where they are creator
             const { data: userOrg } = await supabase
                 .from('organizations')
                 .select('id')
@@ -83,7 +81,6 @@ export async function POST(req: NextRequest) {
             sanitizeIndianMobile(user.phone) ||
             sanitizeIndianMobile((user.user_metadata as any)?.phone)
 
-        // Strict 10-digit Indian mobile validation: must start with 6, 7, 8, or 9
         const phoneRegex = /^[6-9]\d{9}$/
         if (!effectivePhone || !phoneRegex.test(effectivePhone)) {
             return NextResponse.json(
@@ -92,28 +89,23 @@ export async function POST(req: NextRequest) {
             )
         }
 
-        // ── Cryptographically random order ID ──────────────────────────
-        const orderId = `order_${crypto.randomUUID()}`
+        // ── Cryptographically random receipt ID ──────────────────────────
+        const receiptId = `rcpt_${crypto.randomUUID().replace(/-/g, '').slice(0, 10)}`
 
-        const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || req.nextUrl.origin).replace(/\/$/, '')
-
-        const request = {
-            order_amount: 49,
-            order_currency: 'INR',
-            order_id: orderId,
-            customer_details: {
+        const amount = 4900 // Razorpay works in paise (₹49 = 4900 paise)
+        
+        const options = {
+            amount: amount,
+            currency: 'INR',
+            receipt: receiptId,
+            notes: {
                 customer_id: user.id,
-                customer_phone: effectivePhone,
-                customer_email: user.email!,
-                customer_name: profile?.full_name || 'Inventory User'
-            },
-            order_meta: {
-                return_url: `${baseUrl}/pricing?order_id={order_id}`
+                org_id: orgId
             }
         }
 
-        const response = await Cashfree.PGCreateOrder('2022-09-01', request)
-        const paymentSessionId = response.data.payment_session_id
+        const response = await razorpay.orders.create(options)
+        const orderId = response.id
 
         // ── Record order & save customer phone in Supabase ────────────
         const supabaseAdmin = createSupabaseAdmin(
@@ -154,10 +146,10 @@ export async function POST(req: NextRequest) {
                 status: 'CREATED'
             })
 
-        return NextResponse.json({ paymentSessionId, orderId })
+        return NextResponse.json({ orderId, amount: 49, key: keyId })
 
     } catch (error: any) {
-        console.error('Cashfree Error:', error)
+        console.error('Razorpay Error:', error)
         return NextResponse.json({ error: 'Failed to create payment order' }, { status: 500 })
     }
 }

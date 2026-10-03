@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils'
 export function SystemHealthWidget() {
     const [health, setHealth] = useState<any>(null)
     const [loading, setLoading] = useState(true)
-    const [activeTab, setActiveTab] = useState<'database' | 'cashfree' | 'resend' | 'server'>('database')
+    const [activeTab, setActiveTab] = useState<'database' | 'razorpay' | 'resend' | 'server'>('database')
     const [isPending, startTransition] = useTransition()
 
     const fetchHealth = async (showToast = false) => {
@@ -112,10 +112,10 @@ export function SystemHealthWidget() {
                 </button>
 
                 <button
-                    onClick={() => setActiveTab('cashfree')}
+                    onClick={() => setActiveTab('razorpay')}
                     className={cn(
                         'flex flex-col p-2 rounded-xl border text-left transition-all',
-                        activeTab === 'cashfree'
+                        activeTab === 'razorpay'
                             ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400 shadow-sm'
                             : 'bg-white/[0.02] border-white/5 text-slate-400 hover:bg-white/[0.04]'
                     )}
@@ -127,7 +127,7 @@ export function SystemHealthWidget() {
                         </span>
                     </div>
                     <span className="text-[11px] font-semibold text-white mt-1">Payments</span>
-                    <span className="text-[9px] text-slate-400 truncate">Cashfree</span>
+                    <span className="text-[9px] text-slate-400 truncate">Razorpay</span>
                 </button>
 
                 <button
@@ -241,8 +241,8 @@ export function SystemHealthWidget() {
                     </div>
                 )}
 
-                {/* 2. CASHFREE PAYMENT GATEWAY DETAILS */}
-                {activeTab === 'cashfree' && (
+                {/* 2. RAZORPAY PAYMENT GATEWAY DETAILS */}
+                {activeTab === 'razorpay' && (
                     <div className="space-y-3 animate-in fade-in duration-200">
                         <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-between">
                             <div className="flex items-center gap-2.5">
@@ -251,7 +251,7 @@ export function SystemHealthWidget() {
                                 </div>
                                 <div>
                                     <div className="flex items-center gap-2">
-                                        <p className="text-xs font-bold text-white">Cashfree Payments</p>
+                                        <p className="text-xs font-bold text-white">Razorpay Payments</p>
                                         <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                                             {health?.paymentGateway?.environment || 'PROD'}
                                         </span>
@@ -274,10 +274,10 @@ export function SystemHealthWidget() {
                             </div>
                             <div className="flex justify-between items-center py-1 border-b border-white/5">
                                 <span className="text-slate-400 text-[11px]">Payment Webhook</span>
-                                <span className="font-mono text-emerald-400 text-[10px]">/api/cashfree/webhook</span>
+                                <span className="font-mono text-emerald-400 text-[10px]">/api/razorpay/webhook</span>
                             </div>
                             <div className="flex justify-between items-center py-1 border-b border-white/5">
-                                <span className="text-slate-400 text-[11px]">App ID</span>
+                                <span className="text-slate-400 text-[11px]">Key ID</span>
                                 <span className="font-mono text-slate-300 text-[11px]">{health?.paymentGateway?.appIdMasked || 'Configured'}</span>
                             </div>
                             <div className="flex justify-between items-center py-1">

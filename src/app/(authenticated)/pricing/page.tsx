@@ -17,8 +17,7 @@ import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-// @ts-ignore - cashfree-js does not expose types properly in all environments
-import { load } from '@cashfreepayments/cashfree-js'
+import Script from 'next/script'
 
 export default function PricingPage() {
     const [loading, setLoading] = useState(false)
@@ -38,21 +37,18 @@ export default function PricingPage() {
 
     const supabase = createClient()
 
-    // Verify Payment Effect
+    // Verify Payment Effect handled in Razorpay popup callback
     useEffect(() => {
-        const orderId = searchParams?.get('order_id')
-        if (orderId) {
-            verifyCashfreePayment(orderId)
-        }
+        // Reserved for future query-param based flows if needed
     }, [searchParams])
 
-    const verifyCashfreePayment = async (orderId: string) => {
+    const verifyPayment = async (payload: any) => {
         setLoading(true)
         try {
-            const res = await fetch('/api/cashfree/verify', {
+            const res = await fetch('/api/razorpay/verify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ orderId })
+                body: JSON.stringify(payload)
             })
             const data = await res.json()
 
@@ -141,7 +137,7 @@ export default function PricingPage() {
     const initiatePayment = async (phoneToUse: string) => {
         setLoading(true)
         try {
-            const res = await fetch('/api/cashfree/create-order', {
+            const res = await fetch('/api/razorpay/create-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ phone: phoneToUse })
@@ -154,20 +150,40 @@ export default function PricingPage() {
                 return
             }
 
-            const cashfree = await load({
-                mode: process.env.NEXT_PUBLIC_CASHFREE_ENV === 'PRODUCTION' ? "production" : "sandbox"
-            })
-
-            if (!cashfree) {
-                toast.error("Payment SDK is loading, please try again in a moment")
-                setLoading(false)
-                return
+            const options = {
+                key: data.key,
+                amount: data.amount,
+                currency: "INR",
+                name: "Inventory Pro",
+                description: "Pro Plan Subscription",
+                order_id: data.orderId,
+                handler: function (response: any) {
+                    verifyPayment({
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_signature: response.razorpay_signature
+                    })
+                },
+                prefill: {
+                    contact: phoneToUse
+                },
+                theme: {
+                    color: "#10b981"
+                },
+                modal: {
+                    ondismiss: function () {
+                        setLoading(false)
+                        toast.info("Payment cancelled")
+                    }
+                }
             }
 
-            cashfree.checkout({
-                paymentSessionId: data.paymentSessionId,
-                returnUrl: `${window.location.origin}/pricing?order_id=${data.orderId}`
+            const rzp = new (window as any).Razorpay(options)
+            rzp.on('payment.failed', function (response: any) {
+                toast.error(response.error.description || "Payment failed")
+                setLoading(false)
             })
+            rzp.open()
 
         } catch (error: any) {
             console.error("Payment Error:", error)
@@ -186,6 +202,7 @@ export default function PricingPage() {
 
     return (
         <div className="w-full max-w-6xl mx-auto space-y-6 sm:space-y-8 pb-10">
+            <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
 
             {/* Header */}
             <div className="text-center space-y-2 pt-1 sm:pt-2">
@@ -454,7 +471,7 @@ export default function PricingPage() {
                     </div>
                     <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-white/[0.02]">
                         <CreditCard className="h-4 w-4 text-emerald-400" />
-                        <span className="text-xs font-semibold text-slate-200">Cashfree PG</span>
+                        <span className="text-xs font-semibold text-slate-200">Razorpay PG</span>
                         <span className="text-[10px] text-slate-500">UPI, Cards & NetBanking</span>
                     </div>
                     <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-white/[0.02]">
@@ -491,7 +508,7 @@ export default function PricingPage() {
                                     Billing Mobile Number
                                 </DialogTitle>
                                 <DialogDescription className="text-xs text-slate-400">
-                                    Required for Cashfree payment gateway authorization & SMS receipt.
+                                    Required for Razorpay payment gateway authorization & SMS receipt.
                                 </DialogDescription>
                             </div>
                         </div>
@@ -554,7 +571,7 @@ export default function PricingPage() {
                         {/* Security Badge */}
                         <div className="flex items-center gap-2 p-2 rounded-xl bg-black/30 border border-white/10 text-slate-400 text-xs">
                             <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
-                            <span>Encrypted 256-bit checkout via Cashfree</span>
+                            <span>Encrypted 256-bit checkout via Razorpay</span>
                         </div>
 
                         <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 pt-1">
