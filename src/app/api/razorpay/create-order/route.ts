@@ -3,6 +3,7 @@ import Razorpay from 'razorpay'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseAdmin } from '@supabase/supabase-js'
 import crypto from 'crypto'
+import { extractOrg } from '@/lib/subscription'
 
 export async function POST(req: NextRequest) {
     try {
@@ -49,10 +50,10 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Please create an organization or complete onboarding before upgrading.' }, { status: 400 })
         }
 
-        const org = profile?.organizations as any
+        const org = extractOrg(profile)
         if (org?.plan_type === 'PRO' && org?.subscription_status === 'ACTIVE') {
             const endDate = org.subscription_end_date ? new Date(org.subscription_end_date) : null
-            if (endDate && endDate > new Date()) {
+            if (!endDate || endDate > new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)) {
                 return NextResponse.json(
                     { error: 'You already have an active PRO subscription.' },
                     { status: 400 }

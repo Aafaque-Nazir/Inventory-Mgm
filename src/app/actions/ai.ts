@@ -14,37 +14,44 @@ export interface AiInsight {
 
 
 
-export async function getAiInsights(): Promise<AiInsight[]> {
+import { getCurrentProfile } from '@/lib/auth'
+
+export async function getAiInsights(orgIdParam?: string | null): Promise<AiInsight[]> {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return []
+    let orgId = orgIdParam
 
-    // 1. Get Organization ID
-    const { data: profile } = await supabase.from('profiles').select('organization_id').eq('id', user.id).single()
-    if (!profile?.organization_id) return []
-    const orgId = profile.organization_id
+    if (!orgId) {
+        const profile = await getCurrentProfile()
+        orgId = profile?.organization_id || null
+    }
 
-    // 2. Fetch Data (Last 30 Days)
+    if (!orgId) return []
+
+    // 2. Fetch Data (Last 30 Days) concurrently
     const thirtyDaysAgo = new Date()
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-    const { data: rawItems } = await supabase
-        .from('items')
-        .select('id, name, current_stock, min_stock, category, cost_price, selling_price')
-        .eq('organization_id', orgId)
+    const [itemsRes, movementsRes] = await Promise.all([
+        supabase
+            .from('items')
+            .select('id, name, current_stock, min_stock, category, cost_price, selling_price')
+            .eq('organization_id', orgId),
+        supabase
+            .from('stock_movements')
+            .select('item_id, quantity, type, created_at, items:item_id(category)')
+            .eq('organization_id', orgId)
+            .in('type', ['OUT', 'SALE'])
+            .gte('created_at', thirtyDaysAgo.toISOString())
+    ])
+
+    const rawItems = itemsRes.data
+    const movements = movementsRes.data
 
     const items = (rawItems || []).map(item => ({
         ...item,
         quantity: item.current_stock ?? 0,
         low_stock_threshold: item.min_stock ?? 0
     }))
-
-    const { data: movements } = await supabase
-        .from('stock_movements')
-        .select('item_id, quantity, type, created_at, items:item_id(category)')
-        .eq('organization_id', orgId)
-        .in('type', ['OUT', 'SALE'])
-        .gte('created_at', thirtyDaysAgo.toISOString())
 
     if (!items || !movements || items.length === 0) return []
 

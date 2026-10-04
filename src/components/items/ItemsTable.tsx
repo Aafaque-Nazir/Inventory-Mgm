@@ -36,8 +36,10 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import Link from 'next/link'
-import { EditItemDialog } from './EditItemDialog'
-import { QuickStockDialog } from './QuickStockDialog'
+import dynamicImport from 'next/dynamic'
+
+const EditItemDialog = dynamicImport(() => import('./EditItemDialog').then(m => m.EditItemDialog), { ssr: false })
+const QuickStockDialog = dynamicImport(() => import('./QuickStockDialog').then(m => m.QuickStockDialog), { ssr: false })
 
 interface ItemsTableProps {
     items: Item[]

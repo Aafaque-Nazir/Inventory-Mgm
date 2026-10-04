@@ -1,21 +1,14 @@
-import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import Link from 'next/link'
+import { getCurrentProfile } from '@/lib/auth'
 
 export default async function OrganizationSettingsPage() {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const profile = await getCurrentProfile()
 
-    if (!user) redirect('/login')
+    if (!profile) redirect('/login')
 
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('organization:organizations(*)')
-        .eq('id', user.id)
-        .single()
-
-    const org = Array.isArray(profile?.organization) ? profile?.organization[0] : profile?.organization as any
+    const org = Array.isArray(profile?.organization) ? profile?.organization[0] : (profile?.organization || (profile as any)?.organizations) as any
 
     if (!org) redirect('/onboarding')
 

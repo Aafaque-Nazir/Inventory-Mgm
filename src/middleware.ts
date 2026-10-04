@@ -12,6 +12,35 @@ export async function middleware(request: NextRequest) {
         },
     })
 
+    const path = request.nextUrl.pathname
+
+    // Fast-path 1: Public informational pages & webhooks do not require auth checks
+    if (
+        path === '/terms' ||
+        path === '/privacy' ||
+        path === '/refund' ||
+        path === '/contact' ||
+        path.startsWith('/api/razorpay/webhook')
+    ) {
+        return response
+    }
+
+    // Check if any Supabase auth cookies are present
+    const allCookies = request.cookies.getAll()
+    const hasAuthCookie = allCookies.some(
+        c => c.name.startsWith('sb-') && c.name.includes('-auth-token')
+    )
+
+    // Fast-path 2: If accessing public landing or login/signup without an auth cookie, no need to query Supabase
+    if (!hasAuthCookie) {
+        if (path === '/' || path.startsWith('/login') || path.startsWith('/signup') || path.startsWith('/forgot-password')) {
+            return response
+        }
+        if (path.startsWith('/dashboard') || path.startsWith('/super-admin')) {
+            return NextResponse.redirect(new URL('/login', request.url))
+        }
+    }
+
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -38,8 +67,6 @@ export async function middleware(request: NextRequest) {
     const {
         data: { user },
     } = await supabase.auth.getUser()
-
-    const path = request.nextUrl.pathname
 
     // Auth protection for dashboard and super-admin
     if (!user && (path.startsWith('/dashboard') || path.startsWith('/super-admin'))) {

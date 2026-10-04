@@ -1,117 +1,106 @@
 import { createClient } from '@/lib/supabase/server'
-import { StockDistributionChart } from '@/components/reports/StockDistributionChart'
-import { MovementTrendChart } from '@/components/reports/MovementTrendChart'
 import { LowStockTable } from '@/components/reports/LowStockTable'
 import { TopItemsTable } from '@/components/reports/TopItemsTable'
 import { SummaryCard } from '@/components/reports/SummaryCard'
 import { format, subDays } from 'date-fns'
 import { ProLock } from '@/components/common/ProLock'
 import { getWarehouseCookie } from '@/app/actions/warehouse-cookie'
+import { getCurrentProfile } from '@/lib/auth'
+import { isProPlan, extractOrg } from '@/lib/subscription'
+import dynamicImport from 'next/dynamic'
+
+const StockDistributionChart = dynamicImport(
+    () => import('@/components/reports/StockDistributionChart').then((m) => m.StockDistributionChart),
+    {
+        ssr: true,
+        loading: () => <div className="h-[280px] rounded-2xl border border-white/5 bg-white/5 animate-pulse" />
+    }
+)
+
+const MovementTrendChart = dynamicImport(
+    () => import('@/components/reports/MovementTrendChart').then((m) => m.MovementTrendChart),
+    {
+        ssr: true,
+        loading: () => <div className="h-[280px] rounded-2xl border border-white/5 bg-white/5 animate-pulse" />
+    }
+)
 
 export const dynamic = 'force-dynamic'
 
 export default async function ReportsPage() {
     const supabase = await createClient()
 
-    // Get current user's organization_id
-    const { data: { user } } = await supabase.auth.getUser()
+    // 1. Get Profile and Warehouse ID concurrently
+    const [profile, warehouseId] = await Promise.all([
+        getCurrentProfile(),
+        getWarehouseCookie()
+    ])
 
-    let organizationId: string | null = null
-    let isSuperAdmin = false
-    let planType = 'FREE'
-
-    if (user) {
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('organization_id, is_super_admin, organizations(plan_type, subscription_end_date)')
-            .eq('id', user.id)
-            .single()
-        organizationId = profile?.organization_id || null
-        isSuperAdmin = profile?.is_super_admin || false
-        const org = profile?.organizations as any
-        if (org?.plan_type) {
-            planType = org.plan_type
-
-            if (planType === 'PRO' && org?.subscription_end_date) {
-                const expiry = new Date(org.subscription_end_date)
-                if (expiry < new Date()) {
-                    planType = 'FREE'
-                }
-            }
-        }
-    }
-
-    const isPro = planType === 'PRO' || isSuperAdmin
+    const organizationId = profile?.organization_id || null
+    const isSuperAdmin = profile?.is_super_admin || false
+    const org = extractOrg(profile)
+    const isPro = isProPlan(org, isSuperAdmin)
 
     if (!organizationId && !isSuperAdmin) {
         return <div className="p-8">No organization found for reports/analytics.</div>
     }
 
-    // --- CONTEXT AWARE DATA FETCHING ---
-    const warehouseId = await getWarehouseCookie() // From Cookie
-
     let items: any[] = []
     let movements: any[] = []
-    let invoices: any[] = [] // NEW: Fetch Invoices
+    let invoices: any[] = []
 
-    const startDate = subDays(new Date(), 30).toISOString() // INCREASED TO 30 DAYS for better visibility
+    const startDate = subDays(new Date(), 30).toISOString()
 
     if (organizationId) {
-
         if (warehouseId) {
-            // A. Fetch Only Tracked items in this warehouse (Strict Isolation)
-            const { data: locationStock } = await supabase
-                .from('item_stock')
-                .select('item_id, quantity, item:items(*)')
-                .eq('location_id', warehouseId)
+            const [stockRes, movementsRes, invoicesRes] = await Promise.all([
+                supabase
+                    .from('item_stock')
+                    .select('item_id, quantity, item:items(*)')
+                    .eq('location_id', warehouseId),
+                supabase
+                    .from('stock_movements')
+                    .select('created_at, type, quantity, item_id, unit_price')
+                    .eq('organization_id', organizationId)
+                    .eq('location_id', warehouseId)
+                    .gte('created_at', startDate)
+                    .order('created_at', { ascending: true }),
+                supabase
+                    .from('invoices')
+                    .select('created_at, total_amount, items')
+                    .eq('organization_id', organizationId)
+                    .gte('created_at', startDate)
+            ])
 
-            items = locationStock?.map((record: any) => ({
+            items = stockRes.data?.map((record: any) => ({
                 ...record.item,
-                current_stock: record.quantity // Override with LOCAL quantity
+                current_stock: record.quantity
             })) || []
-
-            // B. Fetch Movements for this Warehouse Only
-            const { data: locMovements } = await supabase
-                .from('stock_movements')
-                .select('created_at, type, quantity, item_id, unit_price')
-                .eq('organization_id', organizationId)
-                .eq('location_id', warehouseId)
-                .gte('created_at', startDate)
-                .order('created_at', { ascending: true })
-            movements = locMovements || []
-
+            movements = movementsRes.data || []
+            invoices = invoicesRes.data || []
         } else {
-            // Fallback: Global Data (For Organization)
-            // Ensure we strictly filter by Organization ID even for defaults
-            const { data: allItems } = await supabase
-                .from('items')
-                .select('*')
-                .eq('organization_id', organizationId)
-            items = allItems || []
+            const [itemsRes, movementsRes, invoicesRes] = await Promise.all([
+                supabase
+                    .from('items')
+                    .select('*')
+                    .eq('organization_id', organizationId),
+                supabase
+                    .from('stock_movements')
+                    .select('created_at, type, quantity, item_id, unit_price')
+                    .gte('created_at', startDate)
+                    .order('created_at', { ascending: true })
+                    .eq('organization_id', organizationId),
+                supabase
+                    .from('invoices')
+                    .select('created_at, total_amount, items')
+                    .eq('organization_id', organizationId)
+                    .gte('created_at', startDate)
+            ])
 
-            const { data: allMovements } = await supabase
-                .from('stock_movements')
-                .select('created_at, type, quantity, item_id, unit_price')
-                .gte('created_at', startDate)
-                .order('created_at', { ascending: true })
-                .eq('organization_id', organizationId)
-            movements = allMovements || []
+            items = itemsRes.data || []
+            movements = movementsRes.data || []
+            invoices = invoicesRes.data || []
         }
-
-        // C. Fetch Invoices (Global for Org for now, or could filter by warehouse if invoices had location_id - logic is org wide)
-        // Invoices usually don't have location_id in the schema yet, assuming org-wide for reports is safer or "All Locations"
-        const { data: orgInvoices } = await supabase
-            .from('invoices')
-            .select('created_at, total_amount, items')
-            .eq('organization_id', organizationId)
-            .gte('created_at', startDate)
-        invoices = orgInvoices || []
-
-    } else {
-        // No Organization Found (unlikely for valid users, maybe system admin without org)
-        items = []
-        movements = []
-        invoices = []
     }
 
     // --- KPI Calculations (Context Aware) ---

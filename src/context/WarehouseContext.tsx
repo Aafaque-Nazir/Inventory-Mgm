@@ -20,7 +20,7 @@ interface WarehouseContextType {
 
 const WarehouseContext = createContext<WarehouseContextType | undefined>(undefined)
 
-export function WarehouseProvider({ children }: { children: React.ReactNode }) {
+export function WarehouseProvider({ children, initialOrgId }: { children: React.ReactNode, initialOrgId?: string }) {
     const [selectedWarehouseId, setSelectedWarehouseId] = useState<string | null>(null)
     const [locations, setLocations] = useState<Location[]>([])
     const [isLoading, setIsLoading] = useState(true)
@@ -30,21 +30,27 @@ export function WarehouseProvider({ children }: { children: React.ReactNode }) {
     // Load initial state (cookie logic handled server-side mostly, but client needs to know list)
     useEffect(() => {
         async function loadLocations() {
-            const { data: { user } } = await supabase.auth.getUser()
-            if (!user) return
+            let targetOrgId = initialOrgId
 
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('organization_id')
-                .eq('id', user.id)
-                .single()
+            if (!targetOrgId) {
+                const { data: { user } } = await supabase.auth.getUser()
+                if (!user) return
 
-            if (!profile?.organization_id) return
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('organization_id')
+                    .eq('id', user.id)
+                    .single()
+
+                targetOrgId = profile?.organization_id
+            }
+
+            if (!targetOrgId) return
 
             const { data: locs } = await supabase
                 .from('locations')
                 .select('id, name, is_default')
-                .eq('organization_id', profile.organization_id)
+                .eq('organization_id', targetOrgId)
                 .order('is_default', { ascending: false })
                 .order('name')
 

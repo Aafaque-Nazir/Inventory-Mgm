@@ -1,19 +1,22 @@
 import { createClient } from '@/lib/supabase/server'
-import { RecordSaleDialog } from '@/components/sales/RecordSaleDialog'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { format } from 'date-fns'
 import { CreditCard, Banknote, ShoppingBag } from 'lucide-react'
+import { getCurrentProfile } from '@/lib/auth'
+import dynamicImport from 'next/dynamic'
+
+const RecordSaleDialog = dynamicImport(
+    () => import('@/components/sales/RecordSaleDialog').then((m) => m.RecordSaleDialog)
+)
 
 export const dynamic = 'force-dynamic'
 
 export default async function SalesPage() {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const profile = await getCurrentProfile()
 
-    if (!user) return <div>Please login</div>
-
-    const { data: profile } = await supabase.from('profiles').select('organization_id').eq('id', user.id).single()
+    if (!profile) return <div>Please login</div>
 
     let invoices = []
     if (profile?.organization_id) {

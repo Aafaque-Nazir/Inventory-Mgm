@@ -1,5 +1,5 @@
 import { AppLayout } from '@/components/layout/AppLayout'
-import { createClient } from '@/lib/supabase/server'
+import { getCurrentUser, getCurrentProfile } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 
@@ -8,19 +8,14 @@ export default async function AuthenticatedLayout({
 }: {
     children: React.ReactNode
 }) {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const user = await getCurrentUser()
 
     if (!user) {
         redirect('/login')
     }
 
     // Check if user has an organization
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('organization_id')
-        .eq('id', user.id)
-        .single()
+    const profile = await getCurrentProfile()
 
     const headersList = await headers()
     const pathname = headersList.get('x-current-path') || ''
@@ -31,6 +26,8 @@ export default async function AuthenticatedLayout({
     }
 
     return (
-        <AppLayout>{children}</AppLayout>
+        <AppLayout initialProfile={profile} initialEmail={user.email || null}>
+            {children}
+        </AppLayout>
     )
 }

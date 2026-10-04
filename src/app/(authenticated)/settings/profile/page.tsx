@@ -1,19 +1,15 @@
-import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { format } from "date-fns"
+import { getCurrentUser, getCurrentProfile } from '@/lib/auth'
 
 export default async function ProfileSettingsPage() {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const [user, profile] = await Promise.all([
+        getCurrentUser(),
+        getCurrentProfile()
+    ])
 
-    if (!user) redirect('/login')
-
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single()
+    if (!user || !profile) redirect('/login')
 
     return (
         <div className="space-y-8 max-w-4xl">

@@ -30,38 +30,20 @@ import {
     MoreVertical
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { useEffect, useState } from 'react'
-import { Profile } from '@/types'
+import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { WarehouseSwitcher } from '@/components/warehouses/WarehouseSwitcher'
 import { navGroups } from '@/lib/navigation'
 import { BrandLogo } from '@/components/common/BrandLogo'
 
+import { useUser } from '@/context/UserContext'
+
 export function Topbar() {
     const router = useRouter()
     const pathname = usePathname()
     const supabase = createClient()
-    const [profile, setProfile] = useState<Profile | null>(null)
-    const [email, setEmail] = useState<string | null>(null)
+    const { profile, email, isSuperAdmin, planType } = useUser()
     const [open, setOpen] = useState(false)
-
-
-
-    useEffect(() => {
-        async function getProfile() {
-            const { data: { user } } = await supabase.auth.getUser()
-            if (user) {
-                setEmail(user.email || null)
-                const { data } = await supabase
-                    .from('profiles')
-                    .select('*, organization:organizations(plan_type)')
-                    .eq('id', user.id)
-                    .single()
-                setProfile(data)
-            }
-        }
-        getProfile()
-    }, [supabase])
 
     const handleSignOut = async () => {
         await supabase.auth.signOut()
@@ -238,23 +220,23 @@ export function Topbar() {
                             ? 'Pricing & Plans'
                             : 'Dashboard'}
                     </h2>
-                    {profile?.is_super_admin ? (
+                    {isSuperAdmin ? (
                         <Badge
                             className="bg-purple-600 hover:bg-purple-700 text-[10px] px-2 h-5 font-semibold tracking-wide uppercase border-purple-500/20 hidden sm:inline-flex shrink-0"
                         >
                             SUPER ADMIN
                         </Badge>
-                    ) : profile?.organization?.plan_type && (
+                    ) : planType && (
                         <Badge
                             variant="secondary"
                             className={cn(
                                 "text-[10px] px-2 h-5 font-semibold tracking-wide uppercase hidden sm:inline-flex shrink-0",
-                                profile.organization.plan_type === 'FREE' && "bg-white/10 text-slate-300 border-white/20",
-                                profile.organization.plan_type === 'PRO' && "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
-                                profile.organization.plan_type === 'ENTERPRISE' && "bg-purple-500/10 text-purple-400 border-purple-500/20",
+                                planType === 'FREE' && "bg-white/10 text-slate-300 border-white/20",
+                                planType === 'PRO' && "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
+                                planType === 'ENTERPRISE' && "bg-purple-500/10 text-purple-400 border-purple-500/20",
                             )}
                         >
-                            {profile.organization.plan_type} PLAN
+                            {planType} PLAN
                         </Badge>
                     )}
                     {!pathname.startsWith('/super-admin') && (

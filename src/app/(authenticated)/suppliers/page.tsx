@@ -5,57 +5,52 @@ import { EditSupplierDialog } from '@/components/suppliers/EditSupplierDialog'
 import { DeleteSupplierDialog } from '@/components/suppliers/DeleteSupplierDialog'
 import { Mail, Phone, User } from 'lucide-react'
 
+import { getWarehouseCookie } from '@/app/actions/warehouse-cookie'
+import { getCurrentProfile } from '@/lib/auth'
+
 export const dynamic = 'force-dynamic'
 
 export default async function SuppliersPage() {
     const supabase = await createClient()
 
-    // Get current user's organization_id
-    const { data: { user } } = await supabase.auth.getUser()
-    let organizationId: string | null = null
-    let isSuperAdmin = false
+    // 1. Get profile and warehouse cookie concurrently
+    const [profile, warehouseId] = await Promise.all([
+        getCurrentProfile(),
+        getWarehouseCookie()
+    ])
 
-    if (user) {
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('organization_id, is_super_admin')
-            .eq('id', user.id)
-            .single()
-        organizationId = profile?.organization_id || null
-        isSuperAdmin = profile?.is_super_admin || false
-    }
+    const organizationId = profile?.organization_id || null
+    const isSuperAdmin = profile?.is_super_admin || false
 
     let suppliersQuery = supabase.from('suppliers').select('*').order('name')
-
     if (!isSuperAdmin && organizationId) {
         suppliersQuery = suppliersQuery.eq('organization_id', organizationId)
     }
 
-    const { data: allSuppliers } = await suppliersQuery
+    // 2. Fetch suppliers and warehouse stock filter in parallel if warehouseId is set
+    let suppliers: any[] = []
 
-    // --- WAREHOUSE FILTERING START ---
-    const { getWarehouseCookie } = await import('@/app/actions/warehouse-cookie')
-    const warehouseId = await getWarehouseCookie()
+    if (warehouseId) {
+        const [suppliersRes, stockItemsRes] = await Promise.all([
+            suppliersQuery,
+            supabase
+                .from('item_stock')
+                .select('item:items(supplier_id)')
+                .eq('location_id', warehouseId)
+        ])
 
-    let suppliers = allSuppliers || []
+        const allSuppliers = suppliersRes.data || []
+        const stockItems = stockItemsRes.data || []
 
-    if (warehouseId && suppliers.length > 0) {
-        // 1. Get all items that have STOCK in this warehouse
-        const { data: stockItems } = await supabase
-            .from('item_stock')
-            .select('item:items(supplier_id)')
-            .eq('location_id', warehouseId)
-
-        // 2. Extract unique Supplier IDs from those items
-        // Note: item_stock -> item -> supplier_id
         const relevantSupplierIds = new Set(
-            stockItems?.map((s: any) => s.item?.supplier_id).filter(Boolean)
+            stockItems.map((s: any) => s.item?.supplier_id).filter(Boolean)
         )
 
-        // 3. Filter the main suppliers list
-        suppliers = suppliers.filter(s => relevantSupplierIds.has(s.id))
+        suppliers = allSuppliers.filter(s => relevantSupplierIds.has(s.id))
+    } else {
+        const { data: allSuppliers } = await suppliersQuery
+        suppliers = allSuppliers || []
     }
-    // --- WAREHOUSE FILTERING END ---
 
     return (
         <div className="space-y-6 sm:space-y-8">

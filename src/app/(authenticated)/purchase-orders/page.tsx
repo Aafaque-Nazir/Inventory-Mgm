@@ -1,40 +1,37 @@
 import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { CreatePurchaseOrderDialog } from '@/components/purchase-orders/CreatePurchaseOrderDialog'
 import { DeleteOrderButton } from '@/components/purchase-orders/DeleteOrderButton'
 import { format } from 'date-fns'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Eye, ShoppingCart } from 'lucide-react'
+import { getWarehouseCookie } from '@/app/actions/warehouse-cookie'
+import { getCurrentProfile } from '@/lib/auth'
+import dynamicImport from 'next/dynamic'
+
+const CreatePurchaseOrderDialog = dynamicImport(
+    () => import('@/components/purchase-orders/CreatePurchaseOrderDialog').then((m) => m.CreatePurchaseOrderDialog)
+)
 
 export const dynamic = 'force-dynamic'
 
 export default async function PurchaseOrdersPage() {
     const supabase = await createClient()
 
-    // Get current user's organization_id
-    const { data: { user } } = await supabase.auth.getUser()
-    let organizationId: string | null = null
-    let isSuperAdmin = false
+    // 1. Concurrently get profile and warehouse cookie
+    const [profile, warehouseId] = await Promise.all([
+        getCurrentProfile(),
+        getWarehouseCookie()
+    ])
 
-    if (user) {
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('organization_id, is_super_admin')
-            .eq('id', user.id)
-            .single()
-        organizationId = profile?.organization_id || null
-        isSuperAdmin = profile?.is_super_admin || false
-    }
+    const organizationId = profile?.organization_id || null
+    const isSuperAdmin = profile?.is_super_admin || false
 
     let ordersQuery = supabase
         .from('purchase_orders')
         .select('*, supplier:suppliers(name), profile:profiles!created_by(full_name)')
         .order('created_at', { ascending: false })
-
-    const warehouseId = (await cookies()).get('warehouse_id')?.value
 
     if (!isSuperAdmin && organizationId) {
         ordersQuery = ordersQuery.eq('organization_id', organizationId)
@@ -43,7 +40,6 @@ export default async function PurchaseOrdersPage() {
             ordersQuery = ordersQuery.eq('location_id', warehouseId)
         }
     }
-
 
     const { data: orders, error } = await ordersQuery
 

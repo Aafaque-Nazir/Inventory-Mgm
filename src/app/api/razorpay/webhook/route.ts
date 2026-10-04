@@ -49,11 +49,30 @@ export async function POST(req: NextRequest) {
             if (!orderError && orderRow && orderRow.status !== 'SUCCESS') {
                 const orgId = orderRow.organization_id
                 
+                // Fetch current org subscription_end_date so we can extend if already active
+                const { data: currentOrg } = await supabaseAdmin
+                    .from('organizations')
+                    .select('subscription_end_date')
+                    .eq('id', orgId)
+                    .single()
+
+                let baseDate = new Date()
+                if (currentOrg?.subscription_end_date) {
+                    const existingExpiry = new Date(currentOrg.subscription_end_date)
+                    if (!isNaN(existingExpiry.getTime()) && existingExpiry > baseDate) {
+                        baseDate = existingExpiry
+                    }
+                }
+                const newEndDate = new Date(baseDate.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString()
+
                 await supabaseAdmin
                     .from('organizations')
                     .update({
                         plan_type: 'PRO',
                         subscription_status: 'ACTIVE',
+                        subscription_end_date: newEndDate,
+                        max_users: 5,
+                        max_items: 10000,
                         trial_used: true
                     })
                     .eq('id', orgId)

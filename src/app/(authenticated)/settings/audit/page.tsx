@@ -2,6 +2,7 @@ import { format } from 'date-fns'
 import { ProLock } from '@/components/common/ProLock'
 import { getAuditLogs } from '@/app/actions/audit'
 import { createClient } from '@/lib/supabase/server'
+import { isProPlan, extractOrg } from '@/lib/subscription'
 
 import { Badge } from '@/components/ui/badge'
 
@@ -17,20 +18,13 @@ export default async function AuditLogsPage() {
     if (user) {
         const { data: profile } = await supabase
             .from('profiles')
-            .select('organization_id, is_super_admin, organizations(plan_type, subscription_end_date)')
+            .select('organization_id, is_super_admin, organizations(plan_type, subscription_end_date, subscription_status)')
             .eq('id', user.id)
             .single()
 
         isSuperAdmin = profile?.is_super_admin || false
-
-        // Check Pro (Logic should be centralized but copying here for now to be safe)
-        const orgs = profile?.organizations as any
-        if (orgs?.plan_type === 'PRO') {
-            const endDate = orgs.subscription_end_date
-            if (endDate && new Date(endDate) > new Date()) {
-                isPro = true
-            }
-        }
+        const org = extractOrg(profile)
+        isPro = isProPlan(org, isSuperAdmin)
     }
 
     const { logs } = await getAuditLogs(1, 100)

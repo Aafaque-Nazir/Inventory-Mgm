@@ -1,37 +1,32 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { TeamTab } from '@/components/settings/TeamTab'
+import { getCurrentProfile } from '@/lib/auth'
 
 export default async function TeamSettingsPage() {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const profile = await getCurrentProfile()
 
-    if (!user) redirect('/login')
+    if (!profile) redirect('/login')
 
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select(`
-            *,
-            organization:organizations(*)
-        `)
-        .eq('id', user.id)
-        .single()
-
-    const org = Array.isArray(profile?.organization) ? profile?.organization[0] : profile?.organization as any
+    const org = Array.isArray(profile?.organization) ? profile?.organization[0] : (profile?.organization || (profile as any)?.organizations) as any
     const orgId = profile.organization_id
 
-    // Fetch Team Members
-    const { data: members } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('organization_id', orgId)
+    // Fetch Team Members and Pending Invitations concurrently
+    const [membersRes, invitationsRes] = await Promise.all([
+        supabase
+            .from('profiles')
+            .select('*')
+            .eq('organization_id', orgId),
+        supabase
+            .from('invitations')
+            .select('*')
+            .eq('organization_id', orgId)
+            .eq('status', 'PENDING')
+    ])
 
-    // Fetch Pending Invitations
-    const { data: invitations } = await supabase
-        .from('invitations')
-        .select('*')
-        .eq('organization_id', orgId)
-        .eq('status', 'PENDING')
+    const members = membersRes.data
+    const invitations = invitationsRes.data
 
     return (
         <div className="space-y-8 max-w-6xl">

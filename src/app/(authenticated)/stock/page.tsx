@@ -1,52 +1,40 @@
 import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { AddStockMovementDialog } from '@/components/stock/AddStockMovementDialog'
 import { format } from 'date-fns'
 import { TrendingDown, TrendingUp, ArrowDown, ArrowUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { StockScanner } from '@/components/stock/StockScanner'
-import { ScanItemButton } from '@/components/items/ScanItemButton'
-import { RecordSaleDialog } from '@/components/sales/RecordSaleDialog'
+import { getWarehouseCookie } from '@/app/actions/warehouse-cookie'
+import { getCurrentProfile } from '@/lib/auth'
+import { isProPlan, extractOrg } from '@/lib/subscription'
+import dynamicImport from 'next/dynamic'
+
+const StockScanner = dynamicImport(() => import('@/components/stock/StockScanner').then(m => m.StockScanner))
+const ScanItemButton = dynamicImport(() => import('@/components/items/ScanItemButton').then(m => m.ScanItemButton))
+const RecordSaleDialog = dynamicImport(() => import('@/components/sales/RecordSaleDialog').then(m => m.RecordSaleDialog))
+const AddStockMovementDialog = dynamicImport(() => import('@/components/stock/AddStockMovementDialog').then(m => m.AddStockMovementDialog))
 
 export const dynamic = 'force-dynamic'
 
 export default async function StockPage() {
     const supabase = await createClient()
 
-    // Get current user's organization_id
-    const { data: { user } } = await supabase.auth.getUser()
-    let organizationId: string | null = null
-    let isSuperAdmin = false
-    let isPro = false
+    // 1. Get profile and warehouse cookie concurrently
+    const [profile, warehouseId] = await Promise.all([
+        getCurrentProfile(),
+        getWarehouseCookie()
+    ])
 
-    if (user) {
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('organization_id, is_super_admin, organizations(plan_type, subscription_end_date)')
-            .eq('id', user.id)
-            .single()
-        organizationId = profile?.organization_id || null
-        isSuperAdmin = profile?.is_super_admin || false
-
-        // Check Pro Status
-        const orgs = profile?.organizations as any
-        if (orgs?.plan_type === 'PRO') {
-            const endDate = orgs.subscription_end_date
-            if (endDate && new Date(endDate) > new Date()) {
-                isPro = true
-            }
-        }
-    }
+    const organizationId = profile?.organization_id || null
+    const isSuperAdmin = profile?.is_super_admin || false
+    const org = extractOrg(profile)
+    const isPro = isProPlan(org, isSuperAdmin)
 
     let movementsQuery = supabase
         .from('stock_movements')
         .select('*, item:items(name, sku), profile:profiles(full_name)')
         .order('created_at', { ascending: false })
         .limit(50)
-
-    const warehouseId = (await cookies()).get('warehouse_id')?.value
 
     if (!isSuperAdmin && organizationId) {
         movementsQuery = movementsQuery.eq('organization_id', organizationId)

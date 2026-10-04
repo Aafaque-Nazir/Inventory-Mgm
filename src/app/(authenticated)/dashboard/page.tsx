@@ -3,62 +3,60 @@ import { createClient } from '@/lib/supabase/server'
 import { Package, AlertTriangle, ArrowRightLeft, DollarSign } from 'lucide-react'
 import { StatCard } from '@/components/dashboard/StatCard'
 import { AiInsightsCard } from '@/components/dashboard/AiInsightsCard'
-import { RevenueChart } from '@/components/dashboard/RevenueChart'
 import { RecentActivityList } from '@/components/dashboard/RecentActivityList'
 import { getDashboardMetrics, getRevenueChartData } from '@/app/actions/dashboard'
+import { getAiInsights } from '@/app/actions/ai'
 import { getWarehouseCookie } from '@/app/actions/warehouse-cookie'
+import { getCurrentProfile } from '@/lib/auth'
+import dynamicImport from 'next/dynamic'
+
+const RevenueChart = dynamicImport(
+    () => import('@/components/dashboard/RevenueChart').then((mod) => mod.RevenueChart),
+    {
+        ssr: true,
+        loading: () => (
+            <div className="col-span-1 lg:col-span-7 xl:col-span-8 h-[280px] rounded-xl sm:rounded-2xl border border-white/10 bg-[#111613] p-4 animate-pulse flex items-center justify-center text-xs text-slate-500">
+                Loading revenue trends...
+            </div>
+        ),
+    }
+)
 
 export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
     const supabase = await createClient()
 
-    // Get current user's organization_id from their profile
-    const { data: { user } } = await supabase.auth.getUser()
+    // 1. Get user profile and warehouse cookie in parallel
+    const [profile, warehouseId] = await Promise.all([
+        getCurrentProfile(),
+        getWarehouseCookie()
+    ])
 
-    let organizationId: string | null = null
+    const organizationId = profile?.organization_id || null
 
-    if (user) {
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('organization_id')
-            .eq('id', user.id)
-            .single()
-
-        organizationId = profile?.organization_id || null
-    }
-
-    // --- FETCH DATA ---
-    const warehouseId = await getWarehouseCookie()
-
-    // 1. Metrics from optimized Action
-    const metrics = await getDashboardMetrics()
-    
-    // 2. Chart Data
-    const chartData = await getRevenueChartData('7d')
-
-    // 3. Recent Activity (Movements)
-    let recentMovements: any[] = []
-    
-    if (organizationId) {
-        let query = supabase
+    // 2. Fetch all dashboard data concurrently in parallel
+    let movementsQuery = organizationId
+        ? supabase
             .from('stock_movements')
             .select('*, item:items(name)')
             .eq('organization_id', organizationId)
             .order('created_at', { ascending: false })
             .limit(6)
-        
-        if (warehouseId) {
-            query = query.eq('location_id', warehouseId)
-        }
+        : null
 
-        const { data } = await query
-        recentMovements = data || []
+    if (movementsQuery && warehouseId) {
+        movementsQuery = movementsQuery.eq('location_id', warehouseId)
     }
 
-     // --- AI Forecast Data Fetching ---
-    const { getAiInsights } = await import('@/app/actions/ai')
-    const insights = await getAiInsights()
+    const [metrics, chartData, movementsResult, insights] = await Promise.all([
+        getDashboardMetrics(organizationId, warehouseId),
+        getRevenueChartData('7d', organizationId),
+        movementsQuery ? movementsQuery : Promise.resolve({ data: [] }),
+        getAiInsights(organizationId),
+    ])
+
+    const recentMovements = movementsResult.data || []
 
     return (
         <div className="space-y-3.5 sm:space-y-4">

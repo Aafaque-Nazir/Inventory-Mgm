@@ -17,18 +17,20 @@ export type ChartData = {
     orders: number
 }[]
 
-export async function getDashboardMetrics() {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return null
+import { getCurrentProfile } from '@/lib/auth'
 
-    // Get Org ID
-    const { data: profile } = await supabase.from('profiles').select('organization_id').eq('id', user.id).single()
-    const organizationId = profile?.organization_id
+export async function getDashboardMetrics(orgId?: string | null, wId?: string | null) {
+    const supabase = await createClient()
+    let organizationId = orgId
+
+    if (!organizationId) {
+        const profile = await getCurrentProfile()
+        organizationId = profile?.organization_id || null
+    }
 
     if (!organizationId) return null
 
-    const warehouseId = await getWarehouseCookie()
+    const warehouseId = wId !== undefined ? wId : await getWarehouseCookie()
 
     // 1. Fetch Item Stats
     let itemsCount = 0
@@ -79,13 +81,15 @@ export async function getDashboardMetrics() {
     }
 }
 
-export async function getRevenueChartData(period: '7d' | '30d' = '7d'): Promise<ChartData> {
+export async function getRevenueChartData(period: '7d' | '30d' = '7d', orgId?: string | null): Promise<ChartData> {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return []
+    let organizationId = orgId
 
-    const { data: profile } = await supabase.from('profiles').select('organization_id').eq('id', user.id).single()
-    const organizationId = profile?.organization_id
+    if (!organizationId) {
+        const profile = await getCurrentProfile()
+        organizationId = profile?.organization_id || null
+    }
+
     if (!organizationId) return []
 
     const days = period === '30d' ? 30 : 7

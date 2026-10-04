@@ -1,28 +1,16 @@
-import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { getLocations } from '@/app/actions/locations'
 import { WarehouseList } from '@/components/warehouses/WarehouseList'
+import { getCurrentProfile } from '@/lib/auth'
 
 export default async function WarehousesPage() {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const profile = await getCurrentProfile()
 
-    if (!user) redirect('/login')
-
-    // Fetch Profile & Org Details
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select(`
-            *,
-            organization:organizations(*)
-        `)
-        .eq('id', user.id)
-        .single()
-
+    if (!profile) redirect('/login')
     if (!profile?.organization_id) redirect('/onboarding')
 
     const orgId = profile.organization_id
-    const org = profile.organization
+    const org = (profile.organization || (profile as any).organizations) as any
 
     // Fetch Locations
     const locations = await getLocations(orgId)

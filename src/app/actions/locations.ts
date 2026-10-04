@@ -3,19 +3,18 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 
-export async function getLocations(_organizationId?: string) {
+import { getCurrentProfile } from '@/lib/auth'
+
+export async function getLocations(organizationId?: string) {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return []
+    let targetOrgId = organizationId
 
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('organization_id')
-        .eq('id', user.id)
-        .single()
+    if (!targetOrgId) {
+        const profile = await getCurrentProfile()
+        targetOrgId = profile?.organization_id
+    }
 
-    if (!profile?.organization_id) return []
-    const targetOrgId = profile.organization_id
+    if (!targetOrgId) return []
 
     const { data: locations, error } = await supabase
         .from('locations')

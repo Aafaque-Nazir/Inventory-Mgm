@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -15,7 +15,6 @@ import {
     LogOut,
     MoreVertical
 } from 'lucide-react'
-import { differenceInDays } from 'date-fns'
 import { Button } from '@/components/ui/button'
 import { BrandLogo } from '@/components/common/BrandLogo'
 import {
@@ -36,65 +35,36 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 import { navGroups, NavItem } from '@/lib/navigation'
 
+import { useUser } from '@/context/UserContext'
+
+function subscribeToSidebar(callback: () => void) {
+    window.addEventListener('storage', callback)
+    return () => window.removeEventListener('storage', callback)
+}
+
+function getSidebarSnapshot() {
+    if (typeof window === 'undefined') return false
+    return localStorage.getItem('sidebar-collapsed') === 'true'
+}
+
+function getServerSidebarSnapshot() {
+    return false
+}
+
 export function Sidebar() {
     const pathname = usePathname()
     const supabase = createClient()
-    const [isSuperAdmin, setIsSuperAdmin] = useState(false)
-    const [planType, setPlanType] = useState<string>('FREE')
-    const [trialDays, setTrialDays] = useState<number | null>(null)
-    const [collapsed, setCollapsed] = useState(false)
-    const [mounted, setMounted] = useState(false)
-    const [userProfile, setUserProfile] = useState<any>(null)
-
-    useEffect(() => {
-        setMounted(true)
-        const storedCollapsed = localStorage.getItem('sidebar-collapsed')
-        if (storedCollapsed) {
-            setCollapsed(storedCollapsed === 'true')
-        }
-
-        async function checkRole() {
-            const { data: { user } } = await supabase.auth.getUser()
-            if (user) {
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('*, organizations(plan_type, subscription_end_date, subscription_status)')
-                    .eq('id', user.id)
-                    .single()
-
-                if (profile) {
-                    setUserProfile(profile)
-                    if (profile.is_super_admin) setIsSuperAdmin(true)
-
-                    let effectivePlan = 'FREE'
-                    if (profile.organizations?.plan_type) {
-                        effectivePlan = profile.organizations.plan_type
-                        if (profile.organizations?.subscription_end_date) {
-                            const expiry = new Date(profile.organizations.subscription_end_date)
-                            if (profile.organizations.subscription_status === 'TRIALING') {
-                                const days = differenceInDays(expiry, new Date())
-                                setTrialDays(days >= 0 ? days + 1 : 0)
-                            }
-                            if (expiry < new Date()) {
-                                effectivePlan = 'FREE'
-                            }
-                        }
-                    }
-                    setPlanType(effectivePlan)
-                }
-            }
-        }
-        checkRole()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    const { profile, isSuperAdmin, planType, trialDays } = useUser()
+    const persistedCollapsed = useSyncExternalStore(subscribeToSidebar, getSidebarSnapshot, getServerSidebarSnapshot)
+    const [overrideCollapsed, setOverrideCollapsed] = useState<boolean | null>(null)
+    const collapsed = overrideCollapsed !== null ? overrideCollapsed : persistedCollapsed
+    const userProfile = profile
 
     const toggleCollapse = () => {
-        const newState = !collapsed
-        setCollapsed(newState)
-        localStorage.setItem('sidebar-collapsed', String(newState))
+        const next = !collapsed
+        setOverrideCollapsed(next)
+        localStorage.setItem('sidebar-collapsed', String(next))
     }
-
-    if (!mounted) return null // Prevent hydration mismatch
 
     const isLocked = (item: NavItem) => item.name === 'Reports' && planType === 'FREE' && !isSuperAdmin
 
