@@ -122,6 +122,9 @@ export function RecordSaleDialog({ trigger, initialItem, open: controlledOpen, o
                         name: found.name,
                         quantity: 1,
                         unit_price: found.selling_price || 0,
+                        cost_price: found.cost_price || 0,
+                        hsn_code: found.hsn_code || null,
+                        gst_rate: found.gst_rate || 0,
                         total: found.selling_price || 0
                     }])
                     toast.success(`${found.name} added to cart`)
@@ -161,6 +164,9 @@ export function RecordSaleDialog({ trigger, initialItem, open: controlledOpen, o
                 name: item.name,
                 quantity: 1,
                 unit_price: item.selling_price || 0,
+                cost_price: item.cost_price || 0,
+                hsn_code: item.hsn_code || null,
+                gst_rate: item.gst_rate || 0,
                 total: item.selling_price || 0
             }]
         })
@@ -197,9 +203,9 @@ export function RecordSaleDialog({ trigger, initialItem, open: controlledOpen, o
 
         startTransition(async () => {
             const result = await createInvoice({}, formData)
-            if (result.error) {
+            if ('error' in result && result.error) {
                 toast.error(result.error)
-            } else {
+            } else if ('invoiceId' in result) {
                 toast.success('Sale Recorded!')
                 setLastInvoiceId(result.invoiceId)
                 setLastInvoiceData({
@@ -227,7 +233,7 @@ export function RecordSaleDialog({ trigger, initialItem, open: controlledOpen, o
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {trigger || (
-                    <Button className="bg-green-600 hover:bg-green-700 text-white gap-2">
+                    <Button className="bg-emerald-500 hover:bg-emerald-400 text-[#04160c] font-bold shadow-lg shadow-emerald-500/20 gap-2">
                         <ShoppingCart className="h-4 w-4" /> POS / New Sale
                     </Button>
                 )}

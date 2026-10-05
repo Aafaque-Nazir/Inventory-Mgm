@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseAdmin } from '@supabase/supabase-js'
+import { activateProPlan } from '@/lib/subscription-server'
+
 
 export async function POST(req: NextRequest) {
     try {
@@ -60,38 +62,11 @@ export async function POST(req: NextRequest) {
 
         const orgId = orderRow.organization_id
 
-        // Fetch current org subscription_end_date so we can extend if already active
-        const { data: currentOrg } = await supabaseAdmin
-            .from('organizations')
-            .select('subscription_end_date')
-            .eq('id', orgId)
-            .single()
-
-        let baseDate = new Date()
-        if (currentOrg?.subscription_end_date) {
-            const existingExpiry = new Date(currentOrg.subscription_end_date)
-            if (!isNaN(existingExpiry.getTime()) && existingExpiry > baseDate) {
-                baseDate = existingExpiry
-            }
-        }
-        const newEndDate = new Date(baseDate.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString()
-
-        // Transaction logic: Update organization plan and payment record
-        const { error: orgUpdateError } = await supabaseAdmin
-            .from('organizations')
-            .update({
-                plan_type: 'PRO',
-                subscription_status: 'ACTIVE',
-                subscription_end_date: newEndDate,
-                max_users: 5,
-                max_items: 10000,
-                trial_used: true
-            })
-            .eq('id', orgId)
-
-        if (orgUpdateError) {
-            console.error('Organization Update Error:', orgUpdateError)
-            return NextResponse.json({ success: false, error: 'Failed to update organization plan' }, { status: 500 })
+        // Centralized plan activation
+        const activationResult = await activateProPlan(orgId, 30)
+        if (!activationResult.success) {
+            console.error('Organization Update Error:', activationResult.error)
+            return NextResponse.json({ success: false, error: activationResult.error || 'Failed to update organization plan' }, { status: 500 })
         }
 
         const { error: orderUpdateError } = await supabaseAdmin
@@ -109,7 +84,7 @@ export async function POST(req: NextRequest) {
             // Soft failure, plan was upgraded
         }
 
-        return NextResponse.json({ success: true })
+        return NextResponse.json({ success: true, newEndDate: activationResult.newEndDate })
 
     } catch (error: any) {
         console.error('Razorpay Verification Error:', error)

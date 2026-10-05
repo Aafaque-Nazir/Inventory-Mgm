@@ -72,12 +72,35 @@ export default async function ItemsPage() {
         items = itemsData || []
     }
 
+    // 3. Check for expiring batches (within 30 days)
+    let expiringBatches: any[] = []
+    if (organizationId) {
+        try {
+            const targetDate = new Date()
+            targetDate.setDate(targetDate.getDate() + 30)
+            const targetDateStr = targetDate.toISOString().split('T')[0]
+
+            const { data: batchData } = await supabase
+                .from('item_batches')
+                .select('id, batch_number, expiry_date, quantity, item:items(name, sku)')
+                .eq('organization_id', organizationId)
+                .gt('quantity', 0)
+                .lte('expiry_date', targetDateStr)
+                .order('expiry_date', { ascending: true })
+                .limit(5)
+
+            expiringBatches = batchData || []
+        } catch {
+            // Non-blocking if table is fresh
+        }
+    }
+
     return (
         <div className="space-y-6 sm:space-y-8">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white/90">Inventory</h1>
-                    <p className="text-xs sm:text-sm text-slate-400">Manage your stock and items.</p>
+                    <p className="text-xs sm:text-sm text-slate-400">Manage your stock, SKU tracking, and batch expiry dates.</p>
                 </div>
                 <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:flex-wrap sm:w-auto">
                     <ScanItemButton isPro={isPro || isSuperAdmin} />
@@ -89,6 +112,26 @@ export default async function ItemsPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Expiring Batches Alert Banner */}
+            {expiringBatches.length > 0 && (
+                <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-amber-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+                    <div className="flex items-center gap-3">
+                        <div className="h-9 w-9 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0">
+                            ⚠️
+                        </div>
+                        <div>
+                            <p className="font-bold text-sm text-white">
+                                {expiringBatches.length} batch(es) nearing expiry within 30 days
+                            </p>
+                            <p className="text-xs text-amber-200/80">
+                                {expiringBatches.map((b: any) => `${b.item?.name || 'Item'} (Lot ${b.batch_number} - Exp ${b.expiry_date})`).join(' • ')}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <ItemsTable items={items || []} />
         </div>
     )

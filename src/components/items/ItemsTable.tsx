@@ -40,6 +40,7 @@ import dynamicImport from 'next/dynamic'
 
 const EditItemDialog = dynamicImport(() => import('./EditItemDialog').then(m => m.EditItemDialog), { ssr: false })
 const QuickStockDialog = dynamicImport(() => import('./QuickStockDialog').then(m => m.QuickStockDialog), { ssr: false })
+const BatchManagerDialog = dynamicImport(() => import('./BatchManagerDialog').then(m => m.BatchManagerDialog), { ssr: false })
 
 interface ItemsTableProps {
     items: Item[]
@@ -160,6 +161,11 @@ export function ItemsTable({ items }: ItemsTableProps) {
                                             <DropdownMenuItem onClick={() => setEditItem(item)} className="flex items-center gap-2 focus:bg-emerald-500/20 focus:text-emerald-400 cursor-pointer transition-colors">
                                                 <Edit className="h-4 w-4" />
                                                 Edit Item
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem asChild className="focus:bg-emerald-500/20 focus:text-emerald-400 cursor-pointer transition-colors">
+                                                <div className="w-full cursor-pointer">
+                                                    <BatchManagerDialog itemId={item.id} itemName={item.name} />
+                                                </div>
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator className="bg-white/10" />
                                             <DropdownMenuItem onClick={() => { setQuickStockItem(item); setQuickStockType('IN'); }} className="flex items-center gap-2 focus:bg-emerald-500/20 focus:text-emerald-400 cursor-pointer text-emerald-400">

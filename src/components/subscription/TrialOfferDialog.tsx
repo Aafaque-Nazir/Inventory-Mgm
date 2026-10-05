@@ -19,7 +19,7 @@ interface TrialOfferDialogProps {
 }
 
 export function TrialOfferDialog({ open, onOpenChange, organizationId, trialUsed, planType, isTrigger = false, trigger }: TrialOfferDialogProps) {
-    const _router = useRouter()
+    const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [internalOpen, setInternalOpen] = useState(false)
 
@@ -41,8 +41,7 @@ export function TrialOfferDialog({ open, onOpenChange, organizationId, trialUsed
             } else {
                 toast.success('🎉 Welcome to Pro! 5-Day Trial Activated.')
                 setOpen(false)
-                // Force reload to ensure all Pro features unlock immediately
-                window.location.reload()
+                router.refresh()
             }
         } catch (_error: any) {
             toast.error('Something went wrong. Please try again.')

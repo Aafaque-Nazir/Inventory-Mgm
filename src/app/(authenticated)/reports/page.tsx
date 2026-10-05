@@ -200,11 +200,9 @@ export default async function ReportsPage() {
     invoices.forEach(inv => {
         if (Array.isArray(inv.items)) {
             inv.items.forEach((lineItem: any) => {
-                // lineItem has quantity. Need cost price.
-                // We use CURRENT cost price of the item from database.
-                // Ideally, we should snapshot cost price at time of sale, but we only snapshotted unit_price (selling).
+                // Use snapshotted cost price at time of sale if available, falling back to current item cost
                 const item = items.find(i => i.id === lineItem.item_id)
-                const cost = Number(item?.cost_price || 0)
+                const cost = lineItem.cost_price !== undefined ? Number(lineItem.cost_price) : Number(item?.cost_price || 0)
                 totalCOGS += (Number(lineItem.quantity) * cost)
             })
         }

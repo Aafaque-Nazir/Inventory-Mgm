@@ -23,7 +23,7 @@ export default function PricingPage() {
     const [loading, setLoading] = useState(false)
     const [currentPlan, setCurrentPlan] = useState<string>('FREE')
     const [isLoadingPlan, setIsLoadingPlan] = useState(true)
-    const _router = useRouter()
+    const router = useRouter()
     const searchParams = useSearchParams()
     const [trialUsed, setTrialUsed] = useState(false)
     const [subStatus, setSubStatus] = useState<string>('')
@@ -54,8 +54,10 @@ export default function PricingPage() {
 
             if (data.success) {
                 toast.success("Payment Successful! Welcome to Pro.")
+                setCurrentPlan('PRO')
+                setSubStatus('ACTIVE')
                 window.history.replaceState({}, document.title, window.location.pathname)
-                window.location.reload()
+                router.refresh()
             } else {
                 toast.error(data.error || "Payment verification failed")
             }

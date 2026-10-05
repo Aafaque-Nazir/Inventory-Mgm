@@ -38,7 +38,7 @@ export function ProLock({
                 <p className="text-sm text-muted-foreground mb-4 max-w-[250px]">
                     {description}
                 </p>
-                <Button asChild size="sm" variant="default" className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg border-0">
+                <Button asChild size="sm" variant="default" className="bg-emerald-500 hover:bg-emerald-400 text-[#04160c] font-bold shadow-lg shadow-emerald-500/25 border-0">
                     <Link href="/pricing">Upgrade to Pro</Link>
                 </Button>
             </div>

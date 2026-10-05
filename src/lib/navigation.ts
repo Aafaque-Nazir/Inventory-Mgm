@@ -47,6 +47,7 @@ export const navGroups: NavGroup[] = [
         title: 'Sales & Orders',
         items: [
             { name: 'Sales & Invoices', href: '/sales', icon: FileText },
+            { name: 'Customers (CRM)', href: '/customers', icon: Users },
             { name: 'Purchase Orders', href: '/purchase-orders', icon: ShoppingCart },
         ]
     },

@@ -235,11 +235,12 @@ export default function Home() {
                 {/* 4. SOCIAL PROOF */}
                 <section className="py-12 border-y border-white/5 bg-white/[0.01] relative z-10">
                     <div className="container mx-auto px-6 text-center">
-                        <p className="text-sm font-semibold text-slate-500 tracking-widest uppercase mb-8">Powering modern fulfillment for top brands</p>
-                        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-20 opacity-40 grayscale transition-all duration-500 hover:grayscale-0 hover:opacity-100">
-                            {/* Placeholders for logos (using text for demonstration) */}
-                            {['ACME CORP', 'GLOBAL SHIP', 'TECH LOGISTICS', 'QUANTUM RETAIL', 'NEXUS', 'ZEPHYR'].map(logo => (
-                                <span key={logo} className="text-xl md:text-2xl font-black tracking-tighter mix-blend-difference">{logo}</span>
+                        <p className="text-xs sm:text-sm font-semibold text-slate-500 tracking-widest uppercase mb-8">Trusted by growing businesses across key Indian sectors</p>
+                        <div className="flex flex-wrap justify-center items-center gap-6 md:gap-14 opacity-50 grayscale transition-all duration-500 hover:grayscale-0 hover:opacity-100">
+                            {['RETAIL & KIRANA', 'PHARMA & HEALTHCARE', 'FMCG & GROCERY', 'ELECTRONICS', 'E-COMMERCE HUBS', 'WAREHOUSE & 3PL'].map(sector => (
+                                <span key={sector} className="text-sm md:text-base font-extrabold tracking-wider text-slate-300 border border-white/10 px-4 py-2 rounded-xl bg-white/[0.03]">
+                                    {sector}
+                                </span>
                             ))}
                         </div>
                     </div>
@@ -421,7 +422,9 @@ export default function Home() {
                                     ))}
                                 </ul>
 
-                                <Button className="w-full rounded-2xl h-12 bg-emerald-500 hover:bg-emerald-400 text-[#04160c] font-bold shadow-lg shadow-emerald-500/25 transition-all relative z-10">Start 14-Day Free Trial</Button>
+                                <Link href="/signup">
+                                    <Button className="w-full rounded-2xl h-12 bg-emerald-500 hover:bg-emerald-400 text-[#04160c] font-bold shadow-lg shadow-emerald-500/25 transition-all relative z-10">Start 5-Day Free Trial</Button>
+                                </Link>
                             </div>
                         </div>
                     </div>
