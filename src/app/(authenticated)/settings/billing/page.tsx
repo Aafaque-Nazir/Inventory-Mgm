@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import Link from 'next/link'
-import { Zap, Sparkles, CheckCircle2 } from 'lucide-react'
+import { Zap, Sparkles } from 'lucide-react'
 
 export default async function BillingSettingsPage() {
     const supabase = await createClient()
@@ -20,6 +20,7 @@ export default async function BillingSettingsPage() {
 
     const isPro = org?.plan_type === 'PRO'
     const endDate = org?.subscription_end_date ? new Date(org.subscription_end_date) : null
+    // eslint-disable-next-line react-hooks/purity
     const daysRemaining = endDate ? Math.max(0, Math.ceil((endDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : null
 
     return (
@@ -27,7 +28,7 @@ export default async function BillingSettingsPage() {
             <div>
                 <h3 className="text-2xl font-bold tracking-tight text-white">Subscription & Billing</h3>
                 <p className="text-slate-400 text-sm">
-                    Manage your organization's subscription plan, godowns, and billing details.
+                    Manage your organization&apos;s subscription plan, godowns, and billing details.
                 </p>
             </div>
 

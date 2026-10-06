@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { ScanBarcode, Crown } from 'lucide-react'
+import { ScanBarcode } from 'lucide-react'
 import { BarcodeScanner } from '@/components/common/BarcodeScanner'
 import { CreateItemDialog } from './CreateItemDialog'
 import { QuickStockDialog } from '@/components/items/QuickStockDialog'
@@ -10,15 +10,12 @@ import { getItemBySku } from '@/app/actions/items'
 import { toast } from 'sonner'
 import type { Item } from '@/types'
 
-import { useRouter } from 'next/navigation'
-
 interface ScanItemButtonProps {
     isPro?: boolean
     trigger?: React.ReactNode
 }
 
-export function ScanItemButton({ isPro = false, trigger }: ScanItemButtonProps) {
-    const router = useRouter()
+export function ScanItemButton({ isPro: _isPro = false, trigger }: ScanItemButtonProps) {
     const [isScanning, setIsScanning] = useState(false)
     const [showCreateDialog, setShowCreateDialog] = useState(false)
     const [showStockDialog, setShowStockDialog] = useState(false)

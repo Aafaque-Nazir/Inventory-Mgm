@@ -1,7 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ScanBarcode, Crown } from 'lucide-react'
@@ -24,8 +22,7 @@ interface StockScannerProps {
     trigger?: React.ReactNode
 }
 
-export function StockScanner({ isPro = false, trigger }: StockScannerProps) {
-    const router = useRouter()
+export function StockScanner({ isPro: _isPro = false, trigger }: StockScannerProps) {
     const [isScanning, setIsScanning] = useState(false)
     const [selectedItem, setSelectedItem] = useState<Item | null>(null)
     const [showActionDialog, setShowActionDialog] = useState(false)

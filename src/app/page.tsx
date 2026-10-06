@@ -1,23 +1,14 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import {
-    Box,
     ChevronRight,
-    Zap,
     CheckCircle2,
     Activity,
     ScanLine,
-    Smartphone,
-    TrendingUp,
     Store,
-    Settings,
     ShoppingCart,
     Clock,
-    AlertCircle,
-    Share2,
-    Sparkles,
-    ShieldCheck,
-    FileText
+    Share2
 } from 'lucide-react'
 import { BrandLogo } from '@/components/common/BrandLogo'
 import { LandingNavbar } from '@/components/layout/LandingNavbar'
@@ -258,7 +249,7 @@ export default function Home() {
                             </span>
                             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white mb-4">
                                 Everything a Distributor Needs. <br />
-                                <span className="text-slate-400">Nothing You Don't.</span>
+                                <span className="text-slate-400">Nothing You Don&apos;t.</span>
                             </h2>
                             <p className="text-base sm:text-lg text-slate-400 font-medium">
                                 We cut the fluff of generic accounting software. InvMaster gives you real-time stock control, godown routing, and fast billing.
@@ -275,7 +266,7 @@ export default function Home() {
                                     </div>
                                     <h3 className="text-xl md:text-2xl font-bold text-white mb-2">Batch Number & Expiry Date Engine</h3>
                                     <p className="text-slate-400 text-sm md:text-base max-w-xl">
-                                        Prevent dead stock and retailer return disputes. Every inward entry captures batch numbers and expiry dates. Get automated 30-day expiry notifications so you can clear stock before it's too late.
+                                        Prevent dead stock and retailer return disputes. Every inward entry captures batch numbers and expiry dates. Get automated 30-day expiry notifications so you can clear stock before it&apos;s too late.
                                     </p>
                                 </div>
                                 <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-slate-300">
@@ -325,7 +316,7 @@ export default function Home() {
                                     </div>
                                     <h3 className="text-xl font-bold text-white mb-2">1-Click WhatsApp Invoicing</h3>
                                     <p className="text-slate-400 text-xs sm:text-sm">
-                                        Generate compliant GST invoices with HSN, CGST, and SGST breakups. Instantly dispatch formatted bills directly to your retailer's WhatsApp.
+                                        Generate compliant GST invoices with HSN, CGST, and SGST breakups. Instantly dispatch formatted bills directly to your retailer&apos;s WhatsApp.
                                     </p>
                                 </div>
                                 <div className="text-[11px] text-emerald-300 font-semibold flex items-center gap-1.5">

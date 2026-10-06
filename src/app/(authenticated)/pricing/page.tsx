@@ -1,6 +1,6 @@
 'use client'
 
-import { Check, X, Zap, Loader2, Sparkles, Phone, ShieldCheck, ArrowRight, Shield, CreditCard, RotateCcw, Clock, Building2 } from 'lucide-react'
+import { Check, X, Zap, Loader2, Sparkles, Phone, ShieldCheck, ArrowRight, Shield, CreditCard, RotateCcw, Clock } from 'lucide-react'
 import { TrialOfferDialog } from '@/components/subscription/TrialOfferDialog'
 import { Button } from '@/components/ui/button'
 import {
