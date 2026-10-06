@@ -322,3 +322,38 @@ export async function getInvoice(id: string) {
         return { error: err.message || 'Invoice not found' }
     }
 }
+
+export async function getSalesForExport(daysRange: number = 30) {
+    const supabase = await createClient()
+
+    try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return { error: 'Unauthorized' }
+
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('organization_id')
+            .eq('id', user.id)
+            .single()
+
+        if (!profile?.organization_id) return { error: 'No organization found' }
+
+        let query = supabase
+            .from('invoices')
+            .select('*, organization:organizations(name, gstin, address, phone), customer:customers(name, phone, gstin)')
+            .eq('organization_id', profile.organization_id)
+            .order('created_at', { ascending: false })
+
+        if (daysRange > 0) {
+            const sinceDate = new Date(Date.now() - daysRange * 24 * 60 * 60 * 1000).toISOString()
+            query = query.gte('created_at', sinceDate)
+        }
+
+        const { data: invoices, error } = await query.limit(2000)
+        if (error) throw error
+
+        return { invoices: invoices || [] }
+    } catch (err: any) {
+        return { error: err.message || 'Failed to fetch sales for export' }
+    }
+}

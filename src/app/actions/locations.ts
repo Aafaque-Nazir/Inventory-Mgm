@@ -66,10 +66,16 @@ export async function createLocation(data: { name: string; address?: string; org
 
     if (countError) return { error: "Failed to count locations" }
 
-    // 3. Enforce Limit (Pro = 2) 
-    const MAX_LOCATIONS = 2
-    if (org.plan_type !== 'ENTERPRISE' && (count || 0) >= MAX_LOCATIONS) {
-        return { error: `Pro Plan is limited to ${MAX_LOCATIONS} Warehouses. Upgrade to Enterprise for unlimited.` }
+    // 3. Enforce Limit (Free = 1, Pro = 5 Godowns)
+    const isPro = org.plan_type === 'PRO' || profile.is_super_admin
+    const maxLocations = isPro ? 5 : 1
+
+    if (!isPro && (count || 0) >= 1) {
+        return { error: 'Free Plan includes 1 Warehouse/Godown. Upgrade to Pro to manage up to 5 Godowns.' }
+    }
+
+    if ((count || 0) >= maxLocations && !profile.is_super_admin) {
+        return { error: `Pro Plan supports up to ${maxLocations} Warehouses/Godowns.` }
     }
 
     const { error } = await supabase

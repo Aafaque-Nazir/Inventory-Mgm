@@ -167,6 +167,12 @@ export function InvoiceTemplate({ invoice, organization }: InvoiceTemplateProps)
                     <p className="font-medium text-slate-700">Authorized Signatory</p>
                 </div>
             </div>
+
+            {invoice.organization?.plan_type !== 'PRO' && (
+                <div className="mt-4 pt-2 border-t border-dashed border-slate-200 text-center text-[9px] text-slate-400 font-medium">
+                    Powered by <span className="font-bold text-slate-700">InvMaster</span> • Free GST Invoicing & Inventory for Wholesalers
+                </div>
+            )}
         </div>
     )
 }

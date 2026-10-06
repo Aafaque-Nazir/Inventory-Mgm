@@ -53,75 +53,88 @@ export function LoginForm() {
     }
 
     return (
-        <div
-            className="grid gap-4"
-        >
+        <div className="space-y-3">
             <GoogleSignInButton />
 
-            <div className="relative">
+            <div className="relative my-2">
                 <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-white/5" />
+                    <span className="w-full border-t border-white/[0.08]" />
                 </div>
-                <div className="relative flex justify-center text-[10px] font-semibold tracking-widest uppercase">
-                    <span className="bg-[#0a0a0a] px-3 text-slate-500">
+                <div className="relative flex justify-center text-[10px] font-semibold tracking-wider uppercase">
+                    <span className="bg-[#111412] px-2 text-neutral-500">
                         Or continue with email
                     </span>
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit}>
-                <div className="grid gap-4">
-                    <div className="grid gap-2 group">
-                        <Label htmlFor="email" className="text-slate-400 text-xs font-semibold uppercase tracking-wider group-focus-within:text-emerald-400 transition-colors">Email</Label>
-                        <div className="relative">
-                            <Mail className="absolute left-3.5 top-3.5 h-5 w-5 text-slate-500 group-focus-within:text-emerald-400 transition-colors" />
-                            <Input
-                                id="email"
-                                type="email"
-                                placeholder="name@company.com"
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="pl-11 h-14 bg-black/40 border-white/10 text-white placeholder:text-slate-600 focus:bg-black/60 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all rounded-xl"
-                            />
-                        </div>
+            <form onSubmit={handleSubmit} className="space-y-2.5">
+                <div className="space-y-1 group">
+                    <Label htmlFor="email" className="text-neutral-300 text-[11px] font-medium group-focus-within:text-emerald-400 transition-colors">
+                        Email Address
+                    </Label>
+                    <div className="relative">
+                        <Mail className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-neutral-500 group-focus-within:text-emerald-400 transition-colors" />
+                        <Input
+                            id="email"
+                            type="email"
+                            placeholder="name@company.com"
+                            required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="pl-8 h-9 bg-[#0B0E0C] border-white/10 text-white placeholder:text-neutral-500 text-xs focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all rounded-lg"
+                        />
                     </div>
-                    <div className="grid gap-2 group">
-                        <div className="flex items-center justify-between">
-                            <Label htmlFor="password" className="text-slate-400 text-xs font-semibold uppercase tracking-wider group-focus-within:text-emerald-400 transition-colors">Password</Label>
-                        </div>
-                        <div className="relative">
-                            <Lock className="absolute left-3.5 top-3.5 h-5 w-5 text-slate-500 group-focus-within:text-emerald-400 transition-colors" />
-                            <Input
-                                id="password"
-                                type="password"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="pl-11 h-14 bg-black/40 border-white/10 text-white placeholder:text-slate-600 focus:bg-black/60 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all rounded-xl"
-                            />
-                        </div>
-                    </div>
-                    <Button
-                        className="w-full h-14 bg-emerald-500 hover:bg-emerald-400 text-[#04160c] font-bold shadow-[0_0_25px_rgba(16,185,129,0.3)] transition-all duration-300 rounded-xl hover:scale-[1.01] active:scale-[0.99]"
-                        type="submit"
-                        disabled={loading}
-                    >
-                        {loading ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                            <>
-                                Sign In <ArrowRight className="ml-2 h-4 w-4" />
-                            </>
-                        )}
-                    </Button>
                 </div>
+
+                <div className="space-y-1 group">
+                    <div className="flex items-center justify-between">
+                        <Label htmlFor="password" className="text-neutral-300 text-[11px] font-medium group-focus-within:text-emerald-400 transition-colors">
+                            Password
+                        </Label>
+                        <Link
+                            href="/forgot-password"
+                            className="text-[11px] font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
+                        >
+                            Forgot password?
+                        </Link>
+                    </div>
+                    <div className="relative">
+                        <Lock className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-neutral-500 group-focus-within:text-emerald-400 transition-colors" />
+                        <Input
+                            id="password"
+                            type="password"
+                            placeholder="Enter your password"
+                            required
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="pl-8 h-9 bg-[#0B0E0C] border-white/10 text-white placeholder:text-neutral-500 text-xs focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all rounded-lg"
+                        />
+                    </div>
+                </div>
+
+                <Button
+                    className="w-full h-9 bg-emerald-500 hover:bg-emerald-400 text-black font-semibold transition-all duration-200 rounded-lg text-xs mt-1"
+                    type="submit"
+                    disabled={loading}
+                >
+                    {loading ? (
+                        <>
+                            <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                            Signing in...
+                        </>
+                    ) : (
+                        <>
+                            <span>Sign In</span>
+                            <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                        </>
+                    )}
+                </Button>
             </form>
 
-            <div className="text-center">
-                <p className="text-sm text-slate-400">
+            <div className="text-center pt-1">
+                <p className="text-xs text-neutral-400">
                     Don&apos;t have an account?{" "}
-                    <Link href="/signup" className="font-semibold text-emerald-400 hover:text-emerald-300 transition-colors hover:underline underline-offset-4">
+                    <Link href="/signup" className="font-semibold text-emerald-400 hover:text-emerald-300 transition-colors">
                         Create an account
                     </Link>
                 </p>

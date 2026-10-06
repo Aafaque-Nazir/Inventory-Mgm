@@ -10,10 +10,10 @@ export function LandingNavbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
     return (
-        <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-[#070908]/80 backdrop-blur-2xl supports-[backdrop-filter]:bg-[#070908]/60 transition-all duration-300">
-            <div className="container mx-auto flex h-16 md:h-20 items-center justify-between px-4 sm:px-6 md:px-12">
+        <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-[#070908]/85 backdrop-blur-2xl transition-all duration-300">
+            <div className="container mx-auto flex h-14 md:h-16 items-center justify-between px-4 sm:px-6 md:px-10">
                 <Link href="/" className="flex items-center">
-                    <BrandLogo size="md" showTagline={false} />
+                    <BrandLogo size="sm" showTagline={false} />
                 </Link>
 
                 {/* Desktop Navigation Links */}
@@ -27,12 +27,11 @@ export function LandingNavbar() {
                 {/* Desktop & Mobile Actions */}
                 <div className="flex items-center gap-3 sm:gap-5">
                     <Link href="/login" className="hidden sm:block text-sm font-medium text-slate-400 hover:text-white transition-colors">Log in</Link>
-                    <Link href="/signup">
-                        <Button size="sm" className="rounded-full h-9 sm:h-10 px-4 sm:px-6 bg-emerald-500 text-[#04160c] hover:bg-emerald-400 font-bold shadow-[0_0_25px_-5px_rgba(16,185,129,0.5)] transition-all hover:scale-105 active:scale-95 border border-emerald-400/30 relative overflow-hidden group text-xs sm:text-sm">
-                            <span className="relative z-10 flex items-center gap-1.5 sm:gap-2">Get Access <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></span>
-                            <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:animate-shimmer" />
-                        </Button>
-                    </Link>
+                    <Button asChild size="sm" className="rounded-full h-9 sm:h-9.5 px-4 sm:px-5 bg-emerald-500 text-black hover:bg-emerald-400 font-semibold shadow-sm transition-all hover:scale-[1.02] active:scale-95 text-xs sm:text-sm">
+                        <Link href="/signup">
+                            <span className="flex items-center gap-1.5">Get Access <ChevronRight className="h-3.5 w-3.5" /></span>
+                        </Link>
+                    </Button>
                     {/* Mobile Hamburger Button */}
                     <Button
                         variant="ghost"

@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Plus, Trash2, ShoppingCart, Loader2, Printer, Search } from 'lucide-react'
+import { Plus, Trash2, ShoppingCart, Loader2, Printer, Search, Share2 } from 'lucide-react'
 import { createInvoice } from '@/app/actions/invoices'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
@@ -221,6 +221,36 @@ export function RecordSaleDialog({ trigger, initialItem, open: controlledOpen, o
         })
     }
 
+    const handleWhatsAppShare = () => {
+        if (!lastInvoiceData) return
+        const custName = lastInvoiceData.customer_name || 'Customer'
+        const total = Number(lastInvoiceData.total_amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })
+        const invId = lastInvoiceData.id ? lastInvoiceData.id.slice(0, 8).toUpperCase() : 'BILL'
+
+        const rawPhone = lastInvoiceData.customer_phone ? String(lastInvoiceData.customer_phone).replace(/\D/g, '') : ''
+        const targetPhone = rawPhone.length === 10 ? `91${rawPhone}` : (rawPhone.length === 12 && rawPhone.startsWith('91') ? rawPhone : '')
+
+        const itemsList = Array.isArray(lastInvoiceData.items) ? lastInvoiceData.items : []
+        const itemLines = itemsList.slice(0, 4).map((it: any) => `• ${it.name} (x${it.quantity}) - ₹${Number(it.total || 0).toFixed(0)}`).join('\n')
+        const moreCount = itemsList.length > 4 ? `\n• ...aur ${itemsList.length - 4} items` : ''
+
+        const text = `🧾 *Tax Invoice #${invId}*
+*Bill To:* ${custName}
+*Total Amount:* ₹${total}
+*Payment:* ${lastInvoiceData.payment_method || paymentMethod || 'CASH'}
+
+*Items Summary:*
+${itemLines}${moreCount}
+
+Thank you for your business! 🙏`
+
+        const url = targetPhone
+            ? `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`
+            : `https://wa.me/?text=${encodeURIComponent(text)}`
+
+        window.open(url, '_blank')
+    }
+
     const reset = () => {
         setCart([])
         setCustomerName('')
@@ -362,11 +392,24 @@ export function RecordSaleDialog({ trigger, initialItem, open: controlledOpen, o
                             </div>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row gap-3 w-full pt-3 border-t bg-white dark:bg-slate-950 p-3 sm:p-4 shrink-0">
-                            <Button className="flex-1 bg-slate-900 text-white hover:bg-slate-800 h-10" onClick={() => window.print()}>
-                                <Printer className="mr-2 h-4 w-4" /> Print Receipt
+                        <div className="flex flex-col sm:flex-row gap-2.5 w-full pt-3 border-t bg-slate-50 dark:bg-slate-950 p-3 sm:p-4 shrink-0">
+                            <Button
+                                onClick={handleWhatsAppShare}
+                                className="flex-1 border border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 font-bold h-10 gap-1.5 rounded-xl transition-all"
+                            >
+                                <Share2 className="h-4 w-4 text-emerald-400" /> WhatsApp Bill
                             </Button>
-                            <Button className="flex-1 h-10" variant="outline" onClick={reset}>
+                            <Button
+                                className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-[#04160c] font-black h-10 gap-1.5 rounded-xl shadow-md shadow-emerald-500/20 transition-all"
+                                onClick={() => window.print()}
+                            >
+                                <Printer className="h-4 w-4" /> Print / PDF
+                            </Button>
+                            <Button
+                                className="flex-1 h-10 rounded-xl border-white/10 hover:bg-white/10 font-semibold"
+                                variant="outline"
+                                onClick={reset}
+                            >
                                 New Sale
                             </Button>
                         </div>

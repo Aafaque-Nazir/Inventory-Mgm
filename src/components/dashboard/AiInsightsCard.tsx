@@ -38,7 +38,7 @@ const colorStyleMap: Record<string, {
 }> = {
     red: {
         border: 'border-rose-500/30',
-        bg: 'bg-gradient-to-r from-rose-950/30 via-[#120a0b] to-[#0c0607]',
+        bg: 'bg-[#150f11]',
         badgeBg: 'bg-rose-500/15 border-rose-500/30',
         badgeText: 'text-rose-300',
         text: 'text-rose-200',
@@ -50,7 +50,7 @@ const colorStyleMap: Record<string, {
     },
     yellow: {
         border: 'border-amber-500/30',
-        bg: 'bg-gradient-to-r from-amber-950/25 via-[#131109] to-[#0d0d08]',
+        bg: 'bg-[#14120b]',
         badgeBg: 'bg-amber-500/15 border-amber-500/30',
         badgeText: 'text-amber-300',
         text: 'text-amber-100',
@@ -62,7 +62,7 @@ const colorStyleMap: Record<string, {
     },
     green: {
         border: 'border-emerald-500/30',
-        bg: 'bg-gradient-to-r from-emerald-950/25 via-[#0c1611] to-[#08100c]',
+        bg: 'bg-[#0e1410]',
         badgeBg: 'bg-emerald-500/15 border-emerald-500/30',
         badgeText: 'text-emerald-300',
         text: 'text-emerald-100',
@@ -74,7 +74,7 @@ const colorStyleMap: Record<string, {
     },
     purple: {
         border: 'border-purple-500/30',
-        bg: 'bg-gradient-to-r from-purple-950/25 via-[#130d17] to-[#0c0810]',
+        bg: 'bg-[#130f18]',
         badgeBg: 'bg-purple-500/15 border-purple-500/30',
         badgeText: 'text-purple-300',
         text: 'text-purple-100',
@@ -86,7 +86,7 @@ const colorStyleMap: Record<string, {
     },
     blue: {
         border: 'border-teal-500/30',
-        bg: 'bg-gradient-to-r from-teal-950/25 via-[#0b1615] to-[#070f0e]',
+        bg: 'bg-[#0d1413]',
         badgeBg: 'bg-teal-500/15 border-teal-500/30',
         badgeText: 'text-teal-300',
         text: 'text-teal-100',

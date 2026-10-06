@@ -61,10 +61,6 @@ export default function PrivacyPage() {
           </p>
         </div>
       </div>
-      
-      {/* Background decoration */}
-      <div className="fixed top-[20%] right-[-10%] w-[500px] h-[500px] bg-emerald-900/15 blur-[140px] rounded-full -z-10 pointer-events-none"></div>
-      <div className="fixed bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-emerald-950/20 blur-[140px] rounded-full -z-10 pointer-events-none"></div>
     </div>
   )
 }

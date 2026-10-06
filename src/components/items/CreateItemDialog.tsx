@@ -39,6 +39,7 @@ interface CreateItemDialogProps {
     defaultSize?: string
     defaultColor?: string
     hideTrigger?: boolean
+    trigger?: React.ReactNode
 }
 
 export function CreateItemDialog({
@@ -50,7 +51,8 @@ export function CreateItemDialog({
     defaultUnit = 'pcs',
     defaultSize = '',
     defaultColor = '',
-    hideTrigger = false
+    hideTrigger = false,
+    trigger
 }: CreateItemDialogProps = {}) {
     const [internalOpen, setInternalOpen] = useState(false)
     const isControlled = controlledOpen !== undefined
@@ -144,16 +146,18 @@ export function CreateItemDialog({
         <Dialog open={open} onOpenChange={setOpen}>
             {!hideTrigger && (
                 <DialogTrigger asChild>
-                    <Button>
-                        <Plus className="mr-2 h-4 w-4" /> Add Item
-                    </Button>
+                    {trigger || (
+                        <Button className="h-10 px-5 bg-emerald-500 hover:bg-emerald-400 text-black font-semibold rounded-xl shadow-sm text-xs sm:text-sm gap-2">
+                            <Plus className="mr-1.5 h-4 w-4" /> Add Item
+                        </Button>
+                    )}
                 </DialogTrigger>
             )}
             <DialogContent className="sm:max-w-[425px] overflow-y-auto max-h-[90vh]">
                 <DialogHeader>
                     <DialogTitle>Add New Item</DialogTitle>
                     <DialogDescription>
-                        Create a new item. Free plan limited to 50 items.
+                        Create a new item in your inventory. Free plan includes up to 200 items.
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={onSubmit} className="space-y-4">

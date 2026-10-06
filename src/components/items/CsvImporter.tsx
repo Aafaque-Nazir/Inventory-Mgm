@@ -38,7 +38,11 @@ interface CsvItem {
     color: string
 }
 
-export function CsvImporter() {
+interface CsvImporterProps {
+    trigger?: React.ReactNode
+}
+
+export function CsvImporter({ trigger }: CsvImporterProps = {}) {
     const [open, setOpen] = useState(false)
     const [data, setData] = useState<CsvItem[]>([])
     const [__fileName, setFileName] = useState('')
@@ -110,9 +114,11 @@ export function CsvImporter() {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline">
-                    <Upload className="mr-2 h-4 w-4" /> Import CSV
-                </Button>
+                {trigger || (
+                    <Button variant="outline">
+                        <Upload className="mr-2 h-4 w-4" /> Import CSV
+                    </Button>
+                )}
             </DialogTrigger>
             <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
                 <DialogHeader>

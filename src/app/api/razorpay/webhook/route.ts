@@ -27,7 +27,50 @@ export async function POST(req: NextRequest) {
         }
 
         const event = JSON.parse(bodyText)
+
+        // ── 1. Recurring Subscription Charged (UPI Autopay / e-Mandate) ──
+        if (event.event === 'subscription.charged') {
+            const subscriptionEntity = event.payload?.subscription?.entity
+            const paymentEntity = event.payload?.payment?.entity
+            const subId = subscriptionEntity?.id
+            const paymentId = paymentEntity?.id
+
+            if (subId) {
+                const supabaseAdmin = createSupabaseAdmin(
+                    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                    process.env.SUPABASE_SERVICE_ROLE_KEY!
+                )
+
+                // Try finding by subscription order
+                const { data: orderRow } = await supabaseAdmin
+                    .from('payment_orders')
+                    .select('*')
+                    .eq('order_id', subId)
+                    .maybeSingle()
+
+                const orgId = orderRow?.organization_id || subscriptionEntity?.notes?.org_id
+                const cycle = subscriptionEntity?.notes?.cycle
+                const durationDays = cycle === 'yearly' || Number(orderRow?.amount) >= 900 ? 365 : 30
+
+                if (orgId) {
+                    await activateProPlan(orgId, durationDays)
+
+                    if (orderRow) {
+                        await supabaseAdmin
+                            .from('payment_orders')
+                            .update({
+                                status: 'SUCCESS',
+                                razorpay_payment_id: paymentId || orderRow.razorpay_payment_id,
+                                updated_at: new Date().toISOString()
+                            })
+                            .eq('id', orderRow.id)
+                    }
+                }
+            }
+            return NextResponse.json({ success: true })
+        }
         
+        // ── 2. Standard One-Time Order Paid ─────────────────────────────
         if (event.event === 'payment.captured' || event.event === 'order.paid') {
             const paymentEntity = event.payload.payment?.entity || event.payload.order?.entity
             const orderId = paymentEntity.order_id
@@ -50,8 +93,8 @@ export async function POST(req: NextRequest) {
 
             if (!orderError && orderRow && orderRow.status !== 'SUCCESS') {
                 const orgId = orderRow.organization_id
-                
-                await activateProPlan(orgId, 30)
+                const durationDays = Number(orderRow.amount) >= 900 ? 365 : 30
+                await activateProPlan(orgId, durationDays)
 
                 await supabaseAdmin
                     .from('payment_orders')

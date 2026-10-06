@@ -89,14 +89,11 @@ export default function ContactPage() {
                             className="flex min-h-[80px] w-full rounded-xl border border-white/10 bg-black/50 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:border-emerald-500/50 focus-visible:ring-1 focus-visible:ring-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-50"
                         />
                     </div>
-                    <Button className="w-full bg-emerald-500 hover:bg-emerald-400 text-[#04160c] font-bold h-12 rounded-xl shadow-[0_0_25px_rgba(16,185,129,0.3)] transition-all">Send Message</Button>
+                    <Button className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-semibold h-11 rounded-xl shadow-sm transition-all">Send Message</Button>
                 </form>
             </div>
         </div>
       </div>
-      
-      {/* Background decoration */}
-      <div className="fixed top-[-10%] left-[-10%] w-[600px] h-[600px] bg-emerald-600/10 blur-[150px] rounded-full -z-10 pointer-events-none"></div>
     </div>
   )
 }

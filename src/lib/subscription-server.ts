@@ -54,8 +54,8 @@ export async function activateProPlan(
                 plan_type: 'PRO',
                 subscription_status: 'ACTIVE',
                 subscription_end_date: newEndDate,
-                max_users: 10, // Upgraded from hardcoded 5 to 10 for team scaling
-                max_items: 25000,
+                max_users: 5,
+                max_items: 100000,
                 trial_used: true
             })
             .eq('id', orgId)

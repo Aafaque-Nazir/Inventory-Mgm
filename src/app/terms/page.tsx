@@ -51,8 +51,6 @@ export default function TermsPage() {
           </p>
         </div>
       </div>
-       {/* Background decoration */}
-      <div className="fixed top-[20%] right-[-10%] w-[500px] h-[500px] bg-emerald-900/15 blur-[140px] rounded-full -z-10 pointer-events-none"></div>
     </div>
   )
 }

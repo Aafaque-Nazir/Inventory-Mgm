@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
                 plan_type: 'FREE',
                 subscription_status: 'EXPIRED',
                 max_users: 1,
-                max_items: 50
+                max_items: 200
             })
             .in('id', expiredIds)
 

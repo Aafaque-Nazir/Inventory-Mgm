@@ -27,9 +27,10 @@ import { Label } from '@/components/ui/label'
 interface ExportButtonProps {
     items: any[]
     isPro: boolean
+    trigger?: React.ReactNode
 }
 
-export function ExportButton({ items, isPro }: ExportButtonProps) {
+export function ExportButton({ items, isPro, trigger }: ExportButtonProps) {
     const router = useRouter()
     const [open, setOpen] = useState(false)
     const [dateRange, setDateRange] = useState('lifetime') // lifetime, 30, 60
@@ -99,20 +100,34 @@ export function ExportButton({ items, isPro }: ExportButtonProps) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button
-                    variant="outline"
-                    onClick={(e) => {
-                        if (!isPro) {
-                            e.preventDefault()
-                            handleClick()
-                        }
-                    }}
-                    className={!isPro ? "opacity-70" : "bg-white/5 border-white/10 text-slate-200 hover:bg-white/10 hover:text-white rounded-xl backdrop-blur-sm transition-all"}
-                >
-                    <Download className="mr-2 h-4 w-4" />
-                    Export CSV
-                    {!isPro && <Crown className="ml-2 h-4 w-4 text-amber-500 fill-amber-500" />}
-                </Button>
+                {trigger ? (
+                    <div
+                        onClick={(e) => {
+                            if (!isPro) {
+                                e.preventDefault()
+                                handleClick()
+                            }
+                        }}
+                        className="cursor-pointer inline-block"
+                    >
+                        {trigger}
+                    </div>
+                ) : (
+                    <Button
+                        variant="outline"
+                        onClick={(e) => {
+                            if (!isPro) {
+                                e.preventDefault()
+                                handleClick()
+                            }
+                        }}
+                        className={!isPro ? "opacity-70" : "bg-white/5 border-white/10 text-slate-200 hover:bg-white/10 hover:text-white rounded-xl backdrop-blur-sm transition-all"}
+                    >
+                        <Download className="mr-2 h-4 w-4" />
+                        Export CSV
+                        {!isPro && <Crown className="ml-2 h-4 w-4 text-amber-500 fill-amber-500" />}
+                    </Button>
+                )}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>

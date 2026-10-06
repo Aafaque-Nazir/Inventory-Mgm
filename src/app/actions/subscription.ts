@@ -51,7 +51,7 @@ export async function startFreeTrial(targetOrganizationId?: string) {
         return { error: 'Free trial already used for this organization.' }
     }
 
-    if (org.plan_type === 'PRO' || org.plan_type === 'ENTERPRISE') {
+    if (org.plan_type === 'PRO') {
         return { error: 'You are already on a premium plan.' }
     }
 

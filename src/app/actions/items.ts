@@ -66,7 +66,7 @@ export async function createItem(prevState: any, formData: FormData) {
         // TypeScript workaround for nested join
         const org = profile.organizations as any
         let plan = org?.plan_type || 'FREE'
-        const maxItems = org?.max_items || 50
+        const maxItems = org?.max_items || 200
         const isSuperAdmin = profile.is_super_admin
 
         // Check for Expiry
@@ -210,7 +210,7 @@ export async function bulkCreateItems(rawItems: any[]) {
         const orgId = profile.organization_id
         const org = profile.organizations as any
         let plan = org?.plan_type || 'FREE'
-        const maxItems = org?.max_items || 50
+        const maxItems = org?.max_items || 200
         const isSuperAdmin = profile.is_super_admin
 
         // Check for Expiry

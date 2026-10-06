@@ -21,9 +21,10 @@ import {
 
 interface StockScannerProps {
     isPro?: boolean
+    trigger?: React.ReactNode
 }
 
-export function StockScanner({ isPro = false }: StockScannerProps) {
+export function StockScanner({ isPro = false, trigger }: StockScannerProps) {
     const router = useRouter()
     const [isScanning, setIsScanning] = useState(false)
     const [selectedItem, setSelectedItem] = useState<Item | null>(null)
@@ -54,33 +55,21 @@ export function StockScanner({ isPro = false }: StockScannerProps) {
 
     return (
         <>
-            <Button
-                variant="outline"
-                size="sm"
-                className="gap-1 sm:gap-2 border-dashed sm:size-default relative group overflow-visible"
-                onClick={() => {
-                    if (!isPro) {
-                        toast("⭐ Locked Feature", {
-                            description: "Stock scanning is a Pro feature. Upgrade to unlock!",
-                            action: {
-                                label: "Upgrade Now",
-                                onClick: () => router.push("/pricing")
-                            },
-                            duration: 4000
-                        })
-                        return
-                    }
-                    setIsScanning(true)
-                }}
-            >
-                {!isPro && (
-                    <div className="absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow-sm border border-yellow-500/20">
-                        <Crown className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                    </div>
-                )}
-                <ScanBarcode className="h-4 w-4" />
-                <span className="hidden xs:inline">Scan to</span> Action
-            </Button>
+            {trigger ? (
+                <div onClick={() => setIsScanning(true)} className="inline-block cursor-pointer">
+                    {trigger}
+                </div>
+            ) : (
+                <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1 sm:gap-2 border-dashed sm:size-default relative group overflow-visible"
+                    onClick={() => setIsScanning(true)}
+                >
+                    <ScanBarcode className="h-4 w-4" />
+                    <span className="hidden xs:inline">Scan to</span> Action
+                </Button>
+            )}
 
             <BarcodeScanner
                 open={isScanning}

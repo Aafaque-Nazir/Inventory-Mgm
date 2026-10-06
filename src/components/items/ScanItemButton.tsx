@@ -14,9 +14,10 @@ import { useRouter } from 'next/navigation'
 
 interface ScanItemButtonProps {
     isPro?: boolean
+    trigger?: React.ReactNode
 }
 
-export function ScanItemButton({ isPro = false }: ScanItemButtonProps) {
+export function ScanItemButton({ isPro = false, trigger }: ScanItemButtonProps) {
     const router = useRouter()
     const [isScanning, setIsScanning] = useState(false)
     const [showCreateDialog, setShowCreateDialog] = useState(false)
@@ -111,32 +112,20 @@ export function ScanItemButton({ isPro = false }: ScanItemButtonProps) {
 
     return (
         <>
-            <Button
-                onClick={() => {
-                    if (!isPro) {
-                        toast("⭐ Locked Feature", {
-                            description: "Barcode scanning is a Pro feature. Upgrade to unlock!",
-                            action: {
-                                label: "Upgrade Now",
-                                onClick: () => router.push("/pricing")
-                            },
-                            duration: 4000
-                        })
-                        return
-                    }
-                    setIsScanning(true)
-                }}
-                className="gap-2 bg-emerald-500 hover:bg-emerald-400 text-[#04160c] font-bold shadow-lg shadow-emerald-500/20 relative group overflow-visible"
-            >
-                {!isPro && (
-                    <div className="absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow-sm border border-yellow-500/20">
-                        <Crown className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                    </div>
-                )}
-                <ScanBarcode className="h-4 w-4" />
-                <span className="hidden xs:inline">Scan to Add</span>
-                <span className="xs:hidden">Scan</span>
-            </Button>
+            {trigger ? (
+                <div onClick={() => setIsScanning(true)} className="inline-block cursor-pointer">
+                    {trigger}
+                </div>
+            ) : (
+                <Button
+                    onClick={() => setIsScanning(true)}
+                    className="gap-2 bg-emerald-500 hover:bg-emerald-400 text-[#04160c] font-bold shadow-lg shadow-emerald-500/20 relative group overflow-visible"
+                >
+                    <ScanBarcode className="h-4 w-4" />
+                    <span className="hidden xs:inline">Scan to Add</span>
+                    <span className="xs:hidden">Scan</span>
+                </Button>
+            )}
 
             <BarcodeScanner
                 open={isScanning}

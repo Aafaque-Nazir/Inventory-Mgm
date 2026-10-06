@@ -8,9 +8,9 @@ import { activateProPlan } from '@/lib/subscription-server'
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json()
-        const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body
+        const { razorpay_order_id, razorpay_subscription_id, razorpay_payment_id, razorpay_signature, cycle } = body
 
-        if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+        if (!razorpay_payment_id || !razorpay_signature || (!razorpay_order_id && !razorpay_subscription_id)) {
             return NextResponse.json({ success: false, error: 'Missing payment details' }, { status: 400 })
         }
 
@@ -28,9 +28,15 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: false, error: 'Payment gateway configuration error' }, { status: 500 })
         }
 
+        // Subscriptions use: payment_id + '|' + subscription_id
+        // Standard orders use: order_id + '|' + payment_id
+        const expectedMessage = razorpay_subscription_id
+            ? `${razorpay_payment_id}|${razorpay_subscription_id}`
+            : `${razorpay_order_id}|${razorpay_payment_id}`
+
         const generated_signature = crypto
             .createHmac('sha256', secretKey)
-            .update(razorpay_order_id + "|" + razorpay_payment_id)
+            .update(expectedMessage)
             .digest('hex')
 
         if (generated_signature !== razorpay_signature) {
@@ -43,11 +49,12 @@ export async function POST(req: NextRequest) {
             process.env.SUPABASE_SERVICE_ROLE_KEY!
         )
 
-        // Find the payment order
+        // Find the payment order / subscription record
+        const lookupId = (razorpay_subscription_id || razorpay_order_id)!
         const { data: orderRow, error: orderError } = await supabaseAdmin
             .from('payment_orders')
             .select('*')
-            .eq('order_id', razorpay_order_id)
+            .eq('order_id', lookupId)
             .single()
 
         if (orderError || !orderRow) {
@@ -62,8 +69,9 @@ export async function POST(req: NextRequest) {
 
         const orgId = orderRow.organization_id
 
-        // Centralized plan activation
-        const activationResult = await activateProPlan(orgId, 30)
+        // Centralized plan activation based on cycle or order amount (Yearly >= ₹900 -> 365 days, else 30 days)
+        const durationDays = cycle === 'yearly' || Number(orderRow.amount) >= 900 ? 365 : 30
+        const activationResult = await activateProPlan(orgId, durationDays)
         if (!activationResult.success) {
             console.error('Organization Update Error:', activationResult.error)
             return NextResponse.json({ success: false, error: activationResult.error || 'Failed to update organization plan' }, { status: 500 })

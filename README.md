@@ -28,7 +28,7 @@ Built to solve the "Spreadsheet Chaos" problem, InvMaster provides a clean, fast
 
 ### 📦 Smart Inventory & Operations
 
-- **Real-Time Tracking**: "Stock In" / "Stock Out" logs with facial audit trails.
+- **Real-Time Tracking**: "Stock In" / "Stock Out" logs with detailed user audit trails.
 - **Multi-Warehouse**: Manage stock across multiple physical locations.
 - **Mobile PWA**: Built-in support for barcode scanning using mobile cameras.
 - **Bulk Operations**: CSV Import/Export for mass updates.
@@ -61,7 +61,7 @@ Built to solve the "Spreadsheet Chaos" problem, InvMaster provides a clean, fast
 - **State Management**: React Hooks & Context
 - **Forms**: [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/)
 - **Visualizations**: [Recharts](https://recharts.org/)
-- **Payments**: [Cashfree](https://www.cashfree.com/)
+- **Payments**: [Razorpay](https://razorpay.com/)
 - **Email**: [Resend](https://resend.com/)
 - **PWA**: @ducanh2912/next-pwa
 
@@ -74,7 +74,7 @@ Built to solve the "Spreadsheet Chaos" problem, InvMaster provides a clean, fast
 - Node.js 18+ installed
 - A Supabase account (for Database & Auth)
 - A Resend account (for emails)
-- A Cashfree account (optional, for payments)
+- A Razorpay account (optional, for payments)
 
 ### Installation
 

@@ -1,5 +1,5 @@
 import { LoginForm } from '@/components/auth/LoginForm'
-import { Command } from 'lucide-react'
+import { Command, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { Metadata } from 'next'
 
@@ -10,67 +10,72 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
     return (
-        <div className="relative min-h-[100dvh] flex flex-col items-center justify-center bg-[#070908] overflow-hidden p-4 md:p-8 pt-24 pb-8">
-            {/* Ambient Background Orbs */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] rounded-full bg-emerald-600/15 blur-[140px] mix-blend-screen" />
-                <div className="absolute top-[40%] -right-[10%] w-[40%] h-[60%] rounded-full bg-teal-800/10 blur-[150px] mix-blend-screen" />
-                <div className="absolute -bottom-[20%] left-[20%] w-[60%] h-[50%] rounded-full bg-emerald-800/15 blur-[160px] mix-blend-screen" />
-            </div>
-            
-            {/* Grain Overlay */}
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] mix-blend-overlay pointer-events-none"></div>
+        <div className="relative min-h-[100dvh] flex flex-col justify-between bg-[#080908] text-white overflow-hidden" suppressHydrationWarning>
+            {/* Top Navigation Bar */}
+            <header className="w-full max-w-5xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3.5 relative z-20">
+                <Link href="/" className="flex items-center gap-2 group">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500 shadow-md shadow-emerald-500/20 transition-transform group-hover:scale-105">
+                        <Command className="h-3.5 w-3.5 text-black" />
+                    </div>
+                    <span className="text-base font-bold tracking-tight text-white group-hover:text-emerald-400 transition-colors">
+                        InvMaster
+                    </span>
+                </Link>
 
-            {/* Logo */}
-            <div className="absolute top-6 left-6 md:top-8 md:left-8 flex items-center text-xl font-bold tracking-tight z-20">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)] mr-3">
-                    <Command className="h-5 w-5 text-black" />
-                </div>
-                InvMaster
-            </div>
+                <Link
+                    href="/"
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-400 hover:text-white transition-colors bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 px-3 py-1.5 rounded-lg"
+                >
+                    <ArrowLeft className="h-3.5 w-3.5" />
+                    <span>Back to Website</span>
+                </Link>
+            </header>
 
-            <div className="relative flex w-full max-w-[450px] items-center justify-center z-10 animate-in fade-in zoom-in duration-700">
-                {/* Emerald Glow Behind Card */}
-                <div className="absolute -inset-1 bg-emerald-500/10 blur-2xl rounded-[32px] pointer-events-none opacity-60" />
+            {/* Center Auth Card */}
+            <main className="flex-1 flex items-center justify-center px-4 py-2 relative z-10 w-full">
+                <div 
+                    className="w-full mx-auto"
+                    style={{ maxWidth: '380px' }}
+                >
+                    {/* Compact Card */}
+                    <div 
+                        className="w-full rounded-2xl border border-white/[0.08] bg-[#111412] p-5 sm:p-6 relative z-10"
+                        style={{
+                            boxShadow: '0 24px 48px -12px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+                        }}
+                    >
+                        <div className="text-center mb-4">
+                            <div className="mx-auto flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/20 mb-2.5">
+                                <Command className="h-4 w-4 text-emerald-400" />
+                            </div>
+                            <h1 className="text-xl font-bold tracking-tight text-white">
+                                Welcome back
+                            </h1>
+                            <p className="text-xs text-neutral-400 mt-0.5">
+                                Enter your credentials to access your workspace
+                            </p>
+                        </div>
 
-                {/* Elevated Obsidian Card */}
-                <div className="mx-auto flex w-full flex-col justify-center space-y-6 relative z-10 p-6 sm:p-10 rounded-[32px] border border-white/10 bg-[#111613] backdrop-blur-[40px] shadow-[0_12px_40px_0_rgba(0,0,0,0.7),inset_0_1px_1px_0_rgba(255,255,255,0.08)] overflow-hidden">
-                    
-                    {/* Inner subtle noise for texture on the card */}
-                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] mix-blend-overlay pointer-events-none rounded-[32px]"></div>
+                        <LoginForm />
 
-                    <div className="flex flex-col space-y-2 text-center md:text-left relative z-10">
-                        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2">
-                            Welcome back
-                        </h1>
-                        <p className="text-sm text-slate-400 font-medium">
-                            Enter your credentials to access your workspace
+                        <p className="mt-3 text-center text-[10px] text-neutral-500 leading-normal">
+                            By continuing, you agree to our{' '}
+                            <Link href="/terms" className="underline underline-offset-2 hover:text-neutral-300 transition-colors">
+                                Terms
+                            </Link>
+                            {' '}and{' '}
+                            <Link href="/privacy" className="underline underline-offset-2 hover:text-neutral-300 transition-colors">
+                                Privacy Policy
+                            </Link>.
                         </p>
                     </div>
-
-                    <div className="relative z-10 w-full">
-                        <LoginForm />
-                    </div>
-
-                    <div className="text-center text-sm text-slate-400 mt-6 relative z-10">
-                        <Link href="/forgot-password" className="font-medium underline hover:text-white transition-colors underline-offset-4">
-                            Forgot your password?
-                        </Link>
-                    </div>
-
-                    <p className="px-2 text-center text-sm text-slate-500 relative z-10 mt-4 leading-relaxed">
-                        By clicking continue, you agree to our{" "}
-                        <Link href="/terms" className="font-medium underline underline-offset-4 hover:text-white transition-colors">
-                            Terms of Service
-                        </Link>{" "}
-                        and{" "}
-                        <Link href="/privacy" className="font-medium underline underline-offset-4 hover:text-white transition-colors">
-                            Privacy Policy
-                        </Link>
-                        .
-                    </p>
                 </div>
-            </div>
+            </main>
+
+            {/* Bottom minimal note */}
+            <footer className="py-2.5 text-center text-[10px] text-neutral-600 relative z-10" suppressHydrationWarning>
+                &copy; {new Date().getFullYear()} InvMaster. All rights reserved.
+            </footer>
         </div>
     )
 }

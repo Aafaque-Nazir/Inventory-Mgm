@@ -1,6 +1,6 @@
 'use client'
 
-import { Check, X, Zap, Loader2, Sparkles, Phone, ShieldCheck, ArrowRight, Shield, CreditCard, RotateCcw, Clock } from 'lucide-react'
+import { Check, X, Zap, Loader2, Sparkles, Phone, ShieldCheck, ArrowRight, Shield, CreditCard, RotateCcw, Clock, Building2 } from 'lucide-react'
 import { TrialOfferDialog } from '@/components/subscription/TrialOfferDialog'
 import { Button } from '@/components/ui/button'
 import {
@@ -18,6 +18,7 @@ import { toast } from 'sonner'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Script from 'next/script'
+import { PLANS_CONFIG } from '@/config/plans'
 
 export default function PricingPage() {
     const [loading, setLoading] = useState(false)
@@ -30,6 +31,9 @@ export default function PricingPage() {
     const [orgId, setOrgId] = useState<string>('')
     const [showTrialDialog, setShowTrialDialog] = useState(false)
 
+    // Billing Cycle State: Yearly by default for best SMB retention and savings
+    const [billingCycle, setBillingCycle] = useState<'yearly' | 'monthly'>('yearly')
+
     // Phone Dialog State
     const [phoneModalOpen, setPhoneModalOpen] = useState(false)
     const [phone, setPhone] = useState('')
@@ -37,7 +41,6 @@ export default function PricingPage() {
 
     const supabase = createClient()
 
-    // Verify Payment Effect handled in Razorpay popup callback
     useEffect(() => {
         // Reserved for future query-param based flows if needed
     }, [searchParams])
@@ -164,7 +167,7 @@ export default function PricingPage() {
             const res = await fetch('/api/razorpay/create-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone: phoneToUse })
+                body: JSON.stringify({ phone: phoneToUse, cycle: billingCycle })
             })
 
             let data: any = null
@@ -182,20 +185,10 @@ export default function PricingPage() {
                 return
             }
 
-            const options = {
+            const options: any = {
                 key: data.key,
-                amount: data.amount,
-                currency: "INR",
-                name: "Inventory Pro",
-                description: "Pro Plan Subscription",
-                order_id: data.orderId,
-                handler: function (response: any) {
-                    verifyPayment({
-                        razorpay_payment_id: response.razorpay_payment_id,
-                        razorpay_order_id: response.razorpay_order_id,
-                        razorpay_signature: response.razorpay_signature
-                    })
-                },
+                name: "InvMaster Pro",
+                description: billingCycle === 'yearly' ? 'InvMaster Pro Annual Subscription' : 'InvMaster Pro Monthly Subscription',
                 prefill: {
                     contact: phoneToUse
                 },
@@ -207,6 +200,32 @@ export default function PricingPage() {
                         setLoading(false)
                         toast.info("Payment cancelled")
                     }
+                }
+            }
+
+            if (data.subscriptionId) {
+                // Razorpay Recurring Subscription (UPI Autopay / e-Mandate)
+                options.subscription_id = data.subscriptionId
+                options.handler = function (response: any) {
+                    verifyPayment({
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_subscription_id: response.razorpay_subscription_id,
+                        razorpay_signature: response.razorpay_signature,
+                        cycle: billingCycle
+                    })
+                }
+            } else {
+                // Fallback: One-time order
+                options.amount = data.amount * 100 // in paise
+                options.currency = "INR"
+                options.order_id = data.orderId
+                options.handler = function (response: any) {
+                    verifyPayment({
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_signature: response.razorpay_signature,
+                        cycle: billingCycle
+                    })
                 }
             }
 
@@ -232,59 +251,104 @@ export default function PricingPage() {
         )
     }
 
+    const currentProConfig = PLANS_CONFIG.pro[billingCycle]
+    const proPrice = currentProConfig.price
+    const proMonthlyEquivalent = currentProConfig.monthlyEquivalent
+
     return (
-        <div className="w-full max-w-6xl mx-auto space-y-6 sm:space-y-8 pb-10">
+        <div className="w-full max-w-5xl mx-auto space-y-8 pb-12">
             <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
 
             {/* Header */}
-            <div className="text-center space-y-2 pt-1 sm:pt-2">
+            <div className="text-center space-y-3 pt-2">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
                     <Sparkles className="h-3.5 w-3.5" />
-                    <span>Transparent Pricing & Plans</span>
+                    <span>Simple, Transparent Pricing for Wholesalers</span>
                 </div>
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white">
-                    Predictable Plans for Growing Operations
+                    Built for Fast Inventory, Not Bloated ERPs
                 </h1>
                 <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
-                    Pick the plan that fits your inventory scale. Switch or cancel anytime with zero lock-in.
+                    Manage godowns, batch expiry, purchase orders, and GST bills with zero hidden fees. Upgrade or cancel anytime.
                 </p>
+
+                {/* Billing Cycle Toggle */}
+                <div className="pt-2 flex items-center justify-center">
+                    <div className="inline-flex p-1 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md">
+                        <button
+                            type="button"
+                            onClick={() => setBillingCycle('monthly')}
+                            className={cn(
+                                "px-4 py-2 rounded-xl text-xs font-semibold transition-all",
+                                billingCycle === 'monthly'
+                                    ? "bg-white/15 text-white shadow-sm"
+                                    : "text-slate-400 hover:text-white"
+                            )}
+                        >
+                            Monthly ({PLANS_CONFIG.pro.monthly.displayPrice}/mo)
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setBillingCycle('yearly')}
+                            className={cn(
+                                "px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2",
+                                billingCycle === 'yearly'
+                                    ? "bg-emerald-500 text-[#04160c] shadow-md shadow-emerald-500/25"
+                                    : "text-emerald-400 hover:text-emerald-300"
+                            )}
+                        >
+                            <span>Yearly ({PLANS_CONFIG.pro.yearly.displayPrice}/yr)</span>
+                            {PLANS_CONFIG.isFoundingOfferActive && (
+                                <span className={cn(
+                                    "text-[10px] uppercase px-1.5 py-0.5 rounded-full font-extrabold tracking-wider",
+                                    billingCycle === 'yearly' ? "bg-[#04160c] text-emerald-300" : "bg-emerald-500/20 text-emerald-300"
+                                )}>
+                                    {PLANS_CONFIG.pro.yearly.badge}
+                                </span>
+                            )}
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            {/* Pricing Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 items-stretch">
+            {/* 2-Tier Pricing Grid: Free vs Pro */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch max-w-4xl mx-auto">
                 
                 {/* 1. Starter (Free) Plan */}
                 <div className={cn(
-                    "relative flex flex-col justify-between rounded-2xl border border-white/10 bg-[#0e1410]/80 backdrop-blur-xl p-5 sm:p-6 transition-all duration-200 hover:border-white/20 shadow-lg",
+                    "relative flex flex-col justify-between rounded-3xl border border-white/10 bg-[#0e1410]/90 backdrop-blur-xl p-6 sm:p-7 transition-all duration-200 hover:border-white/20 shadow-xl",
                     currentPlan === 'FREE' && "ring-1 ring-white/15"
                 )}>
                     <div>
                         <div className="flex items-center justify-between">
-                            <h3 className="text-base sm:text-lg font-bold text-white">Starter</h3>
+                            <h3 className="text-lg font-bold text-white">Starter</h3>
                             {currentPlan === 'FREE' && (
-                                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-white/10 text-slate-300 border border-white/10">
+                                <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-white/10 text-slate-300 border border-white/10">
                                     Current Plan
                                 </span>
                             )}
                         </div>
                         <p className="text-xs text-slate-400 mt-1 min-h-[32px]">
-                            Essential tools for small shops and single retail outlets just getting started.
+                            Ideal for small retail shops and single godown businesses getting started with digitized inventory.
                         </p>
 
-                        <div className="my-4 pb-4 border-b border-white/5 flex items-baseline gap-1.5">
-                            <span className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">₹0</span>
-                            <span className="text-xs text-slate-400 font-medium">/ month</span>
+                        <div className="my-5 pb-5 border-b border-white/5 flex items-baseline gap-1.5">
+                            <span className="text-4xl font-extrabold text-white tracking-tight">₹0</span>
+                            <span className="text-xs text-slate-400 font-medium">/ lifetime free</span>
                         </div>
 
-                        <div className="space-y-2.5 mb-6">
-                            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Included features</p>
+                        <div className="space-y-3 mb-6">
+                            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Included In Free</p>
                             <ul className="space-y-2.5 text-xs">
                                 {[
-                                    '1 Team Member (Admin)',
-                                    'Basic Inventory & SKU Tracking',
-                                    'Sales & Invoice Generation',
-                                    'Standard Stock Level Reports',
-                                    'Low Stock Alert Table',
+                                    'Up to 200 Products / SKUs',
+                                    '1 Warehouse / Central Godown',
+                                    '1 Admin Account',
+                                    'Mobile Camera Barcode Scanner (No hardware needed)',
+                                    'GST Tax Invoicing with HSN codes',
+                                    '1-Click WhatsApp Invoice Dispatch',
+                                    'Batch Number & Expiry Tracking',
+                                    'Basic Stock In / Stock Out Movements'
                                 ].map((feature) => (
                                     <li key={feature} className="flex items-center gap-2.5 text-slate-300">
                                         <Check className="h-4 w-4 text-emerald-400 shrink-0" />
@@ -292,10 +356,12 @@ export default function PricingPage() {
                                     </li>
                                 ))}
                                 {[
-                                    'Financial & Profit Analytics',
-                                    'Barcode & QR Code Scanner',
-                                    'Multi-Warehouse Transfers',
-                                    'AI Restock Predictions'
+                                    'Multi-Godown Inter-Warehouse Transfers',
+                                    'Multi-User Team Roles (Manager, Storekeeper)',
+                                    'Stock Audit Trail & Activity Logs',
+                                    'Wholesale Purchase Orders & Receiving',
+                                    'Real-Time P&L & Dead Stock Analytics',
+                                    'Automated Low-Stock Email Alerts'
                                 ].map((feature) => (
                                     <li key={feature} className="flex items-center gap-2.5 text-slate-500">
                                         <X className="h-4 w-4 text-slate-600 shrink-0" />
@@ -308,7 +374,7 @@ export default function PricingPage() {
 
                     <div className="pt-2">
                         <Button
-                            className="w-full bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 rounded-xl h-10 text-xs font-semibold transition-colors"
+                            className="w-full bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 rounded-xl h-11 text-xs font-semibold cursor-default"
                             disabled
                         >
                             {currentPlan === 'FREE' ? 'Active Plan' : 'Free Tier'}
@@ -316,59 +382,63 @@ export default function PricingPage() {
                     </div>
                 </div>
 
-                {/* 2. Pro Plan (Highlighted) */}
+                {/* 2. Pro Plan (Distributor Growth) */}
                 <div className={cn(
-                    "relative flex flex-col justify-between rounded-2xl border border-emerald-500/40 bg-gradient-to-b from-[#112419] to-[#0d1a13] backdrop-blur-xl p-5 sm:p-6 shadow-[0_0_35px_-5px_rgba(16,185,129,0.18)] ring-1 ring-emerald-500/40 transition-all duration-200 hover:border-emerald-500/70",
+                    "relative flex flex-col justify-between rounded-3xl border border-emerald-500/30 bg-[#0e1410] p-6 sm:p-7 shadow-xl ring-1 ring-emerald-500/30 transition-all duration-200 hover:border-emerald-500/50",
                     currentPlan === 'PRO' && "ring-2 ring-emerald-400"
                 )}>
-                    {/* Badge */}
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-500 text-[#04160c] text-[11px] font-bold tracking-wide uppercase shadow-md shadow-emerald-500/30">
-                        <Zap className="h-3 w-3 fill-current" />
-                        Most Popular
-                    </div>
-
                     <div>
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
-                                <h3 className="text-base sm:text-lg font-bold text-white">Pro</h3>
-                                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                    GROWTH
+                                <h3 className="text-lg font-bold text-white">Pro Plan</h3>
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 tracking-wider uppercase">
+                                    {billingCycle === 'yearly' && PLANS_CONFIG.isFoundingOfferActive ? PLANS_CONFIG.pro.yearly.badge : 'Pro Tier'}
                                 </span>
                             </div>
                             {currentPlan === 'PRO' && subStatus === 'TRIALING' ? (
-                                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
                                     Trial Active
                                 </span>
                             ) : currentPlan === 'PRO' ? (
-                                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                                     Current Plan
                                 </span>
-                            ) : null}
+                            ) : (
+                                <span className="text-[10px] font-semibold text-slate-400">
+                                    Distributor Tier
+                                </span>
+                            )}
                         </div>
                         <p className="text-xs text-emerald-200/70 mt-1 min-h-[32px]">
-                            High-velocity tools, AI forecasts, and multi-warehouse operations.
+                            Engineered for high-volume distributors, FMCG/Pharma dealers, and multi-godown operations.
                         </p>
 
-                        <div className="my-4 pb-4 border-b border-emerald-500/20 flex items-baseline gap-1.5">
-                            <span className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">₹49</span>
-                            <span className="text-xs text-emerald-300/70 font-medium">/ month</span>
-                            <span className="ml-auto text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                                Launch Price
+                        <div className="my-5 pb-5 border-b border-emerald-500/20 flex items-baseline gap-2">
+                            <span className="text-4xl font-extrabold text-white tracking-tight">₹{proPrice}</span>
+                            <span className="text-xs text-emerald-300/70 font-medium">
+                                / {billingCycle === 'yearly' ? `year (~₹${proMonthlyEquivalent}/mo)` : 'month'}
                             </span>
+                            {currentProConfig.regularPrice && (
+                                <span className="ml-auto text-xs text-slate-400 line-through">
+                                    Reg. ₹{currentProConfig.regularPrice}
+                                </span>
+                            )}
                         </div>
 
-                        <div className="space-y-2.5 mb-6">
-                            <p className="text-[11px] font-semibold uppercase tracking-wider text-emerald-400">Everything in Starter, plus</p>
+                        <div className="space-y-3 mb-6">
+                            <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Everything in Starter, plus</p>
                             <ul className="space-y-2.5 text-xs">
                                 {[
-                                    'Up to 5 Team Members',
-                                    'Advanced Financial & Profit Analytics',
-                                    'Barcode & QR Scanner (Camera & Hardware)',
-                                    'Stock Movement Audit Trail & Logs',
-                                    'Multi-Warehouse Transfers & Routing',
-                                    'Automated Low Stock Email Alerts',
-                                    'AI Restock & Sales Forecasts',
-                                    'Bulk CSV Import & Export'
+                                    'Unlimited Products & Inventory SKUs',
+                                    'Up to 5 Godowns & Multi-Warehouse Stock Routing',
+                                    'Up to 5 Team Members with Granular Roles (Admin, Manager, Storekeeper)',
+                                    'Stock Movement Audit Trail & Leakage Protection',
+                                    'Wholesale Purchase Order Loop (Draft -> Approve -> Receive)',
+                                    'Sales Returns & Credit Notes System',
+                                    'Real-Time Profit & Loss (P&L) and Margins Analytics',
+                                    'Automated Low-Stock & Expiry Alert Emails',
+                                    'Bulk CSV Catalog Import & Export',
+                                    'Clean Invoices without any InvMaster watermark'
                                 ].map((feature) => (
                                     <li key={feature} className="flex items-center gap-2.5 text-slate-100 font-medium">
                                         <Check className="h-4 w-4 text-emerald-400 shrink-0" />
@@ -382,7 +452,7 @@ export default function PricingPage() {
                     <div className="pt-2 space-y-2">
                         {currentPlan === 'PRO' && subStatus !== 'TRIALING' ? (
                             <Button
-                                className="w-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl h-10 text-xs font-semibold cursor-default"
+                                className="w-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl h-11 text-xs font-semibold cursor-default"
                                 disabled
                             >
                                 <Check className="mr-2 h-4 w-4" /> Current Active Plan
@@ -392,23 +462,23 @@ export default function PricingPage() {
                                 {currentPlan === 'PRO' && subStatus === 'TRIALING' && (
                                     <div className="p-2.5 bg-amber-500/10 border border-amber-500/20 rounded-xl text-center">
                                         <p className="text-xs font-semibold text-amber-300">
-                                            Trial Expiring Soon
+                                            Trial Active
                                         </p>
                                         <p className="text-[11px] text-amber-200/70 mt-0.5">
-                                            Upgrade now to keep your data and Pro access uninterrupted.
+                                            Lock in your Pro membership today to avoid any interruption in multi-godown sync.
                                         </p>
                                     </div>
                                 )}
 
                                 {currentPlan === 'FREE' && !trialUsed && (
                                     <Button
-                                        className="w-full bg-emerald-500 hover:bg-emerald-400 text-[#04160c] font-bold border-0 rounded-xl h-10 text-xs shadow-md shadow-emerald-500/20 transition-all"
+                                        className="w-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded-xl h-11 text-xs font-bold transition-all"
                                         onClick={() => {
                                             toast.info("Opening trial offer...")
                                             setShowTrialDialog(true)
                                         }}
                                     >
-                                        <Sparkles className="mr-1.5 h-4 w-4 fill-[#04160c]" />
+                                        <Sparkles className="mr-1.5 h-4 w-4 fill-emerald-300" />
                                         Start 5-Day Free Trial
                                     </Button>
                                 )}
@@ -416,23 +486,17 @@ export default function PricingPage() {
                                 <Button
                                     onClick={handleUpgradeClick}
                                     disabled={loading}
-                                    variant={currentPlan === 'FREE' && !trialUsed ? 'outline' : 'default'}
-                                    className={cn(
-                                        "w-full rounded-xl h-10 text-xs font-bold transition-all",
-                                        currentPlan === 'FREE' && !trialUsed
-                                            ? "border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300"
-                                            : "bg-emerald-500 hover:bg-emerald-400 text-[#04160c] border-0 shadow-md shadow-emerald-500/25"
-                                    )}
+                                    className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold border-0 rounded-xl shadow-md shadow-emerald-500/15 transition-all h-11 text-xs"
                                 >
                                     {loading ? (
                                         <>
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Connecting...
+                                            Connecting Gateway...
                                         </>
                                     ) : (
                                         <>
-                                            <Zap className={cn("mr-1.5 h-4 w-4", currentPlan === 'FREE' && !trialUsed ? "text-emerald-400" : "fill-[#04160c]")} />
-                                            {currentPlan === 'FREE' && !trialUsed ? 'Or Pay ₹49/mo Directly' : 'Upgrade to Pro — ₹49/mo'}
+                                            <Zap className="mr-1.5 h-4 w-4 fill-[#04160c]" />
+                                            Upgrade to Pro — ₹{proPrice}{billingCycle === 'yearly' ? (PLANS_CONFIG.isFoundingOfferActive ? ' /yr (Founding Deal)' : ' /yr') : ' /mo'}
                                         </>
                                     )}
                                 </Button>
@@ -441,80 +505,30 @@ export default function PricingPage() {
                     </div>
                 </div>
 
-                {/* 3. Enterprise Plan */}
-                <div className="relative flex flex-col justify-between rounded-2xl border border-white/10 bg-[#0e1410]/80 backdrop-blur-xl p-5 sm:p-6 transition-all duration-200 hover:border-white/20 shadow-lg">
-                    <div>
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-base sm:text-lg font-bold text-white">Enterprise</h3>
-                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20">
-                                CUSTOM
-                            </span>
-                        </div>
-                        <p className="text-xs text-slate-400 mt-1 min-h-[32px]">
-                            Dedicated infrastructure, custom integrations, and SLA guarantees for large fleets.
-                        </p>
-
-                        <div className="my-4 pb-4 border-b border-white/5 flex items-baseline gap-1.5">
-                            <span className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Custom</span>
-                            <span className="text-xs text-slate-400 font-medium">/ tailored quote</span>
-                        </div>
-
-                        <div className="space-y-2.5 mb-6">
-                            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Enterprise capabilities</p>
-                            <ul className="space-y-2.5 text-xs">
-                                {[
-                                    'Unlimited Team Members & Roles',
-                                    'Custom ERP & SAP API Integrations',
-                                    'Dedicated Technical Account Manager',
-                                    'Custom Feature & Module Development',
-                                    'On-Premises or Private Cloud Option',
-                                    '99.9% Uptime SLA & 24/7 Phone Support'
-                                ].map((feature) => (
-                                    <li key={feature} className="flex items-center gap-2.5 text-slate-300">
-                                        <Check className="h-4 w-4 text-emerald-400 shrink-0" />
-                                        <span>{feature}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div className="pt-2">
-                        <Button
-                            className="w-full bg-white/10 hover:bg-white/15 text-white border border-white/10 rounded-xl h-10 text-xs font-semibold transition-colors"
-                            asChild
-                        >
-                            <a href="mailto:sales@inventory.com?subject=Enterprise%20Plan%20Inquiry">
-                                Contact Sales <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
-                            </a>
-                        </Button>
-                    </div>
-                </div>
-
             </div>
 
             {/* Trust Signals Footer */}
-            <div className="border-t border-white/5 pt-6 mt-6">
+            <div className="border-t border-white/5 pt-6 mt-4">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                    <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-white/[0.02]">
+                    <div className="flex flex-col items-center gap-1 p-3 rounded-2xl bg-white/[0.02] border border-white/5">
                         <Shield className="h-4 w-4 text-emerald-400" />
                         <span className="text-xs font-semibold text-slate-200">256-Bit SSL</span>
-                        <span className="text-[10px] text-slate-500">Bank-grade security</span>
+                        <span className="text-[10px] text-slate-500">Bank-grade data security</span>
                     </div>
-                    <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-white/[0.02]">
+                    <div className="flex flex-col items-center gap-1 p-3 rounded-2xl bg-white/[0.02] border border-white/5">
                         <CreditCard className="h-4 w-4 text-emerald-400" />
                         <span className="text-xs font-semibold text-slate-200">Razorpay PG</span>
                         <span className="text-[10px] text-slate-500">UPI, Cards & NetBanking</span>
                     </div>
-                    <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-white/[0.02]">
+                    <div className="flex flex-col items-center gap-1 p-3 rounded-2xl bg-white/[0.02] border border-white/5">
                         <Clock className="h-4 w-4 text-emerald-400" />
                         <span className="text-xs font-semibold text-slate-200">Instant Activation</span>
                         <span className="text-[10px] text-slate-500">No waiting time</span>
                     </div>
-                    <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-white/[0.02]">
+                    <div className="flex flex-col items-center gap-1 p-3 rounded-2xl bg-white/[0.02] border border-white/5">
                         <RotateCcw className="h-4 w-4 text-emerald-400" />
-                        <span className="text-xs font-semibold text-slate-200">Cancel Anytime</span>
-                        <span className="text-[10px] text-slate-500">No lock-in or contracts</span>
+                        <span className="text-xs font-semibold text-slate-200">Zero Lock-In</span>
+                        <span className="text-[10px] text-slate-500">Keep full control of data</span>
                     </div>
                 </div>
             </div>
@@ -548,16 +562,16 @@ export default function PricingPage() {
 
                     <form onSubmit={handleConfirmPayment} className="space-y-4 pt-2">
                         {/* Plan & Amount Summary */}
-                        <div className="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-white/10">
+                        <div className="flex items-center justify-between p-3.5 rounded-xl bg-black/40 border border-white/10">
                             <div className="flex items-center gap-2">
                                 <span className="text-xs font-medium text-slate-400">Plan:</span>
                                 <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                                    PRO Monthly
+                                    {billingCycle === 'yearly' ? 'PRO Yearly (Founding Deal)' : 'PRO Monthly'}
                                 </span>
                             </div>
                             <div className="text-right">
                                 <span className="text-xs text-slate-400 mr-1.5">Total:</span>
-                                <span className="text-lg font-extrabold text-white">₹49</span>
+                                <span className="text-xl font-extrabold text-white">₹{proPrice}</span>
                             </div>
                         </div>
 
@@ -627,7 +641,7 @@ export default function PricingPage() {
                                     </>
                                 ) : (
                                     <>
-                                        Proceed to Pay ₹49
+                                        Proceed to Pay ₹{proPrice}
                                         <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
                                     </>
                                 )}

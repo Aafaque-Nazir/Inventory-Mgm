@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseAdmin } from '@supabase/supabase-js'
 import crypto from 'crypto'
 import { extractOrg } from '@/lib/subscription'
+import { PLANS_CONFIG } from '@/config/plans'
 
 export async function POST(req: NextRequest) {
     try {
@@ -93,20 +94,55 @@ export async function POST(req: NextRequest) {
         // ── Cryptographically random receipt ID ──────────────────────────
         const receiptId = `rcpt_${crypto.randomUUID().replace(/-/g, '').slice(0, 10)}`
 
-        const amount = 4900 // Razorpay works in paise (₹49 = 4900 paise)
+        const isYearly = body?.cycle === 'yearly'
+        const planConfig = isYearly ? PLANS_CONFIG.pro.yearly : PLANS_CONFIG.pro.monthly
+        const priceInRupees = planConfig.price
+        const amountInPaise = priceInRupees * 100
         
-        const options = {
-            amount: amount,
-            currency: 'INR',
-            receipt: receiptId,
-            notes: {
-                customer_id: user.id,
-                org_id: orgId
+        let subscriptionId: string | null = null
+        let orderId: string | null = null
+
+        // ── 1. Create Recurring Subscription (Autopay) if Plan ID configured ──
+        if (planConfig.razorpayPlanId) {
+            try {
+                const subResponse: any = await razorpay.subscriptions.create({
+                    plan_id: planConfig.razorpayPlanId,
+                    total_count: isYearly ? 5 : 60,
+                    quantity: 1,
+                    customer_notify: 1,
+                    notes: {
+                        customer_id: user.id,
+                        org_id: orgId,
+                        cycle: planConfig.cycle,
+                        duration_days: String(planConfig.durationDays),
+                        plan_id: planConfig.razorpayPlanId
+                    }
+                })
+                subscriptionId = subResponse.id
+            } catch (subErr: any) {
+                console.warn('Subscription creation skipped or failed, falling back to Order:', subErr?.message || subErr)
             }
         }
 
-        const response = await razorpay.orders.create(options)
-        const orderId = response.id
+        // ── 2. Fallback to standard one-time order if no subscription created ──
+        if (!subscriptionId) {
+            const options = {
+                amount: amountInPaise,
+                currency: 'INR',
+                receipt: receiptId,
+                notes: {
+                    customer_id: user.id,
+                    org_id: orgId,
+                    cycle: planConfig.cycle,
+                    duration_days: String(planConfig.durationDays),
+                    plan_id: planConfig.razorpayPlanId || ''
+                }
+            }
+            const orderResponse = await razorpay.orders.create(options)
+            orderId = orderResponse.id
+        }
+
+        const trackingId = (subscriptionId || orderId)!
 
         // ── Record order & save customer phone in Supabase ────────────
         const supabaseAdmin = createSupabaseAdmin(
@@ -140,14 +176,20 @@ export async function POST(req: NextRequest) {
         await supabaseAdmin
             .from('payment_orders')
             .insert({
-                order_id: orderId,
+                order_id: trackingId,
                 organization_id: orgId,
                 user_id: user.id,
-                amount: 49,
+                amount: priceInRupees,
                 status: 'CREATED'
             })
 
-        return NextResponse.json({ orderId, amount: 49, key: keyId })
+        return NextResponse.json({
+            subscriptionId,
+            orderId,
+            amount: priceInRupees,
+            cycle: isYearly ? 'yearly' : 'monthly',
+            key: keyId
+        })
 
     } catch (error: any) {
         console.error('Razorpay Error:', error)

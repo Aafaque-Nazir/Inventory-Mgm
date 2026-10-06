@@ -96,7 +96,7 @@ export async function getAdminOverviewStats() {
             supabase.from('organizations').select('created_at, plan_type').order('created_at', { ascending: true })
         ])
 
-        const mrr = (proOrgs || 0) * 49 + (entOrgs || 0) * 9999
+        const mrr = (proOrgs || 0) * 199
 
         // Calculate simulated history based on creation dates
         // 1. Group by Month
@@ -128,12 +128,10 @@ export async function getAdminOverviewStats() {
             monthEnd.setMonth(monthEnd.getMonth() + 1)
 
             // Calculate revenue active at this point in time
-            // We assume current plan was active since creation (Approximation)
             const activeOrgs = (allOrgs || []).filter(o => new Date(o.created_at) < monthEnd)
 
             const rev = activeOrgs.reduce((sum, org) => {
-                if (org.plan_type === 'PRO') return sum + 49
-                if (org.plan_type === 'ENTERPRISE') return sum + 9999
+                if (org.plan_type === 'PRO') return sum + 199
                 return sum
             }, 0)
 
